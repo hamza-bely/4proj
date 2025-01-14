@@ -42,6 +42,9 @@
         <mxCell id="0A92OaaJmSJTrZx_7AOb-10" style="edgeStyle=none;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="Jw-5Fzuu9ZcGU-8pzG4B-2" target="0A92OaaJmSJTrZx_7AOb-9">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
+        <mxCell id="0A92OaaJmSJTrZx_7AOb-13" style="edgeStyle=none;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;" edge="1" parent="1" source="Jw-5Fzuu9ZcGU-8pzG4B-2" target="0A92OaaJmSJTrZx_7AOb-12">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
         <mxCell id="Jw-5Fzuu9ZcGU-8pzG4B-2" value="utilisateur" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" parent="1" vertex="1">
           <mxGeometry x="90" y="320" width="30" height="60" as="geometry" />
         </mxCell>
@@ -140,6 +143,21 @@
         </mxCell>
         <mxCell id="0A92OaaJmSJTrZx_7AOb-9" value="calculer le prix de traget" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
           <mxGeometry x="310" y="360" width="120" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="0A92OaaJmSJTrZx_7AOb-16" style="edgeStyle=none;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="0A92OaaJmSJTrZx_7AOb-12" target="0A92OaaJmSJTrZx_7AOb-14">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="0A92OaaJmSJTrZx_7AOb-17" style="edgeStyle=none;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="0A92OaaJmSJTrZx_7AOb-12" target="0A92OaaJmSJTrZx_7AOb-15">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="0A92OaaJmSJTrZx_7AOb-12" value="utilisateur crud" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="430" y="330" width="120" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="0A92OaaJmSJTrZx_7AOb-14" value="suppriem son compte" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="580" y="250" width="120" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="0A92OaaJmSJTrZx_7AOb-15" value="modifie son compte" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="580" y="300" width="120" height="40" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
