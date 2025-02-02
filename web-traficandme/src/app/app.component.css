@@ -1,0 +1,21 @@
+.header{
+  display: flex;
+  justify-content: center;
+}
+
+app-header{
+  display: flex;
+  justify-content: center;
+}
+app-root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+
+app-footer {
+  color: white;
+  text-align: center;
+  padding: 1px
+}
