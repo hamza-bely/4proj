@@ -1,66 +1,27 @@
-import { Component } from '@angular/core';
-import {ImportsModule} from '../../../primeng/imports';
-import {MenuItem} from 'primeng/api';
+import {Component, Inject} from '@angular/core';
+import {RouterLink} from '@angular/router';
+import {LoginComponent} from '../../connection/login/login.component';
+import {CountrySelectorComponent} from '../country-selector/country-selector.component';
+import {TranslateModule} from '@ngx-translate/core';
+import {ToastService} from '../toast/toast.service';
+import {MessageService} from 'primeng/api';
 
 @Component({
   selector: 'app-header',
-  imports: [ImportsModule],
+  imports: [RouterLink, LoginComponent, CountrySelectorComponent, TranslateModule],
   templateUrl: './header.component.html',
   standalone: true,
   styleUrl: './header.component.css'
 })
 export class HeaderComponent {
-  items: MenuItem[] | undefined;
+  constructor(private toastService: ToastService,private messageService: MessageService) {}
+  visible: boolean = false;
 
-  ngOnInit() {
-    this.items = [
-      {
-        label: 'Home',
-        icon: 'pi pi-home',
-        routerLink : [""]
-      },
-      {
-        label: 'Map',
-        icon: 'pi pi-map',
-        routerLink : ["/map"]
-      },
+  showDialog(event : boolean) {
+    this.visible = event;
+  }
 
-      {
-        label: 'Projects',
-        icon: 'pi pi-search',
-        items: [
-          {
-            label: 'Components',
-            icon: 'pi pi-bolt'
-          },
-          {
-            label: 'Blocks',
-            icon: 'pi pi-server'
-          },
-          {
-            label: 'UI Kit',
-            icon: 'pi pi-pencil'
-          },
-          {
-            label: 'Templates',
-            icon: 'pi pi-palette',
-            items: [
-              {
-                label: 'Apollo',
-                icon: 'pi pi-palette'
-              },
-              {
-                label: 'Ultima',
-                icon: 'pi pi-palette'
-              }
-            ]
-          }
-        ]
-      },
-      {
-        label: 'Contact',
-        icon: 'pi pi-envelope'
-      }
-    ]
+  notAvailable() {
+    this.toastService.showWarn("L'action n'est 'pas disponible pour le moment",this.messageService);
   }
 }
