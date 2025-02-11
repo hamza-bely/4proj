@@ -1,9 +1,9 @@
 import { Component } from '@angular/core';
-import {ImportsModule} from '../../../primeng/imports';
+import {TranslatePipe} from '@ngx-translate/core';
 
 @Component({
   selector: 'app-footer',
-  imports: [ImportsModule],
+  imports: [TranslatePipe],
   templateUrl: './footer.component.html',
   standalone: true,
   styleUrl: './footer.component.css'

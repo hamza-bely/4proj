@@ -1,0 +1,10 @@
+ul {
+  border: 1px solid #ddd;
+}
+li {
+  transition: background 0.2s;
+}
+li:hover {
+  background-color: #4f46e5;
+  color: white;
+}

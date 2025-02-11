@@ -1,0 +1,30 @@
+{
+  "header": {
+    "company" : "TraficAndMe",
+    "home" : "Accueil",
+    "map" : "Carte",
+    "log-in": "Log in"
+  },
+
+  "home": {
+    "title-mobile" : "Découvrez votre monde différemment",
+    "description-mobile" : "Notre application mobile de cartographie vous offre une navigation fluide, des itinéraires précis et des recommandations personnalisées pour explorer votre environnement."
+  },
+
+  "connexion": {
+    "title-login": "",
+    "title-register" : "",
+    "name": "",
+    "email": "",
+    "password": "",
+    "password-forgot" : "",
+    "or": "",
+    "button": {
+      "sign-in": ""
+    }
+  },
+
+  "footer" : {
+    "title": "© 2025 TRAFICANDME, Inc. Tous droits réservés."
+  }
+}

@@ -3,26 +3,20 @@ import * as L from 'leaflet';
 
 @Component({
   selector: 'app-map',
-  imports: [],
   templateUrl: './map.component.html',
-  standalone: true,
-  styleUrl: './map.component.css'
+  styleUrl: './map.component.css',
+  standalone: true
 })
-export class MapComponent implements OnInit{
+export class MapComponent implements OnInit {
+  private map!: L.Map;
   constructor() { }
 
   ngOnInit(): void {
-    // Initialiser la carte Leaflet
-    const map = L.map('map').setView([51.505, -0.09], 13); // Coordonnées de Londres, zoom 13
+    this.map = L.map('map').setView([51.505, -0.09], 14); // Coordonnées de Londres
 
-    // Ajouter une couche de tuiles (ici OpenStreetMap)
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-    }).addTo(map);
-
-    // Ajouter un marqueur à la carte
-    L.marker([51.505, -0.09]).addTo(map)
-      .bindPopup('<b>Hello world!</b><br>I am a popup.')
-      .openPopup();
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/">CARTO</a>',
+      subdomains: 'abcd'
+    }).addTo(this.map);
   }
 }

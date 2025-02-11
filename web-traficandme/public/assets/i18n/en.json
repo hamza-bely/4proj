@@ -1,0 +1,31 @@
+{
+  "header": {
+    "company" : "TraficAndme",
+    "home" : "Home",
+    "map" : "Map",
+    "log-in": "Log in"
+  },
+
+  "home": {
+    "title-mobile" : "Discover your world differently",
+    "description-mobile" : "Our mobile mapping app gives you seamless navigation, precise directions, and personalized recommendations for exploring your surroundings."
+  },
+
+  "connexion": {
+    "title-login": "",
+    "title-register" : "",
+    "name": "",
+    "email": "",
+    "password": "",
+    "password-forgot" : "",
+    "or": "",
+    "button": {
+      "sign-in": ""
+    }
+  },
+
+  "footer" : {
+  "title": "© 2025 TRAFICANDME, Inc. All rights reserved."
+  }
+
+}

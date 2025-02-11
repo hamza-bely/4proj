@@ -1,0 +1,23 @@
+<div class="relative">
+  <div class="relative ">
+    <button type="button" (click)="toggleDropdown()" class=" grid w-full cursor-pointer grid-cols-1  bg-white py-1.5 pr-2 pl-3 text-left text-gray-900  focus:ring-2 focus:ring-white sm:text-sm">
+      <span class="col-start-1 row-start-1 flex items-center gap-3 pr-6">
+        <img [src]="selectedLanguages.img" alt="User Image" class="size-5 shrink-0">
+        <span class="block truncate">{{ selectedLanguages.name }}</span>
+      </span>
+      <svg class="pointer-events-none col-start-1 row-start-1 mr-2 size-5 self-center justify-self-end text-gray-500 sm:size-4" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true" data-slot="icon">
+        <path fill-rule="evenodd" d="M4.22 6.22a.75.75 0 0 1 1.06 0L8 8.94l2.72-2.72a.75.75 0 1 1 1.06 1.06l-3.25 3.25a.75.75 0 0 1-1.06 0L4.22 7.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" />
+      </svg>
+    </button>
+    @if(isOpen){
+      <ul  class="absolute z-10 mt-1 max-h-56 w-full overflow-auto rounded-md bg-white shadow-lg ring-1 ring-black/5 focus:outline-none sm:text-sm">
+        @for(language of languages;track language){
+        <li (click)="selectUser(language)" class="cursor-pointer py-2 px-3 flex items-center hover:bg-indigo-600 hover:text-white">
+          <img src="{{ language.img }}" alt="User Image" class="size-5 shrink-0 " fill="">
+          <span class="ml-3 block truncate">{{ language.name }}</span>
+        </li>
+        }
+      </ul>
+    }
+  </div>
+</div>
