@@ -5,3 +5,29 @@ on:
     branches:
       - main
       - develop
+    paths:
+      - 'web-traficandme/**'
+  workflow_dispatch:
+  
+jobs:
+   build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+      
+      - name: Install dependencies
+        run: |
+          cd web-traficandme
+          npm install
+      
+      - name: Build Angular app
+        run: |
+          cd web-traficandme
+          npm run build --prod
+
