@@ -38,9 +38,6 @@ jobs:
     runs-on: self-hosted
     needs: build
     steps:
-      - name: Installer sshpass
-        run: sudo apt-get update && sudo apt-get install -y sshpass
-
       - name: Créer un répertoire sur le serveur distant
         run: |
           sshpass -p "${{ secrets.PASSWORD }}" ssh -o StrictHostKeyChecking=no -p ${{ secrets.PORT }} ${{ secrets.USERNAME }}@${{ secrets.HOST }} 'mkdir -p test'
