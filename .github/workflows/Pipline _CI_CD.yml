@@ -1,6 +1,9 @@
-name: Pipline _CI_CD
+name: Pipline_CI_CD
 
 on:
+  push:
+    branches:
+      - main
   pull_request:
     branches:
       - main
@@ -8,9 +11,9 @@ on:
     paths:
       - 'web-traficandme/**'
   workflow_dispatch:
-  
+
 jobs:
-   build:
+  build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -31,3 +34,10 @@ jobs:
           cd web-traficandme
           npm run build --prod
 
+  build-and-deploy:
+    runs-on: self-hosted
+    needs: build
+    steps:
+      - name: Create directory on remote server
+        run: |
+          sshpass -p "${{ secrets.PASSWORD }}" ssh -o StrictHostKeyChecking=no -p ${{ secrets.PORT }} ${{ secrets.USERNAME }}@${{ secrets.HOST }} 'mkdir -p ~/test'
