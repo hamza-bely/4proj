@@ -16,9 +16,11 @@ import {MessageService} from 'primeng/api';
 export class HeaderComponent {
   constructor(private toastService: ToastService,private messageService: MessageService) {}
   visible: boolean = false;
+  isRegister = false;
 
   showDialog(event : boolean) {
     this.visible = event;
+    this.isRegister = false;
   }
 
   notAvailable() {

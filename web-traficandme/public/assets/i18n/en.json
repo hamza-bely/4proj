@@ -11,16 +11,17 @@
     "description-mobile" : "Our mobile mapping app gives you seamless navigation, precise directions, and personalized recommendations for exploring your surroundings."
   },
 
-  "connexion": {
-    "title-login": "",
-    "title-register" : "",
-    "name": "",
-    "email": "",
-    "password": "",
-    "password-forgot" : "",
-    "or": "",
+  "connection": {
+    "title-login": "Sign in to your account",
+    "title-register" : "Register now",
+    "name": "name",
+    "email": "e-mail",
+    "password": "password",
+    "password-forgot" : "Forgot password?",
+    "not-member" : "Not a member?",
+    "or": "Or",
     "button": {
-      "sign-in": ""
+      "sign-in": "Sign-in"
     }
   },
 

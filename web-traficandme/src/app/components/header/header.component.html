@@ -20,11 +20,11 @@
       <img class="h-12 w-auto" [src]="'assets/images/logo/logo_2.png'" alt="Logo" height="800" width="800">
     </a>
     <div class="flex flex-1 justify-end">
-      <button  type="button" (click)="showDialog(true)"  class="text-sm/6 font-semibold text-gray-900 ">{{ 'header.log-in' | translate }}<span aria-hidden="true">&rarr;</span></button>
+      <button  type="button" (click)="showDialog(true)"  class="cursor-pointer text-sm/6 font-semibold text-gray-900 ">{{ 'header.log-in' | translate }}<span aria-hidden="true">&rarr;</span></button>
       <app-country-selector/>
     </div>
   </nav>
-  <!-- Mobile menu, show/hide based on menu open state. -->
+  <!-- Mobile menu, show/hide based on menu open state. TODO partie mobile  -->
   <div class="lg:hidden" role="dialog" aria-modal="true">
     <!-- Background backdrop, show/hide based on slide-over state. -->
     <div class="fixed inset-0 z-10"></div>

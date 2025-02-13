@@ -11,16 +11,17 @@
     "description-mobile" : "Notre application mobile de cartographie vous offre une navigation fluide, des itinéraires précis et des recommandations personnalisées pour explorer votre environnement."
   },
 
-  "connexion": {
-    "title-login": "",
-    "title-register" : "",
-    "name": "",
-    "email": "",
-    "password": "",
-    "password-forgot" : "",
-    "or": "",
+  "connection": {
+    "title-login": "Connectez-vous à votre compte",
+    "title-register" : "Inscrivez-vous maintenant",
+    "name": "nom",
+    "email": "e-mail",
+    "password": "mot de passe",
+    "password-forgot" : "Mot de passe oublié ?",
+    "not-member" : "Pas encore inscrit?",
+    "or": "ou",
     "button": {
-      "sign-in": ""
+      "sign-in": "Se connecter"
     }
   },
 

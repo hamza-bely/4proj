@@ -1,5 +1,5 @@
 @if(visible){
-<div class="modal-overlay card-login flex justify-center">
+  <div class="modal-overlay card-login flex justify-center">
     <div class="modal" [style]="{ width: '40rem' } ">
       <div class="sm:mx-auto sm:w-full sm:max-w-md">
         <div class="absolute top-0 right-0 hidden pt-4 pr-4 sm:block">
@@ -28,7 +28,7 @@
             </div>
             <div class="flex items-center justify-between">
               <div class="text-sm/6">
-                <a href="#" class="font-semibold text-indigo-600 hover:text-indigo-500">{{ 'connection.password-forgot' | translate }}</a>
+                <a href="#" class="font-semibold text-color-global hover:text-indigo-500">{{ 'connection.password-forgot' | translate }}</a>
               </div>
             </div>
             <div>
@@ -65,11 +65,9 @@
         </div>
         <div class="mt-10 text-center text-sm/6 text-gray-500">
           {{ 'connection.not-member' | translate }}
-         <p class="cursor-pointer text-color-global"> {{ 'connection.title-register' | translate }}</p>
+          <p (click)="toggleForm()" class="cursor-pointer text-color-global"> {{ 'connection.title-register' | translate }}</p>
         </div>
       </div>
     </div>
-</div>
-}@else{
-<p></p>
+  </div>
 }

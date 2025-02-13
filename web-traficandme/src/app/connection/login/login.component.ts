@@ -3,10 +3,11 @@ import {ButtonModule} from 'primeng/button';
 import {InputTextModule} from 'primeng/inputtext';
 import {ToastService} from '../../components/toast/toast.service';
 import {MessageService} from 'primeng/api';
+import {TranslatePipe} from '@ngx-translate/core';
 
 @Component({
   selector: 'app-login',
-  imports: [ButtonModule, InputTextModule],
+  imports: [ButtonModule, InputTextModule, TranslatePipe],
   templateUrl: './login.component.html',
   standalone: true,
   styleUrl: './login.component.css'
