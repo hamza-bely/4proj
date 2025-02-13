@@ -35,7 +35,7 @@ jobs:
           npm run build --prod
 
   build-and-deploy:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs: build
     steps:
       - name: Installer sshpass
