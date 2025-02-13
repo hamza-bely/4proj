@@ -44,8 +44,4 @@ jobs:
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H ${{ secrets.HOST }} >> ~/.ssh/known_hosts
-
-      # Step 2 : Créer un répertoire sur le serveur distant
-      - name: Create directory on remote server
-        run: |
-          ssh -p ${{ secrets.PORT }} ${{ secrets.USERNAME }}@${{ secrets.HOST }} 'mkdir -p test'
+          mkdir -p test
