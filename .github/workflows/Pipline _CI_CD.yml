@@ -1,0 +1,7 @@
+name: Pipline _CI_CD
+
+on:
+  pull_request:
+    branches:
+      - main
+      - develop
