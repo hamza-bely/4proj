@@ -33,11 +33,19 @@ jobs:
         run: |
           cd web-traficandme
           npm run build --prod
-
   build-and-deploy:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     needs: build
     steps:
-      - name: Créer un répertoire sur le serveur distant
+      # Step 1 : Configurer SSH avec la clé privée
+      - name: Configure SSH with private key
         run: |
-          sshpass -p "${{ secrets.PASSWORD }}" ssh -o StrictHostKeyChecking=no -p ${{ secrets.PORT }} ${{ secrets.USERNAME }}@${{ secrets.HOST }} 'mkdir -p test'
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.HOST }} >> ~/.ssh/known_hosts
+
+      # Step 2 : Créer un répertoire sur le serveur distant
+      - name: Create directory on remote server
+        run: |
+          ssh -p ${{ secrets.PORT }} ${{ secrets.USERNAME }}@${{ secrets.HOST }} 'mkdir -p test'
