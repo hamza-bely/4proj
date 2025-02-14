@@ -50,4 +50,4 @@ jobs:
 
       - name: Connect to VM and create directory
         run: |
-          ssh -i ~/.ssh/id_rsa hamza@158.180.239.85 "mkdir -p ~/hamza"
+          ssh -i ~/.ssh/id_rsa hamza@158.180.239.85 "mkdir -p ~/hamzailcapo"
