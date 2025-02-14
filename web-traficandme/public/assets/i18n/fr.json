@@ -27,5 +27,23 @@
 
   "footer" : {
     "title": "© 2025 TRAFICANDME, Inc. Tous droits réservés."
+  },
+
+  "incentive" : {
+    "title" : "Transformez vos voyages avec notre application de navigation nouvelle génération",
+    "description" : "Découvrez comment notre application améliore votre expérience de conduite avec des itinéraires plus intelligents, des alertes en temps réel et une navigation économique.",
+
+    "incentive1": {
+      "title": "Optimisation des itinéraires en temps réel",
+      "description": "Les applications de navigation modernes analysent le trafic en direct et ajustent votre itinéraire en conséquence. Grâce à ces mises à jour dynamiques, vous évitez les embouteillages et arrivez plus rapidement à destination."
+    },
+    "incentive2": {
+      "title": "Alertes communautaires et informations trafic",
+      "description": "Waze et d'autres applications permettent aux conducteurs de signaler en temps réel des accidents, des travaux ou des radars. Cette collaboration entre usagers améliore la précision des trajets et garantit une conduite plus sereine."
+    },
+    "incentive3": {
+      "title": "Économie de temps et de carburant",
+      "description": "En proposant les trajets les plus courts et les plus rapides, ces applications réduisent votre consommation de carburant et votre empreinte écologique. Moins de temps sur la route signifie aussi plus de confort et moins de stress."
+    }
   }
 }

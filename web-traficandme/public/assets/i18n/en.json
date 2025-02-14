@@ -27,6 +27,25 @@
 
   "footer" : {
   "title": "© 2025 TRAFICANDME, Inc. All rights reserved."
+  },
+
+  "incentive" : {
+    "title" : "Transform Your Journeys with Our Next-Gen Navigation App",
+    "description" : "Discover how our app enhances your driving experience with smarter routes, real-time alerts, and cost-saving navigation.",
+    "incentive1":{
+      "title" : "Community Alerts & Traffic Information",
+      "description" : "Apps like Waze allow drivers to report accidents, roadworks, and speed traps in real time. This user-driven collaboration improves route accuracy and ensures a safer, smoother driving experience."
+    },
+
+    "incentive2":{
+      "title" : "Optimisez vos trajets avec TRAFICANDME et arrivez plus vite à destination.",
+      "description" : "Modern navigation apps analyze live traffic data and adjust your route accordingly. With these dynamic updates, you can avoid congestion and reach your destination faster."
+    },
+
+    "incentive3":{
+      "title" : " Time & Fuel Efficiency",
+      "description" : "By suggesting the shortest and fastest routes, these apps help reduce fuel consumption and minimize your environmental impact. Less time on the road means more convenience and less stress."
+    }
   }
 
 }
