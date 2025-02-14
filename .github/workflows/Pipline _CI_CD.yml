@@ -49,17 +49,15 @@ jobs:
   
       - name: Build Docker images
         run: |
-          docker build -t web-traficandme ./web-traficandme/.
-  
-      - name: Save Docker image to a tar file
+          docker build -t web-traficandme ./web-traficandme/.  
+      - name: Copy files to server
         run: |
-          docker save -o web-traficandme.tar web-traficandme
-  
-      - name: Send Docker image to VM
+          scp -i ~/.ssh/id_rsa -r ./* ${{ secrets.USERNAME }}@${{ secrets.HOST }}:/home/${{ secrets.USERNAME }}/app/
+      - name: Deploy with Docker Compose
         run: |
-          scp -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no web-traficandme.tar "${{ secrets.USERNAME }}@${{ secrets.HOST }}:/home/${{ secrets.USERNAME }}/back/"
-          #scp -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no web-traficandme.tar hamza@158.180.239.85:/home/hamza/web-tarficandme/
-          
-      - name: Connect to VM and create directory
-        run: |
-          ssh -i ~/.ssh/id_rsa hamza@158.180.239.85 "mkdir -p ~/hamzailcapo"
+          ssh -i ~/.ssh/id_rsa ${{ secrets.USERNAME }}@${{ secrets.HOST }} << 'EOF'
+            cd /home/${{ secrets.USERNAME }}/app
+            docker-compose down
+            docker-compose build
+            docker-compose up -d
+          EOF
