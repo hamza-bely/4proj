@@ -57,7 +57,7 @@ jobs:
   
       - name: Send Docker image to VM
         run: |
-          scp -i ~/.ssh/id_rsa web-traficandme.tar hamza@158.180.239.85:/web-tarficandme
+          scp -i ~/.ssh/id_rsa web-traficandme.tar hamza@158.180.239.85:/home/hamza/web-tarficandme
           
       - name: Connect to VM and create directory
         run: |
