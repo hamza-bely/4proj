@@ -38,7 +38,7 @@ jobs:
           ssh -i ~/.ssh/id_rsa ${{ secrets.USERNAME }}@${{ secrets.HOST }} << 'EOF'
             cd /home/${{ secrets.USERNAME }}
             tar -xzf app.tar.gz 
-            cd web-trafiandme
+            cd web-traficandme
             docker-compose down
             docker-compose up -d --build  # Reconstruit et redémarre
           EOF
