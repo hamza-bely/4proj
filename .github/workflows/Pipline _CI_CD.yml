@@ -33,21 +33,32 @@ jobs:
         run: |
           cd web-traficandme
           npm run build --prod
- 
   deploy:
     runs-on: ubuntu-latest
     needs: build
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-
+  
       - name: Set up SSH
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H 158.180.239.85 >> ~/.ssh/known_hosts
-
+  
+      - name: Build Docker images
+        run: |
+          docker build -t web-traficandme .
+  
+      - name: Save Docker image to a tar file
+        run: |
+          docker save -o web-traficandme.tar web-traficandme
+  
+      - name: Send Docker image to VM
+        run: |
+          scp -i ~/.ssh/id_rsa web-traficandme.tar hamza@158.180.239.85:/web-tarficandme
+          
       - name: Connect to VM and create directory
         run: |
           ssh -i ~/.ssh/id_rsa hamza@158.180.239.85 "mkdir -p ~/hamzailcapo"
