@@ -71,6 +71,6 @@ jobs:
             cd web-traficandme
             docker-compose down
             docker image rm web-traficandme_frontend
-            docker-compose up 
+            docker-compose up -d
           EOF
 
