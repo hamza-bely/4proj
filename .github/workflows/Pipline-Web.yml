@@ -70,6 +70,7 @@ jobs:
             tar -xzf app.tar.gz 
             cd web-traficandme
             docker-compose down
-            docker-compose up -d --build
+            docker image rm web-traficandme_frontend
+            docker-compose up 
           EOF
 
