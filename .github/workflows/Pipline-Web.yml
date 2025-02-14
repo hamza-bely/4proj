@@ -1,10 +1,12 @@
 
-name: Pipline_CI_CD
+name: Pipline-Web
 
 on:
   push:
     branches:
       - main
+    paths:
+      - 'web-traficandme/**'
   pull_request:
     branches:
       - main
@@ -68,6 +70,6 @@ jobs:
             tar -xzf app.tar.gz 
             cd web-traficandme
             docker-compose down
-            docker-compose up -d --build  
+            docker-compose up -d  
           EOF
 
