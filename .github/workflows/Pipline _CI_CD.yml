@@ -31,7 +31,7 @@ jobs:
         run: tar -czf app.tar.gz ./web-traficandme
 
       - name: Copy archive to server
-        run: scp -i ~/.ssh/id_rsa app.tar.gz ${{ secrets.USERNAME }}@${{ secrets.HOST }}:/home/${{ secrets.USERNAME }}/app/
+        run: scp -i ~/.ssh/id_rsa  -r ./* app.tar.gz ${{ secrets.USERNAME }}@${{ secrets.HOST }}:/home/${{ secrets.USERNAME }}/app/
 
       - name: Deploy with Docker Compose
         run: |
