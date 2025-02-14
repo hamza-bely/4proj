@@ -49,7 +49,7 @@ jobs:
   
       - name: Build Docker images
         run: |
-          docker build -t web-traficandme .
+          docker build -t web-traficandme ./web-traficandme/.
   
       - name: Save Docker image to a tar file
         run: |
