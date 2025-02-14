@@ -47,7 +47,7 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H 158.180.239.85 >> ~/.ssh/known_hosts
+          ssh-keyscan -H ${{ secrets.HOST }} >> ~/.ssh/known_hosts
   
       - name: Archive project files
         run: tar -czf app.tar.gz ./web-traficandme
@@ -70,6 +70,6 @@ jobs:
             tar -xzf app.tar.gz 
             cd web-traficandme
             docker-compose down
-            docker-compose up -d  
+            docker-compose up -d --build
           EOF
 
