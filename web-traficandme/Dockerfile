@@ -13,17 +13,14 @@ RUN npm install
 # Copier tous les fichiers du projet Angular dans le conteneur
 COPY . .
 
-# Construire l'application Angular pour la production
+# Construire l'application Angular
 RUN npm run build --prod
 
-# Utiliser une image NGINX pour servir l'application construite
-FROM nginx:alpine
+# Installer Angular CLI globalement pour exécuter ng serve
+RUN npm install -g @angular/cli
 
-# Copier les fichiers de build Angular dans le répertoire NGINX
-COPY --from=build /app/dist/ /usr/share/nginx/html
-
-# Exposer le port 4200 (par défaut pour Angular en dev)
+# Exposer le port 4200 (port par défaut d'Angular)
 EXPOSE 4200
 
-# Commande pour démarrer NGINX en écoutant sur le port 4200
-CMD ["nginx", "-g", "daemon off;", "-p", "4200"]
+# Démarrer le serveur Angular sur le port 4200 (hôte 0.0.0.0 pour écouter sur toutes les interfaces)
+CMD ["ng", "serve", "--host", "0.0.0.0", "--port", "4200"]
