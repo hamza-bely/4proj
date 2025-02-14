@@ -37,8 +37,8 @@ jobs:
         run: |
           ssh -i ~/.ssh/id_rsa ${{ secrets.USERNAME }}@${{ secrets.HOST }} << 'EOF'
             cd /home/${{ secrets.USERNAME }}
-            tar -xzf app.tar.gz -C app/  # Décompresser dans /home/user/app
-            cd app
+            tar -xzf app.tar.gz -C 
+            cd web-trafiandme
             docker-compose down
             docker-compose up -d --build  # Reconstruit et redémarre
           EOF
