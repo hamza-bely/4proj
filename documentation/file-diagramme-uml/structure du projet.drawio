@@ -7,11 +7,11 @@
         <mxCell id="nslCc2GsLbfLlcvG44iz-10" value="" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=default;verticalAlign=top;aspect=fixed;imageAspect=0;image=https://cdn-icons-png.flaticon.com/512/1493/1493169.png;" vertex="1" parent="1">
           <mxGeometry x="430" y="218" width="62" height="62" as="geometry" />
         </mxCell>
-        <mxCell id="nslCc2GsLbfLlcvG44iz-20" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="nslCc2GsLbfLlcvG44iz-11" target="nslCc2GsLbfLlcvG44iz-18">
+        <mxCell id="nslCc2GsLbfLlcvG44iz-32" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="nslCc2GsLbfLlcvG44iz-11" target="nslCc2GsLbfLlcvG44iz-10">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="nslCc2GsLbfLlcvG44iz-11" value="" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=default;verticalAlign=top;aspect=fixed;imageAspect=0;image=https://miro.medium.com/v2/resize:fit:1400/0*bKfOagkmq0M2KR3-.png;" vertex="1" parent="1">
-          <mxGeometry x="298" y="50" width="70" height="70" as="geometry" />
+          <mxGeometry x="320" y="40" width="70" height="70" as="geometry" />
         </mxCell>
         <mxCell id="nslCc2GsLbfLlcvG44iz-17" value="" style="image;aspect=fixed;html=1;points=[];align=center;fontSize=12;image=img/lib/azure2/other/Arc_PostgreSQL.svg;" vertex="1" parent="1">
           <mxGeometry x="610" y="40" width="65.08" height="68" as="geometry" />
@@ -48,6 +48,9 @@
         </mxCell>
         <mxCell id="nslCc2GsLbfLlcvG44iz-29" value="" style="image;aspect=fixed;html=1;points=[];align=center;fontSize=12;image=img/lib/azure2/other/VM_Application_Definition.svg;" vertex="1" parent="1">
           <mxGeometry x="60" y="188.31" width="59" height="54.49" as="geometry" />
+        </mxCell>
+        <mxCell id="nslCc2GsLbfLlcvG44iz-31" value="[Frontend] → [API Gateway] → [API Backend] → [Keycloak]  &#xa;                                 ↑  &#xa;                             [PostgreSQL (Users + Métier)]" style="text;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="210" y="460" width="360" height="70" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
