@@ -1,9 +1,30 @@
 <mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36 OPR/117.0.0.0" version="25.0.1">
   <diagram name="Page-1" id="M4y0jXKTTHNmajSopDJP">
-    <mxGraphModel>
+    <mxGraphModel dx="1672" dy="746" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
+        <mxCell id="nslCc2GsLbfLlcvG44iz-2" value="" style="image;aspect=fixed;html=1;points=[];align=center;fontSize=12;image=img/lib/azure2/app_services/App_Services.svg;" vertex="1" parent="1">
+          <mxGeometry x="60" y="180" width="50" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="nslCc2GsLbfLlcvG44iz-10" value="" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=default;verticalAlign=top;aspect=fixed;imageAspect=0;image=https://cdn-icons-png.flaticon.com/512/1493/1493169.png;" vertex="1" parent="1">
+          <mxGeometry x="450" y="198" width="62" height="62" as="geometry" />
+        </mxCell>
+        <mxCell id="nslCc2GsLbfLlcvG44iz-11" value="" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=default;verticalAlign=top;aspect=fixed;imageAspect=0;image=https://miro.medium.com/v2/resize:fit:1400/0*bKfOagkmq0M2KR3-.png;" vertex="1" parent="1">
+          <mxGeometry x="280" y="50" width="70" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="nslCc2GsLbfLlcvG44iz-14" value="" style="image;aspect=fixed;html=1;points=[];align=center;fontSize=12;image=img/lib/azure2/iot/Time_Series_Data_Sets.svg;" vertex="1" parent="1">
+          <mxGeometry x="627.31" y="300" width="51.2" height="68" as="geometry" />
+        </mxCell>
+        <mxCell id="nslCc2GsLbfLlcvG44iz-17" value="" style="image;aspect=fixed;html=1;points=[];align=center;fontSize=12;image=img/lib/azure2/other/Arc_PostgreSQL.svg;" vertex="1" parent="1">
+          <mxGeometry x="620.37" y="150" width="65.08" height="68" as="geometry" />
+        </mxCell>
+        <mxCell id="nslCc2GsLbfLlcvG44iz-18" value="" style="image;aspect=fixed;html=1;points=[];align=center;fontSize=12;image=img/lib/azure2/other/Defender_Distributer_Control_System.svg;rotation=90;" vertex="1" parent="1">
+          <mxGeometry x="240" y="270" width="68" height="68" as="geometry" />
+        </mxCell>
+        <mxCell id="nslCc2GsLbfLlcvG44iz-19" value="" style="image;aspect=fixed;html=1;points=[];align=center;fontSize=12;image=img/lib/azure2/intune/Device_Compliance.svg;" vertex="1" parent="1">
+          <mxGeometry x="60" y="310" width="62" height="68" as="geometry" />
+        </mxCell>
       </root>
     </mxGraphModel>
   </diagram>
