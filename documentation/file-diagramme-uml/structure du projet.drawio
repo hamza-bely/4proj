@@ -4,9 +4,6 @@
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
-        <mxCell id="nslCc2GsLbfLlcvG44iz-2" value="" style="image;aspect=fixed;html=1;points=[];align=center;fontSize=12;image=img/lib/azure2/app_services/App_Services.svg;" vertex="1" parent="1">
-          <mxGeometry x="60" y="180" width="50" height="50" as="geometry" />
-        </mxCell>
         <mxCell id="nslCc2GsLbfLlcvG44iz-10" value="" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=default;verticalAlign=top;aspect=fixed;imageAspect=0;image=https://cdn-icons-png.flaticon.com/512/1493/1493169.png;" vertex="1" parent="1">
           <mxGeometry x="440" y="218" width="62" height="62" as="geometry" />
         </mxCell>
@@ -27,14 +24,15 @@
         <mxCell id="nslCc2GsLbfLlcvG44iz-18" value="" style="image;aspect=fixed;html=1;points=[];align=center;fontSize=12;image=img/lib/azure2/other/Defender_Distributer_Control_System.svg;rotation=90;" vertex="1" parent="1">
           <mxGeometry x="230" y="232" width="68" height="68" as="geometry" />
         </mxCell>
-        <mxCell id="nslCc2GsLbfLlcvG44iz-19" value="" style="image;aspect=fixed;html=1;points=[];align=center;fontSize=12;image=img/lib/azure2/intune/Device_Compliance.svg;" vertex="1" parent="1">
-          <mxGeometry x="70" y="300" width="52.88" height="58" as="geometry" />
+        <mxCell id="nslCc2GsLbfLlcvG44iz-22" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.515;entryY=1.015;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="nslCc2GsLbfLlcvG44iz-29" target="nslCc2GsLbfLlcvG44iz-18">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="110" y="205" as="sourcePoint" />
+          </mxGeometry>
         </mxCell>
-        <mxCell id="nslCc2GsLbfLlcvG44iz-22" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.515;entryY=1.015;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="nslCc2GsLbfLlcvG44iz-2" target="nslCc2GsLbfLlcvG44iz-18">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="nslCc2GsLbfLlcvG44iz-23" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.529;entryY=1.029;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="nslCc2GsLbfLlcvG44iz-19" target="nslCc2GsLbfLlcvG44iz-18">
-          <mxGeometry relative="1" as="geometry" />
+        <mxCell id="nslCc2GsLbfLlcvG44iz-23" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.529;entryY=1.029;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="nslCc2GsLbfLlcvG44iz-28" target="nslCc2GsLbfLlcvG44iz-18">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="122.88000000000011" y="329" as="sourcePoint" />
+          </mxGeometry>
         </mxCell>
         <mxCell id="nslCc2GsLbfLlcvG44iz-25" value="" style="image;aspect=fixed;html=1;points=[];align=center;fontSize=12;image=img/lib/azure2/other/Arc_PostgreSQL.svg;" vertex="1" parent="1">
           <mxGeometry x="610" y="230" width="65.08" height="68" as="geometry" />
@@ -44,6 +42,12 @@
         </mxCell>
         <mxCell id="nslCc2GsLbfLlcvG44iz-27" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=-0.046;entryY=0.471;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="nslCc2GsLbfLlcvG44iz-10" target="nslCc2GsLbfLlcvG44iz-25">
           <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="nslCc2GsLbfLlcvG44iz-28" value="" style="image;aspect=fixed;html=1;points=[];align=center;fontSize=12;image=img/lib/azure2/general/Mobile_Engagement.svg;" vertex="1" parent="1">
+          <mxGeometry x="65" y="298" width="40" height="67" as="geometry" />
+        </mxCell>
+        <mxCell id="nslCc2GsLbfLlcvG44iz-29" value="" style="image;aspect=fixed;html=1;points=[];align=center;fontSize=12;image=img/lib/azure2/other/VM_Application_Definition.svg;" vertex="1" parent="1">
+          <mxGeometry x="51" y="180" width="68" height="62.8" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
