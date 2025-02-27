@@ -13,4 +13,8 @@ public class UserInfo {
     private String email;
     private String telephone;
     private String password;
+    private String userName;
+    private String role;
+    private String providerId;
+    private String provider;
 }

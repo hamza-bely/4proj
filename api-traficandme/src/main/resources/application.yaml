@@ -1,10 +1,14 @@
 spring.application.name:
   api-traficandme
+
 spring:
   jpa:
     defer-datasource-initialization: true
     show-sql: true
 
+  h2:
+    console:
+      enabled: true
   security:
     oauth2:
       client:
