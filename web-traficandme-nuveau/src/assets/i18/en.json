@@ -1,0 +1,130 @@
+{
+  "loading" : "Loading...",
+  "languages": {
+    "fr": "French",
+    "en": "English"
+  },
+
+  "header": {
+    "about" : "TraficAndme",
+    "home" : "Home",
+    "map" : "Map",
+    "log-in": "Log in",
+    "register" : "Register",
+    "login" : "Login"
+  },
+
+  "home": {
+    "title-mobile" : "Discover your world differently",
+    "description-mobile" : "Our mobile mapping app gives you seamless navigation, precise directions, and personalized recommendations for exploring your surroundings."
+  },
+
+  "connection": {
+    "title-login": "Sign in to your account",
+    "title-register" : "Register now",
+    "name": "name",
+    "email": "e-mail",
+    "password": "password",
+    "password-forgot" : "Forgot password?",
+    "not-member" : "Not a member?",
+    "or": "Or",
+    "button": {
+      "sign-in": "Sign-in"
+    }
+  },
+
+  "footer" : {
+    "title": "© 2025 TRAFICANDME, Inc. All rights reserved."
+  },
+
+  "incentive" : {
+    "title": "Transform Your Journeys with Our Next-Gen Navigation App",
+    "description": "Discover how our app enhances your driving experience with smarter routes, real-time alerts, and cost-saving navigation.",
+    "incentive1": {
+      "title": "Community Alerts & Traffic Information",
+      "description": "Apps like Waze allow drivers to report accidents, roadworks, and speed traps in real time. This user-driven collaboration improves route accuracy and ensures a safer, smoother driving experience."
+    },
+    "incentive2": {
+      "title": "Optimisez vos trajets avec TRAFICANDME et arrivez plus vite à destination.",
+      "description": "Modern navigation apps analyze live traffic data and adjust your route accordingly. With these dynamic updates, you can avoid congestion and reach your destination faster."
+    },
+    "incentive3": {
+      "title": " Time & Fuel Efficiency",
+      "description": "By suggesting the shortest and fastest routes, these apps help reduce fuel consumption and minimize your environmental impact. Less time on the road means more convenience and less stress."
+    }
+  },
+
+
+    "contact": {
+      "get_in_touch": "Get in touch",
+      "description": "Nullam risus blandit ac aliquam justo ipsum. Quam mauris volutpat massa dictumst amet. Sapien tortor lacus arcu.",
+      "postal_address": "Postal address",
+      "address_1": "742 Evergreen Terrace",
+      "address_2": "Springfield, OR 12345",
+      "email": "Email",
+      "career_inquiry": "Looking for careers?",
+      "view_jobs": "View all job openings",
+      "full_name": "Full name",
+      "message": "Message",
+      "submit": "Submit"
+    },
+
+    "content-section": {
+      "values_title": "Our values",
+      "description": "Lorem ipsum dolor sit amet consect adipisicing elit. Possimus magnam voluptatum cupiditate veritatis in accusamus quisquam.",
+      "be_world_class": "Be world-class",
+      "be_world_class_desc": "Aut illo quae. Ut et harum ea animi natus. Culpa maiores et sed sint et magnam exercitationem quia. Ullam voluptas nihil vitae dicta molestiae et. Aliquid velit porro vero.",
+      "share_knowlege": "Share everything you know",
+      "share_knowlege_desc": "Mollitia delectus a omnis. Quae velit aliquid. Qui nulla maxime adipisci illo id molestiae. Cumque cum ut minus rerum architecto magnam consequatur. Quia quaerat minima.",
+      "always_learning": "Always learning",
+      "always_learning_desc": "Aut repellendus et officiis dolor possimus. Deserunt velit quasi sunt fuga error labore quia ipsum. Commodi autem voluptatem nam. Quos voluptatem totam.",
+      "be_supportive": "Be supportive",
+      "be_supportive_desc": "Magnam provident veritatis odit. Vitae eligendi repellat non. Eum fugit impedit veritatis ducimus. Non qui aspernatur laudantium modi. Praesentium rerum error deserunt harum.",
+      "take_responsibility": "Take responsibility",
+      "take_responsibility_desc": "Sit minus expedita quam in ullam molestiae dignissimos in harum. Tenetur dolorem iure. Non nesciunt dolorem veniam necessitatibus laboriosam voluptas perspiciatis error.",
+      "enjoy_downtime": "Enjoy downtime",
+      "enjoy_downtime_desc": "Ipsa in earum deserunt aut. Quos minus aut animi et soluta. Ipsum dicta ut quia eius. Possimus reprehenderit iste aspernatur ut est velit consequatur distinctio."
+    },
+
+    "feature": {
+      "real_time_updates": {
+        "title": "Real-time Updates",
+        "description": "Get instant information about traffic conditions, accidents, and obstacles for a smoother journey."
+      },
+      "support_24_7": {
+        "title": "24/7 Support",
+        "description": "Continuous support to help you navigate smoothly, wherever you are."
+      },
+      "optimized_navigation": {
+        "title": "Optimized Navigation",
+        "description": "Enjoy fast and secure routing thanks to our advanced guiding algorithms."
+      }
+    },
+
+  "stats": {
+    "title": "Optimize your journeys with real-time data",
+    "description": "Get instant information to adjust your route based on traffic conditions.",
+    "stats": {
+      "users": {
+        "value": "+5M",
+        "title": "Satisfied Users",
+        "description": "Millions of drivers use our app every day."
+      },
+      "alerts": {
+        "value": "1.2M",
+        "title": "Real-time Alerts",
+        "description": "Receive instant updates on accidents and disruptions."
+      },
+      "routes": {
+        "value": "800k",
+        "title": "Optimized Routes",
+        "description": "Enjoy the fastest routes thanks to our navigation AI."
+      }
+    }
+  },
+  "map": {
+    "route-planner"  : "Route planner",
+    "look-place" : "Look for a place"
+  }
+
+}

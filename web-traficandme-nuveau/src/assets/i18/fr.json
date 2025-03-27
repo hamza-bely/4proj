@@ -1,0 +1,129 @@
+{
+  "loading" : "Chargement...",
+  "languages": {
+    "fr": "Français",
+    "en": "Anglais"
+  },
+
+  "header": {
+    "about" : "TraficAndMe",
+    "home" : "Accueil",
+    "map" : "Carte",
+    "log-in": "Log in",
+    "register" : "Registre",
+    "login" : "Se connecter"
+  },
+
+  "home": {
+    "title-mobile" : "Découvrez votre monde différemment",
+    "description-mobile" : "Notre application mobile de cartographie vous offre une navigation fluide, des itinéraires précis et des recommandations personnalisées pour explorer votre environnement."
+  },
+
+  "connection": {
+    "title-login": "Connectez-vous à votre compte",
+    "title-register" : "Inscrivez-vous maintenant",
+    "name": "nom",
+    "email": "e-mail",
+    "password": "mot de passe",
+    "password-forgot" : "Mot de passe oublié ?",
+    "not-member" : "Pas encore inscrit?",
+    "or": "ou",
+    "button": {
+      "sign-in": "Se connecter"
+    }
+  },
+
+  "footer" : {
+    "title": "© 2025 TRAFICANDME, Inc. Tous droits réservés."
+  },
+
+  "incentive" : {
+    "title" : "Transformez vos voyages avec notre application de navigation nouvelle génération",
+    "description" : "Découvrez comment notre application améliore votre expérience de conduite avec des itinéraires plus intelligents, des alertes en temps réel et une navigation économique.",
+
+    "incentive1": {
+      "title": "Optimisation des itinéraires en temps réel",
+      "description": "Les applications de navigation modernes analysent le trafic en direct et ajustent votre itinéraire en conséquence. Grâce à ces mises à jour dynamiques, vous évitez les embouteillages et arrivez plus rapidement à destination."
+    },
+    "incentive2": {
+      "title": "Alertes communautaires et informations trafic",
+      "description": "Waze et d'autres applications permettent aux conducteurs de signaler en temps réel des accidents, des travaux ou des radars. Cette collaboration entre usagers améliore la précision des trajets et garantit une conduite plus sereine."
+    },
+    "incentive3": {
+      "title": "Économie de temps et de carburant",
+      "description": "En proposant les trajets les plus courts et les plus rapides, ces applications réduisent votre consommation de carburant et votre empreinte écologique. Moins de temps sur la route signifie aussi plus de confort et moins de stress."
+    }
+  },
+
+  "contact": {
+    "get_in_touch": "Contactez-nous",
+    "description": "Nullam risus blandit ac aliquam justo ipsum. Quam mauris volutpat massa dictumst amet. Sapien tortor lacus arcu.",
+    "postal_address": "Adresse postale",
+    "address_1": "742 Evergreen Terrace",
+    "address_2": "Springfield, OR 12345",
+    "email": "Email",
+    "career_inquiry": "Vous recherchez un emploi ?",
+    "view_jobs": "Voir toutes les offres d'emploi",
+    "full_name": "Nom complet",
+    "message": "Message",
+    "submit": "Envoyer"
+  },
+
+  "content-section": {
+    "values_title": "Nos valeurs",
+    "description": "Lorem ipsum dolor sit amet consect adipisicing elit. Possimus magnam voluptatum cupiditate veritatis in accusamus quisquam.",
+    "be_world_class": "Soyez de classe mondiale",
+    "be_world_class_desc": "Aut illo quae. Ut et harum ea animi natus. Culpa maiores et sed sint et magnam exercitationem quia. Ullam voluptas nihil vitae dicta molestiae et. Aliquid velit porro vero.",
+    "share_knowlege": "Partagez tout ce que vous savez",
+    "share_knowlege_desc": "Mollitia delectus a omnis. Quae velit aliquid. Qui nulla maxime adipisci illo id molestiae. Cumque cum ut minus rerum architecto magnam consequatur. Quia quaerat minima.",
+    "always_learning": "Toujours apprendre",
+    "always_learning_desc": "Aut repellendus et officiis dolor possimus. Deserunt velit quasi sunt fuga error labore quia ipsum. Commodi autem voluptatem nam. Quos voluptatem totam.",
+    "be_supportive": "Soyez soutenant",
+    "be_supportive_desc": "Magnam provident veritatis odit. Vitae eligendi repellat non. Eum fugit impedit veritatis ducimus. Non qui aspernatur laudantium modi. Praesentium rerum error deserunt harum.",
+    "take_responsibility": "Prenez vos responsabilités",
+    "take_responsibility_desc": "Sit minus expedita quam in ullam molestiae dignissimos in harum. Tenetur dolorem iure. Non nesciunt dolorem veniam necessitatibus laboriosam voluptas perspiciatis error.",
+    "enjoy_downtime": "Profitez de votre temps libre",
+    "enjoy_downtime_desc": "Ipsa in earum deserunt aut. Quos minus aut animi et soluta. Ipsum dicta ut quia eius. Possimus reprehenderit iste aspernatur ut est velit consequatur distinctio."
+  },
+
+  "feature": {
+    "real_time_updates": {
+      "title": "Mises à jour en temps réel",
+      "description": "Recevez des informations instantanées sur l'état du trafic, les accidents et les obstacles pour un trajet plus fluide."
+    },
+    "support_24_7": {
+      "title": "Assistance 24/7",
+      "description": "Un support en continu pour vous aider à naviguer en toute sérénité, où que vous soyez."
+    },
+    "optimized_navigation": {
+      "title": "Navigation optimisée",
+      "description": "Profitez d'un itinéraire rapide et sécurisé grâce à nos algorithmes avancés de guidage."
+    }
+  },
+  "stats": {
+    "title": "Optimisez vos trajets avec des données en temps réel",
+    "description": "Accédez à des informations instantanées pour adapter votre parcours en fonction des conditions de circulation.",
+    "stats": {
+      "users": {
+        "value": "+5M",
+        "title": "Utilisateurs satisfaits",
+        "description": "Des millions de conducteurs utilisent notre application chaque jour."
+      },
+      "alerts": {
+        "value": "1.2M",
+        "title": "Alertes en temps réel",
+        "description": "Recevez des mises à jour instantanées sur les accidents et les perturbations."
+      },
+      "routes": {
+        "value": "800k",
+        "title": "Itinéraires optimisés",
+        "description": "Profitez des trajets les plus rapides grâce à notre IA de navigation."
+      }
+    }
+  },
+  "map": {
+    "route-planner"  : "Planificateur d'itinéraire",
+    "look-place" : "Chercher un endroit"
+  }
+
+}

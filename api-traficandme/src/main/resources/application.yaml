@@ -1,9 +1,6 @@
 spring:
   application:
     name: api-traficandme
-  config:
-    jwt:
-      secret-key: 4b0e1a3f53a7e8b7eac8c5a2a0cde3e0b2f1d8a5e6c5a7b2f1e8b1c2d3f4e5a6
   jpa:
     defer-datasource-initialization: true
     show-sql: true
@@ -24,4 +21,4 @@ spring:
 logging.level.org.springframework.security: TRACE
 
 jwt:
-  secret:
+  secret: 4b0e1a3f53a7e8b7eac8c5a2a0cde3e0b2f1d8a5e6c5a7b2f1e8b1c2d3f4e5a6

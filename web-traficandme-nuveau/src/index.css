@@ -1,0 +1,15 @@
+@import "tailwindcss";
+
+:root {
+    --p-color-blue: #5DB3FF;
+    --p-color-vert: #ACDE50;
+    --p-color-yellow: #FFBC2E;
+}
+
+.button-global{
+    background-color: var( --p-color-blue);
+}
+
+.text-color-global{
+    color: var(--p-color-blue);
+}

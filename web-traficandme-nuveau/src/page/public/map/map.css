@@ -1,0 +1,39 @@
+.position-search{
+    position: absolute;
+    /* top: 300px; */
+    margin-top: 80px;
+    z-index: 1000;
+    background-color: white;
+    height: 200px;
+    margin-left: 80px;
+}
+
+.container-modal{
+    position: absolute;
+    /* top: 500px; */
+    z-index: 1000;
+    margin-top: 50px;
+    width: 400px;
+    margin-left: 50px;
+}
+
+.mode-select {
+    padding: 10px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.mode-select.selected {
+    background-color: #e0e0e0; /* Gris clair */
+}
+
+
+.list-address{
+    position: absolute;
+    background-color: aliceblue;
+}
+
+.position-user{
+
+}
