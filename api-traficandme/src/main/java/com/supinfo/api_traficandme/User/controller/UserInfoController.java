@@ -1,4 +1,4 @@
-package com.supinfo.api_traficandme.controller;
+package com.supinfo.api_traficandme.User.controller;
 
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.web.bind.annotation.GetMapping;

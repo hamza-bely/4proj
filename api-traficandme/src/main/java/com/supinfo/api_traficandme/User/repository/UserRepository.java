@@ -1,10 +1,12 @@
-package com.supinfo.api_traficandme.repository;
+package com.supinfo.api_traficandme.User.repository;
 
-import com.supinfo.api_traficandme.entity.UserInfo;
+import com.supinfo.api_traficandme.User.entity.UserInfo;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface UserRepository  extends CrudRepository<UserInfo, Integer> {
-    UserInfo findByEmail(String email);
+    Optional<UserInfo> findByEmail(String email);
 }

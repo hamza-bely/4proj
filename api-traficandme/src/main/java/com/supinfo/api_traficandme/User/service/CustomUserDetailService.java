@@ -1,7 +1,6 @@
-package com.supinfo.api_traficandme.service;
+package com.supinfo.api_traficandme.User.service;
 
-import com.supinfo.api_traficandme.entity.UserInfo;
-import com.supinfo.api_traficandme.repository.UserRepository;
+import com.supinfo.api_traficandme.User.entity.UserInfo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
