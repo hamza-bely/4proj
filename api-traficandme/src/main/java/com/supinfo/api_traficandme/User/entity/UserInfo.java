@@ -32,11 +32,12 @@ public class UserInfo implements UserDetails {
     private String providerId;
     private String provider;
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private Role roles;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(roles.name()));
+        return List.of(new SimpleGrantedAuthority("ROLE_"+ roles.name()));
     }
 
     @Override

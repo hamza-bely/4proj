@@ -1,4 +1,4 @@
-package com.supinfo.api_traficandme.config;
+package com.supinfo.api_traficandme.security.config;
 
 import com.supinfo.api_traficandme.User.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
