@@ -2,12 +2,10 @@ import { useEffect, useState } from "react";
 import tt from "@tomtom-international/web-sdk-maps";
 import {Alert} from "../../../../assets/kit-ui/alert.tsx";
 import {Input} from "../../../../assets/kit-ui/input.tsx";
-import {Avatar} from "../../../../assets/kit-ui/avatar.tsx";
-import { RiPoliceBadgeFill } from "react-icons/ri";
 
 interface Signal {
     type: string;
-    positio: [number, number];
+    position: [number, number];
     info: {
         name: string;
         user: string;
@@ -22,9 +20,9 @@ interface MarkersProps {
 
 const Markers: React.FC<MarkersProps> = ({ map }) => {
     const [signals, setSignals] = useState<Signal[]>([
-        { type: "dange", positio: [2.3522, 48.8566], info: { name: "dange", user: "ghhaz", status: "confirmed", avatarUrl: "https://randomuser.me/api/portraits/men/1.jpg" } },
-        { type: "police", positio: [2.3622, 48.8566], info: { name: "police", user: "ghhaz", status: "confirmed" } },
-        { type: "police", positio: [2.3622, 45.8566], info: { name: "police", user: "ghhaz", status: "confirmed" } }
+        { type: "dange", position: [2.3522, 48.8566], info: { name: "dange", user: "ghhaz", status: "confirmed", avatarUrl: "https://randomuser.me/api/portraits/men/1.jpg" } },
+        { type: "police", position: [2.3622, 48.8566], info: { name: "police", user: "ghhaz", status: "confirmed", avatarUrl: "https://randomuser.me/api/portraits/men/1.jpg" } },
+        { type: "police", position: [2.3622, 45.8566], info: { name: "police", user: "ghhaz", status: "confirmed", avatarUrl: "https://randomuser.me/api/portraits/men/1.jpg" } }
     ]);
 
     const [newMarkerPos, setNewMarkerPos] = useState<[number, number] | null>(null);
@@ -37,14 +35,9 @@ const Markers: React.FC<MarkersProps> = ({ map }) => {
         const createdMarkers: tt.Marker[] = [];
 
         signals.forEach((signal) => {
-            const coordinates = signal.positio;
+            const coordinates = signal.position;
             const markerElement = document.createElement("div");
             markerElement.className = "rounded-full overflow-hidden shadow-lg border-2 border-white";
-
-
-            const avatarUrl = signal.info.avatarUrl || "https://via.placeholder.com/40"; // Image par défaut
-
-
 
             markerElement.innerHTML = `
                 <img src="/images/icon-map/police.jpg" alt="User Avatar" class="rounded-full w-10 h-10 border-2 border-white shadow-md" />
@@ -92,8 +85,8 @@ const Markers: React.FC<MarkersProps> = ({ map }) => {
 
         const newSignal: Signal = {
             type: newMarkerInfo.type,
-            positio: newMarkerPos,
-            info: { name: newMarkerInfo.type, user: newMarkerInfo.user, status: newMarkerInfo.status }
+            position: newMarkerPos,
+            info: { name: newMarkerInfo.type, user: newMarkerInfo.user, status: newMarkerInfo.status , avatarUrl : newMarkerInfo.status}
         };
 
         setSignals([...signals, newSignal]);

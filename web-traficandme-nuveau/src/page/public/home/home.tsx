@@ -22,7 +22,7 @@ export default function Header() {
                                     <img className="h-20" src="images/logo/logo_2.png" alt="Traficandme"/>
                                     <p style={{fontSize: "40px",fontWeight: "bold",color: "#ACDE50"}}>TRAFIC</p>
                                     <p style={{fontSize: "40px",fontWeight: "bold",color: "#5DB3FF"}}>AND</p>
-                                    <p style={{fontSize: "40px",fontWeight: "bold",color: "#5DB3FF"}}>ME</p>
+                                    <p style={{fontSize: "40px",fontWeight: "bold",color: "#FFBC2E"}}>ME</p>
                                 </div>
                                 <div className="mt-24 sm:mt-32 lg:mt-20">
                                     <a href="#" className="inline-flex space-x-6">

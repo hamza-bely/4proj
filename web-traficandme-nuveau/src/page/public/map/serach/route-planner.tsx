@@ -42,8 +42,15 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated }) => {
         }
         
         setIsLoading(true);
+        console.log(enabled)
+        let avoid : string = ""
+        if(enabled){
+            avoid  = ""
+        }else{
+            avoid = "&avoid=tollRoads"
+        }
 
-        const url = `https://api.tomtom.com/routing/1/calculateRoute/${start.lat},${start.lon}:${end.lat},${end.lon}/json?key=${apiKey}&routeType=${mode}&avoid=tollRoads`;
+        const url = `https://api.tomtom.com/routing/1/calculateRoute/${start.lat},${start.lon}:${end.lat},${end.lon}/json?key=${apiKey}&routeType=${mode}${avoid}`;
 
         try {
             const response = await fetch(url);
