@@ -6,7 +6,10 @@ import com.supinfo.api_traficandme.User.dto.UserRequest;
 import com.supinfo.api_traficandme.User.dto.UserResponse;
 import com.supinfo.api_traficandme.User.entity.UserInfo;
 import com.supinfo.api_traficandme.User.repository.UserRepository;
+import com.supinfo.api_traficandme.common.Role;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
@@ -40,6 +43,7 @@ public class UserService {
     }
 
     public Integer createUser(UserRequest user){
+       getOneUserByEmail(user.email());
         var createdUser = userRepository.save(userMapper.toModel(user));
         return createdUser.getId();
     }
@@ -58,7 +62,7 @@ public class UserService {
         userToUpdate.setFirstName(user.firstName());
         userToUpdate.setLastName(user.lastName());
         userToUpdate.setEmail(user.email());
-        userToUpdate.setRole(user.role());
+        userToUpdate.setRoles(Role.valueOf(user.role()));
         userToUpdate.setPassword(userToUpdate.getPassword());
         userRepository.save(userToUpdate);
     }
@@ -70,6 +74,11 @@ public class UserService {
             return true;
         }
         return false;
+    }
+
+    public UserInfo getOneUserByEmail(String email){
+
+        return userRepository.findOneByEmail(email);
     }
 
     /*
