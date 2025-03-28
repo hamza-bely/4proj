@@ -1,9 +1,9 @@
 package com.supinfo.api_traficandme.security.service;
 
 
-import com.supinfo.api_traficandme.User.dto.AuthenticateRequest;
-import com.supinfo.api_traficandme.User.dto.AuthenticateResponse;
-import com.supinfo.api_traficandme.User.dto.RegisterRequest;
+import com.supinfo.api_traficandme.security.dto.AuthenticateRequest;
+import com.supinfo.api_traficandme.security.dto.AuthenticateResponse;
+import com.supinfo.api_traficandme.security.dto.RegisterRequest;
 import com.supinfo.api_traficandme.User.entity.UserInfo;
 import com.supinfo.api_traficandme.User.repository.UserRepository;
 import com.supinfo.api_traficandme.common.Role;
@@ -30,6 +30,9 @@ public class AuthService {
                 .roles(Role.User)
                 .build();
         userRepository.save(user);
+
+        System.out.println("Saved User Role: " + user.getRoles());
+        System.out.println("Saved User Authorities: " + user.getAuthorities());
         var jwtToken = jwtAuthService.generateToken(user);
         return AuthenticateResponse.builder()
                 .token(jwtToken)

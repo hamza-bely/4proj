@@ -1,4 +1,4 @@
-package com.supinfo.api_traficandme.User.dto;
+package com.supinfo.api_traficandme.security.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
