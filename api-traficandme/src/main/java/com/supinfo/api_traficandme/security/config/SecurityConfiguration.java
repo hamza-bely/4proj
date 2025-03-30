@@ -42,14 +42,13 @@ public class SecurityConfiguration {
 
         httpSecurity.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth ->
-                        auth.requestMatchers("/api/v1/auth/**").permitAll()
+                        auth.requestMatchers("/api/auth/**").permitAll()
                                 .requestMatchers("/v3/api-docs/**").permitAll()
                                 .requestMatchers("/api-docs.yaml").permitAll()
                                 .requestMatchers("/swagger-resources/**").permitAll()
                                 .requestMatchers("/swagger-ui/**").permitAll()
-                                .requestMatchers("/swagger-ui.html").permitAll()
                                 .requestMatchers("/webjars/**").permitAll()
-                                .requestMatchers("/h2-console").permitAll()
+                                .requestMatchers("/h2-console/**").permitAll()
                                 .requestMatchers("/v3/api-docs/swagger-config").permitAll()
                                 .anyRequest().authenticated()
                 )

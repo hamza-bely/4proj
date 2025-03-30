@@ -24,6 +24,6 @@ public class CustomUserDetailService implements UserDetailsService{
             throw new UsernameNotFoundException("l'utilisateur "+username +" n\'existe pas");
         }
         return new User(user.getEmail(), user.getPassword(),
-                Collections.singletonList(new SimpleGrantedAuthority(user.getRole())));
+                Collections.singletonList(new SimpleGrantedAuthority(user.getRoles().name())));
     }
 }

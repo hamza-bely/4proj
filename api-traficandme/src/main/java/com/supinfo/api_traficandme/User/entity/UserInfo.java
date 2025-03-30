@@ -23,18 +23,20 @@ public class UserInfo implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+    @Column(nullable = false)
     private String firstName;
+    @Column(nullable = false)
     private String lastName;
+    @Column(nullable = false)
     private String email;
-    private String telephone;
+    @Column(nullable = false)
     private String password;
-    private String role;
     private String providerId;
-    private String provider;
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role roles;
-
+    @Transient
+    private String pseudo;
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority("ROLE_"+ roles.name()));
@@ -63,5 +65,12 @@ public class UserInfo implements UserDetails {
     @Override
     public boolean isEnabled() {
         return UserDetails.super.isEnabled();
+    }
+
+    public UserInfo(int id, String email, Role roles, String pseudo) {
+        this.id = id;
+        this.email = email;
+        this.roles = roles;
+        this.pseudo = pseudo;
     }
 }

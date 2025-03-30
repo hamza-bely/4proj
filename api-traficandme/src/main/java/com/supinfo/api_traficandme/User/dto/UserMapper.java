@@ -1,6 +1,7 @@
 package com.supinfo.api_traficandme.User.dto;
 
 import com.supinfo.api_traficandme.User.entity.UserInfo;
+import com.supinfo.api_traficandme.common.Role;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -17,7 +18,7 @@ public class UserMapper {
                 .lastName(request.lastName())
                 .email(request.email())
                 .password(passwordEncoder.encode(request.password()))
-                .role(request.role())
+                .roles(Role.valueOf(request.role()))
                 .build();
     }
 
@@ -26,7 +27,7 @@ public class UserMapper {
                 userInfo.getId(),
                 userInfo.getFirstName() +" "+ userInfo.getLastName(),
                 userInfo.getEmail(),
-                userInfo.getRole()
+                userInfo.getRoles().name()
         );
     }
 }

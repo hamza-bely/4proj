@@ -22,35 +22,39 @@ import java.util.Map;
 public class UserInfoController {
     private  final UserService userService;
 
-    @PostMapping
+    @PostMapping("create")
     //@PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<Integer> createUser(@Valid @RequestBody UserRequest request){
+        var use = userService.getOneUserByEmail(request.email());
+        if (use != null){
+            return new ResponseEntity<>(Integer.valueOf("User already exists"),HttpStatus.BAD_REQUEST);
+        }
         var userId = userService.createUser(request);
         return new ResponseEntity<>(userId, HttpStatus.CREATED);
     }
 
-    @GetMapping
+    @GetMapping("list")
     //@PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<List<UserResponse>> getAllUser(){
         var list = userService.getAllUsers();
         return new ResponseEntity<>(list, HttpStatus.OK);
     }
 
-    @GetMapping("/{userId}")
+    @GetMapping("getUser/{userId}")
     //@PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<UserResponse> getUser(@PathVariable("userId") Integer userId){
         var user = userService.getUserById(userId);
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
-    @PutMapping("/{userId}")
+    @PutMapping("update/{userId}")
     //@PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<Void> updateUser(@PathVariable ("userId") String userId,@Valid @RequestBody UserRequest request){
          userService.updateUser(Integer.valueOf(userId),request);
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 
-    @DeleteMapping("/{userId}")
+    @DeleteMapping("delete/{userId}")
     //@PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<Void> deleteUser(@PathVariable("userId") Integer userId){
         userService.deleteUser(userId);
