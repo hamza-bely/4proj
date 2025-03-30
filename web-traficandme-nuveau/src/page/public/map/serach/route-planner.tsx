@@ -7,7 +7,7 @@ import Search from "./search-bar.tsx";
 import { Switch } from "@headlessui/react";
 import {useTranslation} from "react-i18next";
 import { FaCar } from "react-icons/fa";
-import {MdFilterListAlt, MdOutlineMan} from "react-icons/md";
+import {MdFilterListAlt} from "react-icons/md";
 
 
 type RouteResponse = {
@@ -23,11 +23,11 @@ interface RoutePlannerProps {
 }
 
 const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated }) => {
-    /*const [start, setStart] = useState<string>("48.8566,2.3522"); // Coordonnées de départ (Paris)
-    const [end, setEnd] = useState<string>("45.7640,4.8357");   // Coordonnées d'arrivée (Lyon)*/
+    const [start, setStart] = useState<{ lat: number; lon: number }>({ lat: 47.7640, lon: 2.8357 }); // Coordonnées de départ (Paris)
+    const [end, setEnd] = useState<{ lat: number; lon: number }>({ lat: 45.7640, lon: 4.835 }); // Coordonnées d'arrivée (Lyon)
     const { t } = useTranslation();
-    const [start, setStart] = useState<{ lat: number; lon: number } | null>(null);
-    const [end, setEnd] = useState<{ lat: number; lon: number } | null>(null);
+    //const [start, setStart] = useState<{ lat: number; lon: number } | null>(null);
+    //const [end, setEnd] = useState<{ lat: number; lon: number } | null>(null);
     const [mode, setMode] = useState<string>("fastest");
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [enabled, setEnabled] = useState(false)
@@ -74,9 +74,7 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated }) => {
     return (
         <div>
             <h2>{t('map.route-planner')}</h2>
-
             <MdFilterListAlt style={{fontSize : "20px"}} onClick={() => setFilter(!filter)} />
-
             {filter &&
             <div className="select-container flex mt-2">
                 <div
@@ -91,16 +89,8 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated }) => {
                 >
                     <FaCar/>curte
                 </div>
-                <div
-                    className={`mode-select ${mode === "pedestrian" ? "selected" : ""}`}
-                    onClick={() => setMode("pedestrian")}
-                >
-                    <MdOutlineMan/>
-                </div>
-
-
                 <div className="m-1">
-                    <p>Peage</p>
+                    <p>sans Peage</p>
 
                     <Switch
                         checked={enabled}
@@ -125,7 +115,8 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated }) => {
             />
             <div className="flex justify-center">
                 <button
-                    className="rounded-sm m-2 flex  bg-gray-950 px-2 py-2 text-sm font-semibold text-white shadow-xs hover:bg-gray-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-600"
+                    style={{backgroundColor : "#5DB3FF"}}
+                    className="rounded-sm m-2 flex  px-2 py-2 text-sm font-semibold text-white shadow-xs hover:bg-gray-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-600"
                     onClick={handleCalculateRoute}
                     disabled={isLoading}
                 >

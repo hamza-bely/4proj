@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { ChevronUpDownIcon } from "@heroicons/react/20/solid";
 import { searchAddress } from "../../../../services/service/map-servie.tsx";
 import {useTranslation} from "react-i18next";
+import Spinner from "../../../../components/sniper/sniper.tsx";
 
 type SearchResult = {
   id: string;
@@ -24,17 +25,17 @@ const Search: React.FC<SearchProps> = ({ onSearchResultSelect }) => {
 
   useEffect(() => {
     if (query.trim()) {
+      setIsOpen(true);
       const debounceTimeout = setTimeout(handleSearch, 500);
       return () => clearTimeout(debounceTimeout);
     } else {
       setResults([]);
-      setIsOpen(false);
+      setIsOpen(true);
     }
   }, [query]);
 
   const handleSearch = async () => {
     setIsLoading(true);
-    setIsOpen(false);
     try {
       const response = await searchAddress(query);
       const data = await response;
@@ -77,9 +78,13 @@ const Search: React.FC<SearchProps> = ({ onSearchResultSelect }) => {
               className="absolute right-3 top-2 size-5 text-gray-500 cursor-pointer"
               onClick={() => setIsOpen(!isOpen)}
           />
+          {isLoading &&(
+              <div className="absolute right-10 top-2 size-5 text-gray-500 cursor-pointer">
+                <Spinner/>
+              </div>
+          )}
         </div>
 
-        {isLoading && <div className="text-gray-500 mt-2">Chargement...</div>}
 
         {isOpen && results.length > 0 && (
             <ul className="absolute z-10 mt-1 w-full bg-white rounded-md shadow-lg max-h-60 overflow-auto border border-gray-300">
