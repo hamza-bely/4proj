@@ -1,6 +1,5 @@
 package com.supinfo.api_traficandme.User.service;
 
-
 import com.supinfo.api_traficandme.User.dto.UserMapper;
 import com.supinfo.api_traficandme.User.dto.UserRequest;
 import com.supinfo.api_traficandme.User.dto.UserResponse;
@@ -8,8 +7,6 @@ import com.supinfo.api_traficandme.User.entity.UserInfo;
 import com.supinfo.api_traficandme.User.repository.UserRepository;
 import com.supinfo.api_traficandme.common.Role;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
