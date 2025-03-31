@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import useUserStore from "../../../service/store/user-store";
+import useUserStore from "../../../services/store/user-store";
 import Spinner from "../../../components/sniper/sniper.tsx";
 
 export default function UpdateUserAdmin({
@@ -20,7 +20,7 @@ export default function UpdateUserAdmin({
         const selectedUser = users.find((user) => user._id === id);
         if (selectedUser) {
             setUserData({
-                name: selectedUser.name || "",
+                name: selectedUser.firstName || "",
                 role: selectedUser.role || "user",
             });
         }

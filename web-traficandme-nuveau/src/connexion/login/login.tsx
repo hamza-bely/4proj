@@ -3,6 +3,8 @@ import {useTranslation} from "react-i18next";
 import {UserLoginRequest} from "../../services/model/user.tsx";
 import { FcGoogle } from "react-icons/fc";
 import { FaFacebookSquare } from "react-icons/fa";
+import {login} from "../../services/service/user-service.tsx";
+import Cookies from "js-cookie";
 
 export default function Login({ closeModal }: { closeModal: () => void }) {
     const [email, setEmail] = useState("");
@@ -18,7 +20,17 @@ export default function Login({ closeModal }: { closeModal: () => void }) {
 
         setIsLoading(true);
         try {
-          //TODO login
+            const response = await login(user);
+            if (response) {
+                console.log(response)
+                Cookies.set("authToken", response.data.token, {
+                    expires: 7,
+                    secure: true,
+                    sameSite: "Strict",
+                    path: "/"
+                });
+                closeModal()
+            }
         } catch (error) {
             console.error(error);
         } finally {

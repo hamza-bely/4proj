@@ -11,7 +11,9 @@
     "map" : "Map",
     "log-in": "Log in",
     "register" : "Register",
-    "login" : "Login"
+    "login" : "Login",
+    "company" : "TraficAndMe",
+    "users" : "Users"
   },
 
   "home": {

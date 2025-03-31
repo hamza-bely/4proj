@@ -1,10 +1,10 @@
 import { useTranslation } from "react-i18next";
-import useUserStore from "../../../service/store/user-store";
+import useUserStore from "../../../services/store/user-store";
 import  { useEffect, useState } from "react";
-import { Dialog } from "../../../components/kit-ui/dialog";
 import UpdateUserAdmin from "./update-user-admin.tsx";
 import CreateUserAdmin from "./create-user-admin.tsx";
 import Spinner from "../../../components/sniper/sniper.tsx";
+import {Dialog} from "../../../assets/kit-ui/dialog";
 
 export default function ListUserAdmin() {
     const { t } = useTranslation();
@@ -12,19 +12,19 @@ export default function ListUserAdmin() {
 
     const [isOpenCreate, setIsOpenCreate] = useState(false);
     const [isOpenUpdate, setIsOpenUpdate] = useState(false);
-    const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+    const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
     const [isDeleting, setIsDeleting] = useState(false);
 
     useEffect(() => {
         fetchUsers();
-    }, [fetchUsers]);
+    }, [users]);
 
-    const handleUpdateClick = (id: string) => {
+    const handleUpdateClick = (id: number) => {
         setSelectedUserId(id);
         setIsOpenUpdate(true);
     };
 
-    const handleDelete = (userId: string) => {
+    const handleDelete = (userId: number) => {
         if (window.confirm(t("confirm delete"))) {
             setIsDeleting(true);
             deleteUser(userId).finally(() => setIsDeleting(false));
@@ -86,25 +86,29 @@ export default function ListUserAdmin() {
                                 </tr>
                             ) : (
                                 users.map((user) => (
-                                    <tr key={user._id} className="even:bg-gray-50">
+                                    <tr key={user.id} className="even:bg-gray-50">
                                         <td className="py-4 pr-3 pl-4 text-sm font-medium whitespace-nowrap text-gray-900 sm:pl-3">
-                                            {user._id}
+                                            {user.id}
                                         </td>
                                         <td className="py-4 pr-3 pl-4 text-sm font-medium whitespace-nowrap text-gray-900 sm:pl-3">
-                                            {user.name}
+                                            {user.firstName}
+                                        </td>
+                                        <td className="py-4 pr-3 pl-4 text-sm font-medium whitespace-nowrap text-gray-900 sm:pl-3">
+                                            {user.lastName}
                                         </td>
                                         <td className="px-3 py-4 text-sm whitespace-nowrap text-gray-500">{user.email}</td>
+                                        <td className="px-3 py-4 text-sm whitespace-nowrap text-gray-500">{user.role}</td>
                                         <td className="px-3 py-4 text-sm whitespace-nowrap text-gray-500">{user.createdAt}</td>
                                         <td className="relative py-4 pr-4 pl-3 text-right text-sm font-medium whitespace-nowrap sm:pr-3">
                                             <button
-                                                onClick={() => handleDelete(user.auth_service_user_id)}
+                                                onClick={() => handleDelete(user.id)}
                                                 className="text-red-600 hover:text-red-900"
                                                 disabled={isDeleting}
                                             >
                                                 {isDeleting ? t("loading") : t("delete")}
                                             </button>
                                             <button
-                                                onClick={() => handleUpdateClick(user.auth_service_user_id)}
+                                                onClick={() => handleUpdateClick(user.id)}
                                                 className="text-indigo-800 ml-5 hover:text-indigo-400"
                                                 disabled={isDeleting}
                                             >

@@ -2,6 +2,8 @@ import { Routes, Route } from "react-router-dom";
 import Home from "../page/public/home/home.tsx";
 import Map from "../page/public/map/map/map.tsx";
 import MapComponent from "../page/public/map/map/map.tsx";
+import AuthGuardAdmin from "./auth-guard-admin.tsx";
+import ListUserAdmin from "../page/admin/user/list-user-admin.tsx";
 
 
 const AppRoutes = () => {
@@ -10,22 +12,14 @@ const AppRoutes = () => {
             <Route path="/" element={<Home />} />
             <Route path="/map" element={<Map />} />
             <Route path="/about" element={<MapComponent />} />
-            {/*<Route
-                path="/admin/gestion-users"
+            <Route
+                path="/admin/management-users"
                 element={
                     <AuthGuardAdmin>
                         <ListUserAdmin/>
                     </AuthGuardAdmin>
                 }
             />
-                <Route
-                path="/admin/gestion-tickets"
-                element={
-                <AuthGuardAdmin>
-                <ListTicketsAdmin/>
-               </AuthGuardAdmin>
-
-        />*/}
 
         </Routes>
     );

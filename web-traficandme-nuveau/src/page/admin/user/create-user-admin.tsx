@@ -1,15 +1,15 @@
 import React, { useState } from "react";
-import useUserStore from "../../../service/store/user-store.tsx";
-import { RegisterUserRequest } from "../../../service/model/user.tsx";
+import useUserStore from "../../../services/store/user-store.tsx";
+import { UserRegisterRequest } from "../../../services/model/user.tsx";
 
 export default function CreateUserAdmin({ setIsOpenCreate }: { setIsOpenCreate: (open: boolean) => void }) {
     const { createUser } = useUserStore();
 
-    const defaultUserData: RegisterUserRequest = {
-        name: "John Doe",
-        email: "john.doe@example.com",
+    const defaultUserData: UserRegisterRequest = {
+        firstName: "John Doe",
+        lastName: "john.doe@example.com",
         password: "password123",
-        password_confirmation: "password123",
+        email: "password123",
     };
 
     const [userData, setUserData] = useState<any>(defaultUserData);

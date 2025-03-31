@@ -1,22 +1,29 @@
 import { Navigate } from "react-router-dom";
-import {JSX} from "react";
-const isAuthenticated = () => {
-    const userData = localStorage.getItem("user_data");
+import {JSX, useEffect, useState} from "react";
+import {getUserRole} from "../services/service/token-service.tsx";
+import Cookies from "js-cookie";
+const isAuthenticated = (role: string | string[] | null) => {
 
-    if (!userData) {
+    if (!role) {
         return false;
     }
 
     try {
-        const user = JSON.parse(userData);
-        return user?.role === "admin" || user?.role === "event_creator";
+        return role === "ROLE_ADMIN" ;
     } catch (error) {
         console.error("Erreur de parsing des données utilisateur :", error);
         return false;
     }
 };
 const AuthGuard = ({ children }: { children: JSX.Element }) => {
-    return isAuthenticated() ? children : <Navigate to="/" />;
+    const [role, setRole] = useState<string | string[] | null>(null);
+    const token = Cookies.get("authToken");
+
+    useEffect(() => {
+        setRole(getUserRole());
+    }, [token]);
+    //TODO  A SUPPRIME
+    return isAuthenticated("ROLE_ADMIN") ? children : <Navigate to="/" />;
 };
 
 

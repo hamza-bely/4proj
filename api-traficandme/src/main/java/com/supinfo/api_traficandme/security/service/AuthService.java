@@ -31,8 +31,8 @@ public class AuthService {
         if (isNullOrEmpty(request.getEmail())) throw new IllegalArgumentException("L'email est obligatoire.");
         if (isNullOrEmpty(request.getPassword())) throw new IllegalArgumentException("Le mot de passe est obligatoire.");
 
-        if (request.getPassword().length() < 16) {
-            throw new IllegalArgumentException("Le mot de passe doit comporter au moins 16 caractères.");
+        if (request.getPassword().length() < 8) {
+            throw new IllegalArgumentException("Le mot de passe doit comporter au moins 8 caractères.");
         }
         if (!Pattern.compile(".*[0-9].*").matcher(request.getPassword()).matches()) {
             throw new IllegalArgumentException("Le mot de passe doit contenir au moins un chiffre.");
@@ -50,7 +50,7 @@ public class AuthService {
                 .lastName(request.getLastName())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
-                .roles(Role.User)
+                .roles(Role.USER)
                 .build();
         userRepository.save(user);
 
