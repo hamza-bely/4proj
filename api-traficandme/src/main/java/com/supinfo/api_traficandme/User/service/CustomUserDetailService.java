@@ -1,7 +1,6 @@
 package com.supinfo.api_traficandme.User.service;
 
 import com.supinfo.api_traficandme.User.entity.UserInfo;
-import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -12,10 +11,13 @@ import org.springframework.stereotype.Service;
 import java.util.Collections;
 
 @Service
-@RequiredArgsConstructor
 public class CustomUserDetailService implements UserDetailsService{
 
     private final UserService userService;
+
+    public CustomUserDetailService ( UserService userService){
+        this.userService= userService;
+    }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {

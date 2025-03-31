@@ -51,10 +51,10 @@ export default function Header() {
 
     function handleLogout() {
         Cookies.remove("authToken");
-        // TODO refresh obbligatoire
+        window.location.reload();
     }
 
-    const navigationLinks = role !== "ROLE_ADMIN" ? navigationAdmin : navigation;
+    const navigationLinks = role === "ROLE_ADMIN" ? navigationAdmin : navigation;
 
     useEffect(() => {
         setRole(getUserRole());

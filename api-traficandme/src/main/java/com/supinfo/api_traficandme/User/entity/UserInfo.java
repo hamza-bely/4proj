@@ -5,7 +5,6 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,14 +14,13 @@ import java.util.List;
 
 @Entity
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @Table(name = "utilisateur")
 public class UserInfo implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Integer id;
     @Column(nullable = false)
     private String firstName;
     @Column(nullable = false)
@@ -37,6 +35,22 @@ public class UserInfo implements UserDetails {
     private Role roles;
     @Transient
     private String pseudo;
+
+    public UserInfo() {
+
+    }
+
+    public UserInfo(Integer id,String firstName, String lastName, String email, String password, Role roles) {
+        this.id = id;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.password = password;
+        this.roles = roles;
+    }
+
+
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority("ROLE_"+ roles.name()));

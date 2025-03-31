@@ -22,7 +22,6 @@ export default function Login({ closeModal }: { closeModal: () => void }) {
         try {
             const response = await login(user);
             if (response) {
-                console.log(response)
                 Cookies.set("authToken", response.data.token, {
                     expires: 7,
                     secure: true,

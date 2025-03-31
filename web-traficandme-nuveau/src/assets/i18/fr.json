@@ -126,6 +126,27 @@
   "map": {
     "route-planner"  : "Planificateur d'itinéraire",
     "look-place" : "Chercher un endroit"
-  }
+  },
+  "user-admin" :{
+    "title" : "Gestion des utilisateurs",
+    "add-user" : "Ajouter un utilisateur",
+    "role" : "Role",
+    "username" : "Username",
+    "email" : "E-mail",
+    "delete" : "Supprimer",
+    "edit" : "Modifier",
+    "no_users" : "Aucun utilisateur"
 
+  },
+  "profile": {
+    "title": "Profil",
+    "date-create-profile": "Date de création",
+    "name": "Nom",
+    "email": "Email",
+    "password": "Nouveau mot de passe",
+    "save": "Sauvegarder",
+    "cancel": "Annuler",
+    "edit": "Modifier",
+    "no_user_info": "Aucune information utilisateur trouvée."
+  }
 }

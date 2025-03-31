@@ -1,9 +1,8 @@
-import {useEffect, useState} from "react";
+import { useState} from "react";
 import {UserRegisterRequest} from "../../services/model/user.tsx";
 import {useTranslation} from "react-i18next";
 import {register} from "../../services/service/user-service.tsx";
 import Cookies from "js-cookie";
-import {getUserRole} from "../../services/service/token-service.tsx";
 
 export default function Register({ closeModal }: { closeModal: () => void }) {
     const [firstName, setFirstName] = useState("");
@@ -27,7 +26,6 @@ export default function Register({ closeModal }: { closeModal: () => void }) {
         try {
             const response = await register(user);
             if (response) {
-                console.log(response)
                 Cookies.set("authToken", response.data.token, {
                     expires: 7,
                     secure: true,

@@ -4,6 +4,8 @@ import Map from "../page/public/map/map/map.tsx";
 import MapComponent from "../page/public/map/map/map.tsx";
 import AuthGuardAdmin from "./auth-guard-admin.tsx";
 import ListUserAdmin from "../page/admin/user/list-user-admin.tsx";
+import AuthGuard from "./auth-guard.tsx";
+import Profile from "../page/user/profile.tsx";
 
 
 const AppRoutes = () => {
@@ -21,6 +23,14 @@ const AppRoutes = () => {
                 }
             />
 
+            <Route
+                path="/profile"
+                element={
+                    <AuthGuard>
+                        <Profile/>
+                    </AuthGuard>
+                }
+            />
         </Routes>
     );
 };

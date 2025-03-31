@@ -1,88 +1,100 @@
 import React, { useState } from "react";
 import useUserStore from "../../../services/store/user-store.tsx";
-import { UserRegisterRequest } from "../../../services/model/user.tsx";
+import {UserCreateRequest} from "../../../services/model/user.tsx";
 
 export default function CreateUserAdmin({ setIsOpenCreate }: { setIsOpenCreate: (open: boolean) => void }) {
     const { createUser } = useUserStore();
 
-    const defaultUserData: UserRegisterRequest = {
-        firstName: "John Doe",
-        lastName: "john.doe@example.com",
-        password: "password123",
-        email: "password123",
+    const defaultUserData: UserCreateRequest = {
+        firstName: "",
+        lastName: "",
+        email: "",
+        password: "",
+        role: "USER",
     };
 
-    const [userData, setUserData] = useState<any>(defaultUserData);
-    const [isLoading, setIsLoading] = useState<boolean>(false); // État pour gérer le chargement
+    const [request, setRequest] = useState<UserCreateRequest>(defaultUserData);
+    const [isLoading, setIsLoading] = useState<boolean>(false);
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
-        setUserData((prev: any) => ({ ...prev, [name]: value }));
+        setRequest((prev) => ({ ...prev, [name]: value }));
     };
 
     const handleSubmit = async () => {
-        console.log("User data:", userData);
-
-        setIsLoading(true); // Démarrer le chargement
+        setIsLoading(true);
         try {
-            await createUser(userData); // Attendre la création de l'utilisateur
-            setIsOpenCreate(false); // Fermer le modal une fois l'utilisateur créé
+            await createUser(request);
+            setIsOpenCreate(false);
         } catch (error) {
             console.error("Erreur lors de la création de l'utilisateur", error);
         } finally {
-            setIsLoading(false); // Terminer le chargement
+            setIsLoading(false);
         }
     };
-
-    // Validation pour s'assurer que tous les champs sont remplis et que les mots de passe correspondent
-    const isFormValid = Object.values(userData).every((value) => value !== "") && userData.password === userData.password_confirmation;
+    const isFormValid = Object.values(request).every((value) => value !== "");
 
     return (
         <div className="max-w-2xl mx-auto bg-white rounded-lg p-5">
-            <h2 className="text-2xl font-bold text-gray-900">Ajouter un utilisateur</h2>
+            <h2 className="text-2xl font-semibold text-gray-900 text-center">
+                Ajouter un utilisateru
+            </h2>
             <div className="space-y-4">
+                <div>
+                <label className="block font-medium text-gray-700">Prénom</label>
+                    <input
+                        type="text"
+                        name="firstName"
+                        value={request.firstName}
+                        onChange={handleChange}
+                        className="m-2 block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-gray-300 placeholder-gray-400 focus:outline-indigo-600"
+                    />
+                </div>
+
                 <div>
                     <label className="block font-medium text-gray-700">Nom</label>
                     <input
                         type="text"
-                        name="name"
-                        value={userData.name}
+                        name="lastName"
+                        value={request.lastName}
                         onChange={handleChange}
-                        className="w-full p-2 border rounded"
+                        className="m-2 block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-gray-300 placeholder-gray-400 focus:outline-indigo-600"
                     />
                 </div>
 
                 <div>
-                    <label className="block font-medium text-gray-700 mt-2">Email</label>
+                    <label className="block font-medium text-gray-700">Email</label>
                     <input
                         type="email"
                         name="email"
-                        value={userData.email}
+                        value={request.email}
                         onChange={handleChange}
-                        className="w-full p-2 border rounded"
+                        className="m-2 block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-gray-300 placeholder-gray-400 focus:outline-indigo-600"
                     />
                 </div>
 
                 <div>
-                    <label className="block font-medium text-gray-700 mt-2">Mot de passe</label>
+                    <label className="block font-medium text-gray-700">Mot de passe</label>
                     <input
                         type="password"
                         name="password"
-                        value={userData.password}
+                        value={request.password}
                         onChange={handleChange}
-                        className="w-full p-2 border rounded"
+                        className="m-2 block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-gray-300 placeholder-gray-400 focus:outline-indigo-600"
                     />
                 </div>
 
                 <div>
-                    <label className="block font-medium text-gray-700 mt-2">Confirmation du mot de passe</label>
-                    <input
-                        type="password"
-                        name="password_confirmation"
-                        value={userData.password_confirmation}
+                    <label className="block font-medium text-gray-700">Rôle</label>
+                    <select
+                        name="role"
+                        value={request.role}
                         onChange={handleChange}
-                        className="w-full p-2 border rounded"
-                    />
+                        className="m-2 block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-gray-300 placeholder-gray-400 focus:outline-indigo-600"
+                    >
+                        <option value="USER">Utilisateur</option>
+                        <option value="ADMIN">Administrateur</option>
+                    </select>
                 </div>
 
                 <button

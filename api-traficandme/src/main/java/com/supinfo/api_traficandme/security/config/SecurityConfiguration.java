@@ -53,6 +53,7 @@ public class SecurityConfiguration {
     SecurityFilterChain ApisecurityFilterChain(HttpSecurity httpSecurity) throws Exception{
 
         httpSecurity.csrf(AbstractHttpConfigurer::disable)
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth ->
                         auth.requestMatchers("/api/auth/**").permitAll()
                                 .requestMatchers("/v3/api-docs/**").permitAll()
@@ -75,7 +76,7 @@ public class SecurityConfiguration {
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("*") );
+        configuration.setAllowedOrigins(List.of("http://localhost:5179") ); ///TODO ajouter le url de mobile
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
         configuration.setAllowCredentials(true);

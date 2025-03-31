@@ -7,7 +7,6 @@ import com.supinfo.api_traficandme.security.dto.RegisterRequest;
 import com.supinfo.api_traficandme.User.entity.UserInfo;
 import com.supinfo.api_traficandme.User.repository.UserRepository;
 import com.supinfo.api_traficandme.common.Role;
-import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -17,60 +16,69 @@ import org.springframework.stereotype.Service;
 import java.util.regex.Pattern;
 
 @Service
-@RequiredArgsConstructor
 public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtAuthService jwtAuthService;
     private final AuthenticationManager authenticationManager;
 
+
+    public AuthService (UserRepository userRepository,PasswordEncoder passwordEncoder,JwtAuthService jwtAuthService,AuthenticationManager authenticationManager){
+        this.userRepository =userRepository;
+        this.passwordEncoder =passwordEncoder;
+        this.jwtAuthService =jwtAuthService;
+        this.authenticationManager =authenticationManager;
+    }
+
     public AuthenticateResponse register(RegisterRequest request) {
 
-        if (isNullOrEmpty(request.getFirstName())) throw new IllegalArgumentException("Le prénom est obligatoire.");
-        if (isNullOrEmpty(request.getLastName())) throw new IllegalArgumentException("Le nom est obligatoire.");
-        if (isNullOrEmpty(request.getEmail())) throw new IllegalArgumentException("L'email est obligatoire.");
-        if (isNullOrEmpty(request.getPassword())) throw new IllegalArgumentException("Le mot de passe est obligatoire.");
+        if (isNullOrEmpty(request.getFirstName())) throw new IllegalArgumentException("First name is required.");
+        if (isNullOrEmpty(request.getLastName())) throw new IllegalArgumentException("Last name is required.");
+        if (isNullOrEmpty(request.getEmail())) throw new IllegalArgumentException("Email is required.");
+        if (isNullOrEmpty(request.getPassword())) throw new IllegalArgumentException("Password is required.");
 
         if (request.getPassword().length() < 8) {
-            throw new IllegalArgumentException("Le mot de passe doit comporter au moins 8 caractères.");
+            throw new IllegalArgumentException("Password must be at least 8 characters long.");
         }
         if (!Pattern.compile(".*[0-9].*").matcher(request.getPassword()).matches()) {
-            throw new IllegalArgumentException("Le mot de passe doit contenir au moins un chiffre.");
+            throw new IllegalArgumentException("Password must contain at least one digit.");
         }
         if (!Pattern.compile(".*[!@#$%^&*(),.?\":{}|<>].*").matcher(request.getPassword()).matches()) {
-            throw new IllegalArgumentException("Le mot de passe doit contenir au moins un caractère spécial.");
+            throw new IllegalArgumentException("Password must contain at least one special character.");
         }
 
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new IllegalArgumentException("L'email est déjà utilisé.");
+            throw new IllegalArgumentException("Email is already in use.");
         }
 
-        var user = UserInfo.builder()
-                .firstName(request.getFirstName())
-                .lastName(request.getLastName())
-                .email(request.getEmail())
-                .password(passwordEncoder.encode(request.getPassword()))
-                .roles(Role.USER)
-                .build();
+        UserInfo user = new UserInfo(
+                null,
+                request.getFirstName(),
+                request.getLastName(),
+                request.getEmail(),
+                passwordEncoder.encode(request.getPassword()),
+                Role.USER
+        );
         userRepository.save(user);
 
         System.out.println("Saved User Role: " + user.getRoles());
         System.out.println("Saved User Authorities: " + user.getAuthorities());
         String jwtToken = jwtAuthService.generateToken(user);
-        return AuthenticateResponse.builder()
-                .token(jwtToken)
-                .user(new UserResponse(
+        return new AuthenticateResponse(
+                jwtToken,
+                new UserResponse(
                         user.getId(),
-                        user.getFirstName()+" "+user.getLastName(),
+                        user.getFirstName() + " " + user.getLastName(),
                         user.getEmail(),
                         user.getRoles().name()
-                ))
-                .build();
+                )
+        );
+
     }
 
     public AuthenticateResponse authenticate(AuthenticateRequest request) {
-        if (isNullOrEmpty(request.getEmail())) throw new IllegalArgumentException("L'email est obligatoire.");
-        if (isNullOrEmpty(request.getPassword())) throw new IllegalArgumentException("Le mot de passe est obligatoire.");
+        if (isNullOrEmpty(request.getEmail())) throw new IllegalArgumentException("Email is required.gatoire.");
+        if (isNullOrEmpty(request.getPassword())) throw new IllegalArgumentException("The mot de passe is obligatory.");
 
         try {
             authenticationManager.authenticate(
@@ -80,19 +88,20 @@ public class AuthService {
                     )
             );
         } catch (BadCredentialsException e) {
-            throw new IllegalArgumentException("Email ou mot de passe invalide.");
+            throw new IllegalArgumentException("Email or many passes invalid.");
         }
         UserInfo user = userRepository.findByEmail(request.getEmail()).orElseThrow();
         String jwtToken = jwtAuthService.generateToken(user);
-        return AuthenticateResponse.builder()
-                .token(jwtToken)
-                .user(new UserResponse(
+        return new AuthenticateResponse(
+                jwtToken,
+                new UserResponse(
                         user.getId(),
-                        user.getFirstName()+" "+user.getLastName(),
+                        user.getFirstName() + " " + user.getLastName(),
                         user.getEmail(),
                         user.getRoles().name()
-                ))
-                .build();
+                )
+        );
+
     }
 
     public UserInfo getOneUserByEmail(String email){

@@ -14,14 +14,15 @@ public class UserMapper {
     }
 
     public UserInfo toModel(UserRequest request) {
-        return UserInfo.builder()
-                .id(request.id())
-                .firstName(request.firstName())
-                .lastName(request.lastName())
-                .email(request.email())
-                .password(passwordEncoder.encode(request.password()))
-                .roles(Role.valueOf(request.role()))
-                .build();
+        return new UserInfo(
+                request.id(),
+                request.firstName(),
+                request.lastName(),
+                request.email(),
+                passwordEncoder.encode(request.password()),
+                Role.valueOf(request.role())
+        );
+
     }
 
     public UserResponse toResponse(UserInfo userInfo) {
