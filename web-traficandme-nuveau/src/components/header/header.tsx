@@ -1,18 +1,19 @@
-import {useEffect, useState} from 'react';
+import { useEffect, useState } from 'react';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 import Languages from "../languages/languages.tsx";
-import {Dialog} from "../../assets/kit-ui/dialog.tsx";
+import { Dialog } from "../../assets/kit-ui/dialog.tsx";
 import Login from "../../connexion/login/login.tsx";
 import Register from "../../connexion/register/register.tsx";
-import {Menu, MenuButton, MenuItem, MenuItems} from "@headlessui/react";
-import {Link} from "react-router-dom";
-import {useTranslation} from "react-i18next";
-import {getUserRole} from "../../services/service/token-service.tsx";
+import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
+import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import { getUserRole } from "../../services/service/token-service.tsx";
 import Cookies from "js-cookie";
+import useUserStore from "../../services/store/user-store.tsx";
 
 export interface interfaceLanguages {
-    name: string
-    img : string
+    name: string;
+    img: string;
 }
 
 type NavigationItem = {
@@ -27,20 +28,22 @@ export default function Header() {
     const { t } = useTranslation();
     const [role, setRole] = useState<string | string[] | null>(null);
     const token = Cookies.get("authToken");
-    const navigation : NavigationItem[] = [
+    const { user, fetchUser } = useUserStore();
+
+    const navigation: NavigationItem[] = [
         { name: t('header.home'), href: '/' },
         { name: t('header.map'), href: '/map' },
         { name: t('header.company'), href: '/about' },
     ];
 
     const navigationAdmin: NavigationItem[] = [
-        { name: t('header.home'), href: '/'},
+        { name: t('header.home'), href: '/' },
         { name: t('header.map'), href: '/map' },
-        { name: t('header.company'), href: '/about'},
-        { name: t('header.users'), href: '/admin/management-users'}
+        { name: t('header.company'), href: '/about' },
+        { name: t('header.users'), href: '/admin/management-users' }
     ];
 
-    const languages : interfaceLanguages[] = [
+    const languages: interfaceLanguages[] = [
         { name: 'en', img: 'images/languages/english.png' },
         { name: 'fr', img: 'images/languages/french.png' },
     ];
@@ -58,7 +61,23 @@ export default function Header() {
 
     useEffect(() => {
         setRole(getUserRole());
+
+        const fetchData = async () => {
+            try {
+                await fetchUser();
+            } catch (error) {
+                console.error(error);
+            }
+        };
+        if(token){
+          fetchData();
+        }
     }, [token]);
+
+    const getInitials = (username: string) => {
+        if (!username) return '';
+        return username.charAt(0).toUpperCase();
+    };
 
     return (
         <header className="bg-white">
@@ -101,21 +120,23 @@ export default function Header() {
                             <div>
                                 <MenuButton
                                     className="relative flex rounded-full bg-gray-800 text-sm focus:ring-offset-2 focus:ring-offset-gray-800">
-                                    <span className="absolute -inset-1.5"/>
-                                    <img alt="Profile" src="/image/user1.png" className="h-8 w-8 rounded-full"/>
+                                    <span className="absolute -inset-1.5" />
+                                    <span className="h-8 w-8 rounded-full bg-blue-500 text-white flex items-center justify-center">
+                                        {getInitials(user?.username ? user.username : "j" )}
+                                    </span>
                                 </MenuButton>
                             </div>
                             <MenuItems
                                 className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5">
                                 <MenuItem>
-                                    {({active}) => (
+                                    {({ active }) => (
                                         <Link to="/profile" className={`block px-4 py-2 text-sm ${active ? 'bg-gray-100' : ''}`}>
                                             {t("profile.title")}
                                         </Link>
                                     )}
                                 </MenuItem>
                                 <MenuItem>
-                                    {({active}) => (
+                                    {({ active }) => (
                                         <button onClick={handleLogout}
                                                 className={`block w-full text-left px-4 py-2 text-sm ${active ? 'bg-gray-100' : ''}`}>
                                             {t("logout")}
@@ -135,7 +156,6 @@ export default function Header() {
                         </div>
                     )}
                     <Languages languages={languages} />
-
                 </div>
             </nav>
 
@@ -174,10 +194,10 @@ export default function Header() {
                     </div>
                 </div>
             )}
-            <Dialog style={{zIndex: 11, position: "fixed", top: 0, left: 0, right: 0, bottom: 0, display: "flex", justifyContent: "center", alignItems: "center"}} open={isOpenLogin} onClose={() => setIsOpenLogin(false)}>
+            <Dialog style={{ zIndex: 11, position: "fixed", top: 0, left: 0, right: 0, bottom: 0, display: "flex", justifyContent: "center", alignItems: "center" }} open={isOpenLogin} onClose={() => setIsOpenLogin(false)}>
                 <Login closeModal={() => setIsOpenLogin(false)} />
             </Dialog>
-            <Dialog  style={{zIndex: 11, position: "fixed", top: 0, left: 0, right: 0, bottom: 0, display: "flex", justifyContent: "center", alignItems: "center"}} open={isOpenRegister} onClose={() => setIsOpenRegister(false)}>
+            <Dialog style={{ zIndex: 11, position: "fixed", top: 0, left: 0, right: 0, bottom: 0, display: "flex", justifyContent: "center", alignItems: "center" }} open={isOpenRegister} onClose={() => setIsOpenRegister(false)}>
                 <Register closeModal={() => setIsOpenRegister(false)} />
             </Dialog>
         </header>

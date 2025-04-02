@@ -1,4 +1,4 @@
-import {User, UserCreateRequest} from "../model/user.tsx";
+import {User, UserComplete, UserCreateRequest} from "../model/user.tsx";
 import {fetchUser, fetchUsers, createUser, updateUser} from "../service/user-service.tsx";
 import { create } from "zustand";
 
@@ -8,7 +8,7 @@ interface UserState {
     fetchUsers: () => Promise<void>;
     fetchUser: () => Promise<void>;
     createUser : (params: UserCreateRequest) => Promise<void>;
-    updateUser : (id: number, params : any) => Promise<void>;
+    updateUser : (id: number, params : UserComplete) => Promise<void>;
     deleteUser: (id: number) => Promise<void>;
 }
 

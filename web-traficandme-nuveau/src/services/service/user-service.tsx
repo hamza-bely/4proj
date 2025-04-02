@@ -90,9 +90,9 @@ export const fetchUser = async (): Promise<UserResponseFetchUser> => {
     } catch (error) {
         if (error instanceof AxiosError && error.response) {
             const errorMessage = error.response.data?.message || "Une erreur est survenue";
-            toast.error(errorMessage);
+            console.error(errorMessage);
         } else {
-            toast.error("Erreur inconnue");
+            console.error("Erreur inconnue");
         }
         throw error;
     }

@@ -105,7 +105,7 @@ export default function Profile() {
                                             </div>
                                             <div className="flex justify-between py-3">
                                                 <dt className="text-gray-500">{t("profile.date-create-profile")}</dt>
-                                                <dd className="text-gray-900">{new Date(user.created_at).toLocaleDateString()}</dd>
+                                                <dd className="text-gray-900">{new Date(user.createDate).toLocaleDateString()}</dd>
                                             </div>
                                         </dl>
                                     ) : (

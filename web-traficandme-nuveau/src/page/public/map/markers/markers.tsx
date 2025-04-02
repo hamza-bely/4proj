@@ -1,16 +1,19 @@
 import { useEffect, useState } from "react";
 import tt from "@tomtom-international/web-sdk-maps";
-import {Alert} from "../../../../assets/kit-ui/alert.tsx";
-import {Input} from "../../../../assets/kit-ui/input.tsx";
+import { Alert } from "../../../../assets/kit-ui/alert.tsx";
+import { Input } from "../../../../assets/kit-ui/input.tsx";
+import PopupContent from "./popup-content.tsx";
+import { createRoot } from "react-dom/client";
+import { getUserRole } from "../../../../services/service/token-service.tsx";
+import Cookies from "js-cookie";
 
 interface Signal {
     type: string;
     position: [number, number];
     info: {
-        name: string;
         user: string;
-        status: string;
-        avatarUrl : string;
+        status: "Available" | "Unavailable" | "Canceled" | "Pending";
+        creteDate: string;
     };
 }
 
@@ -20,16 +23,19 @@ interface MarkersProps {
 
 const Markers: React.FC<MarkersProps> = ({ map }) => {
     const [signals, setSignals] = useState<Signal[]>([
-        { type: "dange", position: [2.3522, 48.8566], info: { name: "dange", user: "ghhaz", status: "confirmed", avatarUrl: "https://randomuser.me/api/portraits/men/1.jpg" } },
-        { type: "police", position: [2.3622, 48.8566], info: { name: "police", user: "ghhaz", status: "confirmed", avatarUrl: "https://randomuser.me/api/portraits/men/1.jpg" } },
-        { type: "police", position: [2.3622, 45.8566], info: { name: "police", user: "ghhaz", status: "confirmed", avatarUrl: "https://randomuser.me/api/portraits/men/1.jpg" } }
+        { type: "Danger", position: [2.3522, 48.8566], info: { status: "Available", user: "ghhaz", creteDate: "" } },
+        { type: "Police", position: [2.3622, 48.8566], info: { status: "Unavailable", user: "ghhaz", creteDate: "" } },
+        { type: "Police", position: [2.3622, 45.8566], info: { status: "Available", user: "ghhaz", creteDate: "" } }
     ]);
-
+    const token = Cookies.get("authToken");
+    const [userRole, setRole] = useState<string | string[] | null>(null);
     const [newMarkerPos, setNewMarkerPos] = useState<[number, number] | null>(null);
     const [newMarkerInfo, setNewMarkerInfo] = useState({ type: "", user: "", status: "" });
     const [showModal, setShowModal] = useState(false);
-
+    const [isAddingMarker, setIsAddingMarker] = useState(false);
     useEffect(() => {
+        setRole(getUserRole());
+
         if (!map) return;
 
         const createdMarkers: tt.Marker[] = [];
@@ -38,22 +44,30 @@ const Markers: React.FC<MarkersProps> = ({ map }) => {
             const coordinates = signal.position;
             const markerElement = document.createElement("div");
             markerElement.className = "rounded-full overflow-hidden shadow-lg border-2 border-white";
+            markerElement.style.marginBottom = "50px";
 
             markerElement.innerHTML = `
                 <img src="/images/icon-map/police.jpg" alt="User Avatar" class="rounded-full w-10 h-10 border-2 border-white shadow-md" />
             `;
 
-
             const marker = new tt.Marker({ element: markerElement })
                 .setLngLat(coordinates)
                 .addTo(map);
 
-            const popupContent = `
-                <h3>${signal.info.name}</h3>
-                <p>User: ${signal.info.user}</p>
-                <p>Status: ${signal.info.status}</p>
-            `;
-            const popup = new tt.Popup().setHTML(popupContent);
+            const popupContainer = document.createElement("div");
+            popupContainer.style.marginBottom = "10px";
+
+            const root = createRoot(popupContainer);
+
+            root.render(
+                <PopupContent
+                    type={signal.type}
+                    user={signal.info.user}
+                    creteDate={signal.info.creteDate}
+                />
+            );
+
+            const popup = new tt.Popup({ offset: { bottom: [0, -40] } }).setDOMContent(popupContainer);
 
             marker.getElement().addEventListener("mouseover", () => {
                 marker.setPopup(popup).togglePopup();
@@ -67,9 +81,12 @@ const Markers: React.FC<MarkersProps> = ({ map }) => {
         });
 
         const handleMapClick = (event: tt.EventData) => {
-            const { lng, lat } = event.lngLat;
-            setNewMarkerPos([lng, lat]);
-            setShowModal(true);
+            if (isAddingMarker && userRole) {
+                const { lng, lat } = event.lngLat;
+                setNewMarkerPos([lng, lat]);
+                setShowModal(true);
+                setIsAddingMarker(false);
+            }
         };
 
         map.on("click", handleMapClick);
@@ -78,7 +95,7 @@ const Markers: React.FC<MarkersProps> = ({ map }) => {
             createdMarkers.forEach((marker) => marker.remove());
             map.off("click", handleMapClick);
         };
-    }, [map, signals]);
+    }, [map, signals, isAddingMarker,token]);
 
     const handleAddMarker = () => {
         if (!newMarkerPos) return;
@@ -86,7 +103,7 @@ const Markers: React.FC<MarkersProps> = ({ map }) => {
         const newSignal: Signal = {
             type: newMarkerInfo.type,
             position: newMarkerPos,
-            info: { name: newMarkerInfo.type, user: newMarkerInfo.user, status: newMarkerInfo.status , avatarUrl : newMarkerInfo.status}
+            info: { name: newMarkerInfo.type, user: newMarkerInfo.user, status: newMarkerInfo.status, avatarUrl: newMarkerInfo.status }
         };
 
         setSignals([...signals, newSignal]);
@@ -97,19 +114,11 @@ const Markers: React.FC<MarkersProps> = ({ map }) => {
     return (
         <>
             <Alert open={showModal} onClose={setShowModal}>
-                <div className="bg-white p-6 rounded-lg  w-96 animate-fadeIn">
+                <div className="bg-white p-6 rounded-lg w-96 animate-fadeIn">
                     <h2 className="text-xl font-semibold mb-4 text-gray-800">Ajouter un marqueur</h2>
 
-                    <label className="block mb-2 text-gray-700">Type:
-                        <Input name="full_name" value={newMarkerInfo.type}  onChange={(e) => setNewMarkerInfo({ ...newMarkerInfo, type: e.target.value })} />
-                    </label>
-
-                    <label className="block mb-2 text-gray-700">Utilisateur:
-                        <Input name="full_name"  value={newMarkerInfo.user} onChange={(e) => setNewMarkerInfo({ ...newMarkerInfo, user: e.target.value })}  />
-                    </label>
-
-                    <label className="block mb-2 text-gray-700">Statut:
-                        <Input name="full_name" value={newMarkerInfo.status}  onChange={(e) => setNewMarkerInfo({ ...newMarkerInfo, status: e.target.value })} />
+                    <label className="block  text-gray-700">Type:
+                        <Input name="full_name mt-2" value={newMarkerInfo.type} onChange={(e) => setNewMarkerInfo({ ...newMarkerInfo, type: e.target.value })} />
                     </label>
 
                     <div className="flex justify-end mt-4">
@@ -118,6 +127,12 @@ const Markers: React.FC<MarkersProps> = ({ map }) => {
                     </div>
                 </div>
             </Alert>
+            {userRole && <button
+                style={{zIndex:"1001"}}
+                onClick={() => setIsAddingMarker(true)}
+                className="fixed bottom-10 right-10 bg-blue-500 text-white rounded-full p-4 shadow-lg hover:bg-blue-600"
+            >+
+            </button>}
         </>
     );
 };

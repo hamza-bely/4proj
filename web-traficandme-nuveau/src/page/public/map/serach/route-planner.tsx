@@ -8,6 +8,8 @@ import { Switch } from "@headlessui/react";
 import {useTranslation} from "react-i18next";
 import { FaCar } from "react-icons/fa";
 import {MdFilterListAlt} from "react-icons/md";
+import {LuRabbit, LuTurtle} from "react-icons/lu";
+import {TbBarrierBlockOff} from "react-icons/tb";
 
 
 type RouteResponse = {
@@ -81,16 +83,16 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated }) => {
                     className={`mode-select ${mode === "fastest" ? "selected" : ""}`}
                     onClick={() => setMode("fastest")}
                 >
-                    <FaCar/>rapide
+                    <LuRabbit />
                 </div>
                 <div
                     className={`mode-select ${mode === "shortest" ? "selected" : ""}`}
                     onClick={() => setMode("shortest")}
                 >
-                    <FaCar/>curte
+                    <LuTurtle />
                 </div>
-                <div className="m-1">
-                    <p>sans Peage</p>
+                <div className="m-1 container-toll">
+                    <TbBarrierBlockOff />
 
                     <Switch
                         checked={enabled}

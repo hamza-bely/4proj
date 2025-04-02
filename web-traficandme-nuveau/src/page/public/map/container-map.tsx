@@ -1,34 +1,40 @@
 import "./map.css"
 import Search from "./serach/search-bar.tsx";
 import RoutePlanner from "./serach/route-planner.tsx";
-import  {useState} from "react";
+import { useState} from "react";
 import { LuSearch } from "react-icons/lu";
 import {TbRouteSquare} from "react-icons/tb";
 import {MdOutlineGpsFixed} from "react-icons/md";
 import tt from "@tomtom-international/web-sdk-maps";
-
+import TrafficIndicator from "./traffic-indicator.tsx";
 
 interface ContainerMapProps {
     map: tt.Map | null;
 }
 
 export default function  ContainerMap   ({ map }: ContainerMapProps )  {
-
     const [search , setSearch]= useState<boolean>(false)
+
+    // Variables globales pour stocker les popups et marqueurs
+    let popups = [];
+    let markers = [];
 
     async function showRoute(routeData: string) {
         if (!map) return;
 
         try {
-            const routeCoordinates = JSON.parse(routeData); // Convertir la chaîne JSON en tableau
+            const routeCoordinates = JSON.parse(routeData);
 
-            // Supprimer l'ancienne route si elle existe
+            // Supprimer l'ancienne route
             if (map.getSource("route")) {
                 map.removeLayer("route-layer");
                 map.removeSource("route");
             }
 
-            // Ajouter une nouvelle source pour l'itinéraire
+            // Supprimer les anciens popups et marqueurs
+            clearPopupsAndMarkers();
+
+            // Ajouter la nouvelle route
             map.addSource("route", {
                 type: "geojson",
                 data: {
@@ -40,7 +46,6 @@ export default function  ContainerMap   ({ map }: ContainerMapProps )  {
                 },
             });
 
-            // Ajouter un calque pour afficher l'itinéraire
             map.addLayer({
                 id: "route-layer",
                 type: "line",
@@ -50,12 +55,11 @@ export default function  ContainerMap   ({ map }: ContainerMapProps )  {
                     "line-cap": "round",
                 },
                 paint: {
-                    "line-color": "#5DB3FF", // Couleur de la ligne
-                    "line-width": 8, // Largeur de la ligne
+                    "line-color": "#5DB3FF",
+                    "line-width": 8,
                 },
             });
 
-            // Ajuster la carte pour afficher l'itinéraire
             map.fitBounds(routeCoordinates.reduce((bbox, coord) => {
                 const [lon, lat] = coord;
                 return [
@@ -66,29 +70,72 @@ export default function  ContainerMap   ({ map }: ContainerMapProps )  {
                 ];
             }, [Infinity, Infinity, -Infinity, -Infinity]), { padding: 50 });
 
-            // Ajouter les icônes de départ et d'arrivée
-            const startPoint = routeCoordinates[0]; // Point de départ
-            const endPoint = routeCoordinates[routeCoordinates.length - 1]; // Point d'arrivée
+            const startPoint = routeCoordinates[0];
+            const endPoint = routeCoordinates[routeCoordinates.length - 1];
 
             // Ajouter un marqueur pour le point de départ
-            new tt.Marker({ element: createCustomIcon("Départ") })
+            const startMarker = new tt.Marker({ element: createCustomIcon("Départ") })
                 .setLngLat(startPoint)
                 .addTo(map);
+            markers.push(startMarker); // Stocker le marqueur
 
             // Ajouter un marqueur pour le point d'arrivée
-            new tt.Marker({ element: createCustomIcon("Arrivée") })
+            const endMarker = new tt.Marker({ element: createCustomIcon("Arrivée") })
                 .setLngLat(endPoint)
                 .addTo(map);
+            markers.push(endMarker); // Stocker le marqueur
+
+            // Obtenir la durée du trajet avec TomTom
+            const duration = await getRouteDuration(startPoint, endPoint);
+
+            // Obtenir le point médian de la route
+            const middlePoint = routeCoordinates[Math.floor(routeCoordinates.length / 2)];
+
+            // Ajouter un popup avec la durée du trajet (ouvert par défaut)
+            const popup = new tt.Popup({ offset: 10, closeButton: false, closeOnClick: false })
+                .setLngLat(middlePoint)
+                .setHTML(`<strong>Durée du trajet :</strong> ${duration}`)
+                .addTo(map);
+
+            popups.push(popup); // Stocker le popup
 
         } catch (error) {
             console.error("Erreur lors de l'affichage de l'itinéraire :", error);
         }
     }
 
-// Fonction pour créer un marqueur personnalisé (avec texte, ou icône)
-    function createCustomIcon(type: string) {
+    function clearPopupsAndMarkers() {
+        popups.forEach(popup => popup.remove());
+        popups = [];
+
+        markers.forEach(marker => marker.remove());
+        markers = [];
+    }
+
+    async function getRouteDuration(startPoint, endPoint) {
+        const apiKey = '9zc7scbLhpcrEFouo0xJWt0jep9qNlnv';
+        const url = `https://api.tomtom.com/routing/1/calculateRoute/${startPoint[1]},${startPoint[0]}:${endPoint[1]},${endPoint[0]}/json?key=${apiKey}`;
+
+        try {
+            const response = await fetch(url);
+            const data = await response.json();
+
+            if (data.routes && data.routes[0] && data.routes[0].summary) {
+                const durationInSeconds = data.routes[0].summary.travelTimeInSeconds;
+                const hours = Math.floor(durationInSeconds / 3600);
+                const minutes = Math.floor((durationInSeconds % 3600) / 60);
+                return `${hours}h ${minutes}min`;
+            }
+            return 'Inconnue';
+        } catch (error) {
+            console.error("Erreur lors du calcul de la durée du trajet :", error);
+            return 'Erreur';
+        }
+    }
+
+    function createCustomIcon(type) {
         const div = document.createElement("div");
-        div.style.backgroundColor = type === "Départ" ? "green" : "red"; // Couleur pour le départ (vert) et l'arrivée (rouge)
+        div.style.backgroundColor = type === "Départ" ? "green" : "red"; // Vert pour départ, rouge pour arrivée
         div.style.width = "20px";
         div.style.height = "20px";
         div.style.borderRadius = "50%";
@@ -102,12 +149,10 @@ export default function  ContainerMap   ({ map }: ContainerMapProps )  {
         return div;
     }
 
-    // Callback de l'itinéraire calculé (à partir de RoutePlanner)
     const onRouteCalculated = (routePolyline: string) => {
         showRoute(routePolyline);
     };
 
-    // Lorsque l'utilisateur sélectionne un résultat de recherche
     const onSearchResultSelect = (position: { lat: number; lon: number }) => {
         if (map) {
             map.flyTo({ center: [position.lon, position.lat], zoom: 15 });
@@ -122,12 +167,10 @@ export default function  ContainerMap   ({ map }: ContainerMapProps )  {
                     const { latitude, longitude } = position.coords;
 
                     if (map) {
-                        // Ajouter un marqueur à la position actuelle
                         new tt.Marker()
                             .setLngLat([longitude, latitude])
                             .addTo(map);
 
-                        // Centrer la carte sur la position de l'utilisateur
                         map.flyTo({ center: [longitude, latitude], zoom: 14 });
                     }
                 },
@@ -141,28 +184,6 @@ export default function  ContainerMap   ({ map }: ContainerMapProps )  {
             alert("La géolocalisation n'est pas supportée par ce navigateur.");
         }
     }
-
-    function enableTrafficLayer() {
-        if (!map) return;
-
-        if (!map.getLayer("traffic")) {
-            map.addLayer({
-                id: "traffic",
-                type: "raster",
-                source: {
-                    type: "raster",
-                    tiles: [
-                        "https://api.tomtom.com/traffic/map/4/tile/flow/relative0/{z}/{x}/{y}.png?key=9zc7scbLhpcrEFouo0xJWt0jep9qNlnv"
-                    ],
-                    tileSize: 256
-                },
-                layout: {
-                    visibility: "visible"
-                }
-            });
-        }
-    }
-
 
     return (
         <div>
@@ -198,20 +219,13 @@ export default function  ContainerMap   ({ map }: ContainerMapProps )  {
                                     className={`text-md m-2 cursor-pointer  hover:p-[1px] ${search ? 'text-blue-500' : 'text-gray-500'}`}
                                 />
 
-                                <button
-                                    onClick={enableTrafficLayer}
-                                    className="bg-blue-500 text-white p-2 rounded shadow"
-                                >
-                                    Afficher le trafic
-                                </button>
-
                             </div>
                         </div>
 
                         {!search && <Search onSearchResultSelect={onSearchResultSelect}/>}
                         {search && <RoutePlanner onRouteCalculated={onRouteCalculated}/>}
                     </div>
-
+                    <TrafficIndicator/>
                 </div>
             </div>
         </div>
