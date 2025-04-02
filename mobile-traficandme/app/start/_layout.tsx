@@ -1,5 +1,5 @@
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { Slot, useSegments } from 'expo-router';
+import { Slot, useSegments, Stack } from 'expo-router';
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { useColorScheme } from '@/hooks/useColorScheme';
@@ -13,7 +13,8 @@ export default function StartLayout() {
     return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
         <View style={[styles.container, { backgroundColor }]}>
-            <Slot />
+            <Slot  />
+
         </View>   
     </ThemeProvider>
     );
@@ -22,6 +23,5 @@ export default function StartLayout() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        paddingTop: 110,
     },
 });

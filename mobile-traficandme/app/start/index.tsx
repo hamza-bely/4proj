@@ -18,9 +18,9 @@ export default function StartScreen() {
   >
     <View style={styles.overlay}>
       <View style={styles.content}>
-        <Text style={styles.title}>Concluez vos <Text style={styles.spanTitle}>Deals</Text> sans aucun risque de perte.   </Text>
+        <Text style={styles.title}>Prenez le volant, nous gérons le  <Text style={styles.spanTitle}>Trafic</Text>.</Text>
       </View>
-      <Link href="/" asChild style={styles.button}>
+      <Link href="/start/login" asChild style={styles.button}>
         <Pressable><Text style={styles.buttonText}>Commencer</Text></Pressable>
       </Link>
     </View>
@@ -59,7 +59,7 @@ const styles = StyleSheet.create({
   button: {
     position: 'absolute',
     bottom: 50,
-    backgroundColor: '#D3AF77',
+    backgroundColor: '#ffbc2e',
     paddingVertical: 12,
     paddingHorizontal: 110,
     borderRadius: 15,
@@ -77,6 +77,6 @@ const styles = StyleSheet.create({
   },
   spanTitle:{
     fontFamily:'redRoseBold',
-    color:'#D3AF77'
+    color:'#ffbc2e'
   }
 });
