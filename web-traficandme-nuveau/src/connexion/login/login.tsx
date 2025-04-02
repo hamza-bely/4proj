@@ -1,6 +1,10 @@
 import { useState } from "react";
 import {useTranslation} from "react-i18next";
 import {UserLoginRequest} from "../../services/model/user.tsx";
+import { FcGoogle } from "react-icons/fc";
+import { FaFacebookSquare } from "react-icons/fa";
+import {login} from "../../services/service/user-service.tsx";
+import Cookies from "js-cookie";
 
 export default function Login({ closeModal }: { closeModal: () => void }) {
     const [email, setEmail] = useState("");
@@ -16,7 +20,16 @@ export default function Login({ closeModal }: { closeModal: () => void }) {
 
         setIsLoading(true);
         try {
-          //TODO login
+            const response = await login(user);
+            if (response) {
+                Cookies.set("authToken", response.data.token, {
+                    expires: 7,
+                    secure: true,
+                    sameSite: "Strict",
+                    path: "/"
+                });
+                closeModal()
+            }
         } catch (error) {
             console.error(error);
         } finally {
@@ -69,6 +82,7 @@ export default function Login({ closeModal }: { closeModal: () => void }) {
                             </div>
                         </div>
 
+
                         <div>
                             <button
                                 type="submit"
@@ -86,9 +100,42 @@ export default function Login({ closeModal }: { closeModal: () => void }) {
                                 )}
                             </button>
                         </div>
-                    </form>
-                </div>
-            </div>
+
+
+                        <div>
+                            <div className="relative mt-10">
+                                <div aria-hidden="true" className="absolute inset-0 flex items-center">
+                                    <div className="w-full border-t border-gray-200"/>
+                                </div>
+                                <div className="relative flex justify-center text-sm/6 font-medium">
+                                    <span className="bg-white px-6 text-gray-900">Or continue with</span>
+                                </div>
+                            </div>
+
+                            <div className="mt-6 grid grid-cols-2 gap-4">
+                                <a
+                                    href="#"
+                                    className="flex w-full items-center justify-center gap-3 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 shadow-xs ring-gray-300 ring-inset hover:bg-gray-50 focus-visible:ring-transparent"
+                                >
+                                    <FcGoogle />
+
+                                    <span className="text-sm/6 font-semibold">Google</span>
+                                </a>
+
+                                <a
+                                    href="#"
+                                    className="flex w-full items-center justify-center gap-3 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 shadow-xs ring-gray-300 ring-inset hover:bg-gray-50 focus-visible:ring-transparent"
+                                >
+                                    <FaFacebookSquare />
+
+                                    <span className="text-sm/6 font-semibold">Facebook</span>
+                                </a>
+                            </div>
+                        </div>
+            </form>
         </div>
-    );
+</div>
+</div>
+)
+    ;
 }

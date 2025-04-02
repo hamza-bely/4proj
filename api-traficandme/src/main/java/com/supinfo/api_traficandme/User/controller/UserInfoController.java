@@ -2,14 +2,15 @@ package com.supinfo.api_traficandme.User.controller;
 
 import com.supinfo.api_traficandme.User.dto.UserRequest;
 import com.supinfo.api_traficandme.User.dto.UserResponse;
+import com.supinfo.api_traficandme.User.entity.UserInfo;
 import com.supinfo.api_traficandme.User.service.UserService;
+import com.supinfo.api_traficandme.security.dto.ApiResponse;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,26 +19,39 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/users")
-@RequiredArgsConstructor
+@CrossOrigin(origins = "*")
+
 public class UserInfoController {
     private  final UserService userService;
 
+    public UserInfoController(UserService userService,PasswordEncoder passwordEncoder){
+        this.userService = userService;
+    }
+
     @PostMapping("create")
     //@PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<Integer> createUser(@Valid @RequestBody UserRequest request){
-        var use = userService.getOneUserByEmail(request.email());
-        if (use != null){
-            return new ResponseEntity<>(Integer.valueOf("User already exists"),HttpStatus.BAD_REQUEST);
+    public ResponseEntity<ApiResponse<UserResponse>> createUser(@Valid @RequestBody UserRequest request){
+        try {
+            UserResponse response = userService.createUser(request);
+            ApiResponse<UserResponse> apiResponse = new ApiResponse<>("List users", response);
+            return ResponseEntity.ok(apiResponse);
+        } catch (RuntimeException e) {
+            ApiResponse<UserResponse> errorResponse = new ApiResponse<>(e.getMessage(), null);
+            return ResponseEntity.badRequest().body(errorResponse);
         }
-        var userId = userService.createUser(request);
-        return new ResponseEntity<>(userId, HttpStatus.CREATED);
     }
 
     @GetMapping("list")
     //@PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<List<UserResponse>> getAllUser(){
-        var list = userService.getAllUsers();
-        return new ResponseEntity<>(list, HttpStatus.OK);
+    public ResponseEntity<ApiResponse<List<UserResponse>>> getAllUser(){
+        try {
+            List<UserResponse> response = userService.getAllUsers();
+            ApiResponse<List<UserResponse>> apiResponse = new ApiResponse<>("List users", response);
+            return ResponseEntity.ok(apiResponse);
+        } catch (RuntimeException e) {
+            ApiResponse<List<UserResponse>> errorResponse = new ApiResponse<>(e.getMessage(), null);
+            return ResponseEntity.badRequest().body(errorResponse);
+        }
     }
 
     @GetMapping("getUser/{userId}")
@@ -49,9 +63,15 @@ public class UserInfoController {
 
     @PutMapping("update/{userId}")
     //@PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<Void> updateUser(@PathVariable ("userId") String userId,@Valid @RequestBody UserRequest request){
-         userService.updateUser(Integer.valueOf(userId),request);
-        return new ResponseEntity<>(HttpStatus.ACCEPTED);
+    public ResponseEntity<ApiResponse<UserResponse>> updateUser(@PathVariable ("userId") String userId,@Valid @RequestBody UserRequest request){
+        try {
+            UserResponse response = userService.updateUser(Integer.valueOf(userId),request);
+            ApiResponse<UserResponse> apiResponse = new ApiResponse<>("Update User", response);
+            return ResponseEntity.ok(apiResponse);
+        } catch (RuntimeException e) {
+            ApiResponse<UserResponse> errorResponse = new ApiResponse<>(e.getMessage(), null);
+            return ResponseEntity.badRequest().body(errorResponse);
+        }
     }
 
     @DeleteMapping("delete/{userId}")
@@ -68,9 +88,15 @@ public class UserInfoController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<UserResponse> getUSerConnected() {
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        var userAuthenticated = userService.getUserByEmail(((UserDetails) principal).getUsername());
-        return new ResponseEntity<>(userAuthenticated, HttpStatus.OK);
+    public ResponseEntity<ApiResponse<UserResponse>> getUSerConnected() {
+        try {
+            Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            UserResponse response = userService.getUserByEmail(((UserDetails) principal).getUsername());
+            ApiResponse<UserResponse> apiResponse = new ApiResponse<>("User", response);
+            return ResponseEntity.ok(apiResponse);
+        } catch (RuntimeException e) {
+            ApiResponse<UserResponse> errorResponse = new ApiResponse<>(e.getMessage(), null);
+            return ResponseEntity.badRequest().body(errorResponse);
+        }
     }
 }

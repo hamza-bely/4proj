@@ -1,33 +1,39 @@
 import { useEffect, useState } from "react";
-import useUserStore from "../../../service/store/user-store";
+import useUserStore from "../../../services/store/user-store";
 import Spinner from "../../../components/sniper/sniper.tsx";
 
 export default function UpdateUserAdmin({
                                             id,
                                             setIsOpenUpdate,
                                         }: {
-    id: string;
+    id: number;
     setIsOpenUpdate: (open: boolean) => void;
 }) {
     const { updateUser, users } = useUserStore();
     const [userData, setUserData] = useState({
-        name: "",
-        role: "user",
+        firstName: "",
+        lastName: "",
+        email: "",
+        password: "",
+        role: "ROLE_USER",
     });
     const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
-        const selectedUser = users.find((user) => user._id === id);
+        const selectedUser = users.find((user ) => user.id === id);
         if (selectedUser) {
             setUserData({
-                name: selectedUser.name || "",
-                role: selectedUser.role || "user",
+                firstName: selectedUser.username?.split(" ")[0] || "",
+                lastName: selectedUser.username?.split(" ")[1] || "",
+                email: selectedUser.email || "",
+                password: "",
+                role: selectedUser.role || "ROLE_USER",
             });
         }
     }, [id, users]);
 
     const handleChange = (
-        e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+        e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
     ) => {
         setUserData({
             ...userData,
@@ -38,8 +44,11 @@ export default function UpdateUserAdmin({
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setIsLoading(true);
+
         try {
-            await updateUser(id, userData);
+            const updatePayload = { ...userData };
+
+            await updateUser(id, updatePayload);
             setIsOpenUpdate(false);
         } catch (error) {
             console.error("Erreur lors de la mise à jour :", error);
@@ -54,15 +63,12 @@ export default function UpdateUserAdmin({
                 Modifier un Utilisateur
             </h2>
             <form onSubmit={handleSubmit} className="space-y-5">
-                {/* Nom */}
                 <div>
-                    <label className="block text-gray-700 font-medium">
-                        Nom de l'utilisateur
-                    </label>
+                    <label className="block text-gray-700 font-medium">Prénom</label>
                     <input
                         type="text"
-                        name="name"
-                        value={userData.name}
+                        name="firstName"
+                        value={userData.firstName}
                         onChange={handleChange}
                         required
                         className="m-2 block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-gray-300 placeholder-gray-400 focus:outline-indigo-600"
@@ -70,22 +76,54 @@ export default function UpdateUserAdmin({
                 </div>
 
                 <div>
-                    <label className="block text-gray-700 font-medium">
-                        Rôle de l'utilisateur
-                    </label>
+                    <label className="block text-gray-700 font-medium">Nom</label>
+                    <input
+                        type="text"
+                        name="lastName"
+                        value={userData.lastName}
+                        onChange={handleChange}
+                        required
+                        className="m-2 block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-gray-300 placeholder-gray-400 focus:outline-indigo-600"
+                    />
+                </div>
+
+                <div>
+                    <label className="block text-gray-700 font-medium">Email</label>
+                    <input
+                        type="email"
+                        name="email"
+                        value={userData.email}
+                        onChange={handleChange}
+                        required
+                        className="m-2 block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-gray-300 placeholder-gray-400 focus:outline-indigo-600"
+                    />
+                </div>
+
+                <div>
+                    <label className="block text-gray-700 font-medium">Mot de passe</label>
+                    <input
+                        type="password"
+                        name="password"
+                        value={userData.password}
+                        onChange={handleChange}
+                        placeholder="Laisser vide si non modifié"
+                        className="m-2 block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-gray-300 placeholder-gray-400 focus:outline-indigo-600"
+                    />
+                </div>
+
+                <div>
+                    <label className="block text-gray-700 font-medium">Rôle</label>
                     <select
                         name="role"
                         value={userData.role}
                         onChange={handleChange}
                         className="m-2 block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-gray-300 focus:outline-indigo-600"
                     >
-                        <option value="user">Utilisateur</option>
-                        <option value="organizer">Créateur</option>
-                        <option value="admin">Admin</option>
+                        <option value="ROLE_USER">Utilisateur</option>
+                        <option value="ROLE_ADMIN">Admin</option>
                     </select>
                 </div>
 
-                {/* Bouton de mise à jour */}
                 <button
                     type="submit"
                     disabled={isLoading}

@@ -1,22 +1,25 @@
 import { Navigate } from "react-router-dom";
 import {JSX} from "react";
-const isAuthenticated = () => {
-    const userData = localStorage.getItem("user_data");
+import Cookies from "js-cookie";
+const isAuthenticated = (token: string | undefined) => {
 
-    if (!userData) {
+    if (!token) {
         return false;
     }
 
     try {
-        const user = JSON.parse(userData);
-        return user?.role;
+        if (token) {
+            return true;
+        }
     } catch (error) {
         console.error("Erreur de parsing des données utilisateur :", error);
         return false;
     }
 };
 const AuthGuard = ({ children }: { children: JSX.Element }) => {
-    return isAuthenticated() ? children : <Navigate to="/" />;
+    const token = Cookies.get("authToken");
+
+    return isAuthenticated(token) ? children : <Navigate to="/" />;
 };
 
 

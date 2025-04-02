@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import {useEffect, useState} from 'react';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 import Languages from "../languages/languages.tsx";
 import {Dialog} from "../../assets/kit-ui/dialog.tsx";
@@ -7,58 +7,70 @@ import Register from "../../connexion/register/register.tsx";
 import {Menu, MenuButton, MenuItem, MenuItems} from "@headlessui/react";
 import {Link} from "react-router-dom";
 import {useTranslation} from "react-i18next";
+import {getUserRole} from "../../services/service/token-service.tsx";
+import Cookies from "js-cookie";
 
 export interface interfaceLanguages {
     name: string
     img : string
 }
 
-const navigation = [
-    { name: 'Product', href: '#' },
-    { name: 'Features', href: '#' },
-    { name: 'Company', href: '#' },
-];
-
-
-const languages : interfaceLanguages[] = [
-    { name: 'en', img: 'images/languages/english.png' },
-    { name: 'fr', img: 'images/languages/french.png' },
-];
+type NavigationItem = {
+    name: string;
+    href: string;
+};
 
 export default function Header() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [isOpenLogin, setIsOpenLogin] = useState(false);
     const [isOpenRegister, setIsOpenRegister] = useState(false);
     const { t } = useTranslation();
-    const user : boolean = false;
+    const [role, setRole] = useState<string | string[] | null>(null);
+    const token = Cookies.get("authToken");
+    const navigation : NavigationItem[] = [
+        { name: t('header.home'), href: '/' },
+        { name: t('header.map'), href: '/map' },
+        { name: t('header.company'), href: '/about' },
+    ];
+
+    const navigationAdmin: NavigationItem[] = [
+        { name: t('header.home'), href: '/'},
+        { name: t('header.map'), href: '/map' },
+        { name: t('header.company'), href: '/about'},
+        { name: t('header.users'), href: '/admin/management-users'}
+    ];
+
+    const languages : interfaceLanguages[] = [
+        { name: 'en', img: 'images/languages/english.png' },
+        { name: 'fr', img: 'images/languages/french.png' },
+    ];
 
     const toggleMobileMenu = () => {
         setMobileMenuOpen(!mobileMenuOpen);
     };
 
-
     function handleLogout() {
-
+        Cookies.remove("authToken");
+        window.location.reload();
     }
+
+    const navigationLinks = role === "ROLE_ADMIN" ? navigationAdmin : navigation;
+
+    useEffect(() => {
+        setRole(getUserRole());
+    }, [token]);
 
     return (
         <header className="bg-white">
             <nav className="mx-auto flex max-w-7xl items-center justify-between p-4 lg:px-8" aria-label="Global">
                 <div className="flex flex-1">
                     <div className="hidden lg:flex lg:gap-x-12">
-                        <Link to="/" className="text-sm font-semibold text-gray-900">
-                            <i className="pi pi-home mr-1"></i>{t("header.home")}
-                        </Link>
-                        <Link to="map" className="text-sm font-semibold text-gray-900 flex items-center">
-                            <i className="pi pi-map mr-1"></i>{t("header.map")}
-                        </Link>
-                        <Link
-                            to="/about"
-                            className="cursor-pointer text-sm font-semibold text-gray-900"
-                            onClick={() => alert('This section is not available')}
-                        >
-                            <i className="pi pi-building mr-1"></i> {t("header.about")}
-                        </Link>
+                        {navigationLinks.map((item) => (
+                            <Link key={item.name} to={item.href}
+                                  className="text-gray-900 hover:text-gray-700 px-3 py-2 text-sm font-medium">
+                                {item.name}
+                            </Link>
+                        ))}
                     </div>
                     <div className="flex lg:hidden">
                         <button
@@ -84,7 +96,7 @@ export default function Header() {
                 </a>
 
                 <div className="flex flex-1 justify-end">
-                    {user ? (
+                    {role ? (
                         <Menu as="div" className="relative ml-3">
                             <div>
                                 <MenuButton

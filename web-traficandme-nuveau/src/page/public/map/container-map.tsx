@@ -16,18 +16,19 @@ export default function  ContainerMap   ({ map }: ContainerMapProps )  {
 
     const [search , setSearch]= useState<boolean>(false)
 
-    const showRoute = (routeData: string) => {
+    async function showRoute(routeData: string) {
         if (!map) return;
 
         try {
-            const routeCoordinates = JSON.parse(routeData); // Convertir la chaîne JSON en tablea
+            const routeCoordinates = JSON.parse(routeData); // Convertir la chaîne JSON en tableau
 
-            // Vérifier si une route existe déjà et la supprimer avant d'ajouter la nouvelle
+            // Supprimer l'ancienne route si elle existe
             if (map.getSource("route")) {
                 map.removeLayer("route-layer");
                 map.removeSource("route");
             }
 
+            // Ajouter une nouvelle source pour l'itinéraire
             map.addSource("route", {
                 type: "geojson",
                 data: {
@@ -39,7 +40,7 @@ export default function  ContainerMap   ({ map }: ContainerMapProps )  {
                 },
             });
 
-            // Ajouter le layer pour dessiner la route
+            // Ajouter un calque pour afficher l'itinéraire
             map.addLayer({
                 id: "route-layer",
                 type: "line",
@@ -49,12 +50,13 @@ export default function  ContainerMap   ({ map }: ContainerMapProps )  {
                     "line-cap": "round",
                 },
                 paint: {
-                    "line-color": "#19589b", // Rouge
-                    "line-width": 8,
+                    "line-color": "#5DB3FF", // Couleur de la ligne
+                    "line-width": 8, // Largeur de la ligne
                 },
             });
 
-            const bounds = routeCoordinates.reduce((bbox, coord) => {
+            // Ajuster la carte pour afficher l'itinéraire
+            map.fitBounds(routeCoordinates.reduce((bbox, coord) => {
                 const [lon, lat] = coord;
                 return [
                     Math.min(bbox[0], lon),
@@ -62,13 +64,43 @@ export default function  ContainerMap   ({ map }: ContainerMapProps )  {
                     Math.max(bbox[2], lon),
                     Math.max(bbox[3], lat),
                 ];
-            }, [Infinity, Infinity, -Infinity, -Infinity]);
+            }, [Infinity, Infinity, -Infinity, -Infinity]), { padding: 50 });
 
-            map.fitBounds(bounds, { padding: 50 });
+            // Ajouter les icônes de départ et d'arrivée
+            const startPoint = routeCoordinates[0]; // Point de départ
+            const endPoint = routeCoordinates[routeCoordinates.length - 1]; // Point d'arrivée
+
+            // Ajouter un marqueur pour le point de départ
+            new tt.Marker({ element: createCustomIcon("Départ") })
+                .setLngLat(startPoint)
+                .addTo(map);
+
+            // Ajouter un marqueur pour le point d'arrivée
+            new tt.Marker({ element: createCustomIcon("Arrivée") })
+                .setLngLat(endPoint)
+                .addTo(map);
+
         } catch (error) {
             console.error("Erreur lors de l'affichage de l'itinéraire :", error);
         }
-    };
+    }
+
+// Fonction pour créer un marqueur personnalisé (avec texte, ou icône)
+    function createCustomIcon(type: string) {
+        const div = document.createElement("div");
+        div.style.backgroundColor = type === "Départ" ? "green" : "red"; // Couleur pour le départ (vert) et l'arrivée (rouge)
+        div.style.width = "20px";
+        div.style.height = "20px";
+        div.style.borderRadius = "50%";
+        div.style.display = "flex";
+        div.style.alignItems = "center";
+        div.style.justifyContent = "center";
+        div.style.color = "white";
+        div.style.fontSize = "12px";
+        div.style.fontWeight = "bold";
+        div.innerText = type === "Départ" ? "D" : "A";
+        return div;
+    }
 
     // Callback de l'itinéraire calculé (à partir de RoutePlanner)
     const onRouteCalculated = (routePolyline: string) => {
@@ -81,7 +113,7 @@ export default function  ContainerMap   ({ map }: ContainerMapProps )  {
             map.flyTo({ center: [position.lon, position.lat], zoom: 15 });
             new tt.Marker().setLngLat([position.lon, position.lat]).addTo(map);
         }
-    };
+    }
 
     function getUserPosition() {
         if (navigator.geolocation) {
@@ -113,9 +145,7 @@ export default function  ContainerMap   ({ map }: ContainerMapProps )  {
     function enableTrafficLayer() {
         if (!map) return;
 
-        // Vérifie si la couche de trafic existe déjà
         if (!map.getLayer("traffic")) {
-            // Ajoute une source de trafic en temps réel
             map.addLayer({
                 id: "traffic",
                 type: "raster",

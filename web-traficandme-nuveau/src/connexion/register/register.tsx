@@ -1,28 +1,39 @@
-import { useState } from "react";
+import { useState} from "react";
 import {UserRegisterRequest} from "../../services/model/user.tsx";
 import {useTranslation} from "react-i18next";
+import {register} from "../../services/service/user-service.tsx";
+import Cookies from "js-cookie";
 
 export default function Register({ closeModal }: { closeModal: () => void }) {
-    const [name, setName] = useState("");
+    const [firstName, setFirstName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [passwordConfirmation, setPasswordConfirmation] = useState("");
-    const [isLoading, setIsLoading] = useState(false); // Ajout de l'état de chargement
+    const [lastName, setLastName] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
     const { t } = useTranslation();
 
     const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
 
         const user : UserRegisterRequest = {
-            name,
+            firstName,
+            lastName,
             email,
             password,
-            password_confirmation: passwordConfirmation,
         };
 
         setIsLoading(true);
         try {
-            //TODO register
+            const response = await register(user);
+            if (response) {
+                Cookies.set("authToken", response.data.token, {
+                    expires: 7,
+                    secure: true,
+                    sameSite: "Strict",
+                    path: "/"
+                });
+                closeModal()
+            }
         } catch (error) {
             console.error(error);
         } finally {
@@ -41,16 +52,33 @@ export default function Register({ closeModal }: { closeModal: () => void }) {
                 <div className="bg-white px-6 py-12 sm:rounded-lg sm:px-12">
                     <form onSubmit={handleSubmit} className="space-y-6">
                         <div>
-                            <label htmlFor="name" className="block text-sm font-medium text-gray-900">
-                                Nom
+                            <label htmlFor="firstName" className="block text-sm font-medium text-gray-900">
+                                firstName
                             </label>
                             <div className="mt-2">
                                 <input
-                                    id="name"
-                                    name="name"
+                                    id="firstName"
+                                    name="firstName"
                                     type="text"
-                                    value={name}
-                                    onChange={(e) => setName(e.target.value)}
+                                    value={firstName}
+                                    onChange={(e) => setFirstName(e.target.value)}
+                                    required
+                                    className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm"
+                                />
+                            </div>
+                        </div>
+
+                        <div>
+                            <label htmlFor="name" className="block text-sm font-medium text-gray-900">
+                                lastName
+                            </label>
+                            <div className="mt-2">
+                                <input
+                                    id="lastName"
+                                    name="lastName"
+                                    type="text"
+                                    value={lastName}
+                                    onChange={(e) => setLastName(e.target.value)}
                                     required
                                     className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm"
                                 />
@@ -92,23 +120,6 @@ export default function Register({ closeModal }: { closeModal: () => void }) {
                             </div>
                         </div>
 
-                        <div>
-                            <label htmlFor="passwordConfirmation" className="block text-sm font-medium text-gray-900">
-                                {t('connection.password')}
-                            </label>
-                            <div className="mt-2">
-                                <input
-                                    id="passwordConfirmation"
-                                    name="passwordConfirmation"
-                                    type="password"
-                                    value={passwordConfirmation}
-                                    onChange={(e) => setPasswordConfirmation(e.target.value)}
-                                    required
-                                    autoComplete="current-password"
-                                    className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm"
-                                />
-                            </div>
-                        </div>
 
                         <div>
                             <button

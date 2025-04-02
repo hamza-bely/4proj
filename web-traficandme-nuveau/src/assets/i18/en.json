@@ -11,7 +11,9 @@
     "map" : "Map",
     "log-in": "Log in",
     "register" : "Register",
-    "login" : "Login"
+    "login" : "Login",
+    "company" : "TraficAndMe",
+    "users" : "Users"
   },
 
   "home": {
@@ -125,6 +127,27 @@
   "map": {
     "route-planner"  : "Route planner",
     "look-place" : "Look for a place"
-  }
+  },
+  "user-admin" :{
+    "title" : "User Management",
+    "add-user" : "Add user",
+    "role" : "Role",
+    "username" : "Username",
+    "email" : "Email",
+    "delete" : "Delete",
+    "edit" : "Edit",
+    "no_users" : "No userur"
+  },
 
+  "profile": {
+    "title": "Profile",
+    "date-create-profile": "Creation date",
+    "name": "Name",
+    "email": "Email",
+    "password": "New Password",
+    "save": "Save",
+    "cancel": "Cancel",
+    "edit": "Edit",
+    "no_user_info": "No user information found."
+  }
 }

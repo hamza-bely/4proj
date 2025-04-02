@@ -1,25 +1,31 @@
 package com.supinfo.api_traficandme.User.service;
 
-
 import com.supinfo.api_traficandme.User.dto.UserMapper;
 import com.supinfo.api_traficandme.User.dto.UserRequest;
 import com.supinfo.api_traficandme.User.dto.UserResponse;
 import com.supinfo.api_traficandme.User.entity.UserInfo;
 import com.supinfo.api_traficandme.User.repository.UserRepository;
 import com.supinfo.api_traficandme.common.Role;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import com.supinfo.api_traficandme.security.dto.AuthenticateResponse;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final PasswordEncoder passwordEncoder;
+
+    public UserService (UserRepository userRepository,UserMapper userMapper,PasswordEncoder passwordEncoder) {
+        this.userRepository = userRepository;
+        this.userMapper= userMapper;
+        this.passwordEncoder =passwordEncoder;
+    }
+
     public UserInfo findUser(String Username){
         return userRepository.findByEmail(Username).orElseThrow();
     }
@@ -42,21 +48,92 @@ public class UserService {
                 .orElseThrow();
     }
 
-    public Integer createUser(UserRequest user){
-       getOneUserByEmail(user.email());
-        var createdUser = userRepository.save(userMapper.toModel(user));
-        return createdUser.getId();
+    public UserResponse createUser(UserRequest request){
+        if (isNullOrEmpty(request.firstName())) throw new IllegalArgumentException("First name is required.");
+        if (isNullOrEmpty(request.lastName())) throw new IllegalArgumentException("Last name is required.");
+        if (isNullOrEmpty(request.email())) throw new IllegalArgumentException("Email is required.");
+        if (isNullOrEmpty(request.password())) throw new IllegalArgumentException("Password is required.");
+
+        if (request.password().length() < 8) {
+            throw new IllegalArgumentException("Password must be at least 8 characters long.");
+        }
+        if (!Pattern.compile(".*[0-9].*").matcher(request.password()).matches()) {
+            throw new IllegalArgumentException("Password must contain at least one digit.");
+        }
+        if (!Pattern.compile(".*[!@#$%^&*(),.?\":{}|<>].*").matcher(request.password()).matches()) {
+            throw new IllegalArgumentException("Password must contain at least one special character.");
+        }
+
+        if (userRepository.existsByEmail(request.email())) {
+            throw new IllegalArgumentException("Email is already in use.");
+        }
+
+        UserInfo user = new UserInfo(
+                null,
+                request.firstName(),
+                request.lastName(),
+                request.email(),
+                passwordEncoder.encode(request.password()),
+                Role.valueOf(request.role())
+        );
+
+        userRepository.save(user);
+
+        System.out.println("Saved User Role: " + user.getRoles());
+        System.out.println("Saved User Authorities: " + user.getAuthorities());
+        return new UserResponse(
+                        user.getId(),
+                        user.getFirstName() + " " + user.getLastName(),
+                        user.getEmail(),
+                        user.getRoles().name()
+        );
     }
 
     public void deleteUser(Integer id){
         userRepository.deleteById(id);
     }
 
-    public void updateUser(Integer id, UserRequest request){
+    public UserResponse updateUser(Integer id, UserRequest request) {
 
-        var userToUpdate = userRepository.findById(id).orElseThrow();
-          mergeUser(userToUpdate, request);
+        var user = userRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("User not found."));
+
+        if (isNullOrEmpty(request.firstName())) throw new IllegalArgumentException("First name is required.");
+        if (isNullOrEmpty(request.lastName())) throw new IllegalArgumentException("Last name is required.");
+        if (isNullOrEmpty(request.email())) throw new IllegalArgumentException("Email is required.");
+        if (isNullOrEmpty(request.role())) throw new IllegalArgumentException("Role is required.");
+
+        if (!user.getEmail().equals(request.email()) && userRepository.existsByEmail(request.email())) {
+            throw new IllegalArgumentException("Email is already in use.");
+        }
+
+        String updatedPassword = user.getPassword();
+        if (!isNullOrEmpty(request.password())) {
+            if (request.password().length() < 8) {
+                throw new IllegalArgumentException("Password must be at least 8 characters long.");
+            }
+            if (!Pattern.compile(".*[0-9].*").matcher(request.password()).matches()) {
+                throw new IllegalArgumentException("Password must contain at least one digit.");
+            }
+            if (!Pattern.compile(".*[!@#$%^&*(),.?\":{}|<>].*").matcher(request.password()).matches()) {
+                throw new IllegalArgumentException("Password must contain at least one special character.");
+            }
+            updatedPassword = request.password();
+        }
+
+        user.setFirstName(request.firstName());
+        user.setLastName(request.lastName());
+        user.setEmail(request.email());
+        user.setPassword(updatedPassword);
+        user.setRoles(Role.valueOf(request.role().toUpperCase()));
+
+
+
+        userRepository.save(user);
+
+        return userMapper.toResponse(user);
     }
+
 
     public void mergeUser(UserInfo userToUpdate, UserRequest user){
         userToUpdate.setFirstName(user.firstName());
@@ -77,8 +154,11 @@ public class UserService {
     }
 
     public UserInfo getOneUserByEmail(String email){
-
         return userRepository.findOneByEmail(email);
+    }
+
+    private boolean isNullOrEmpty(String value) {
+        return value == null || value.trim().isEmpty();
     }
 
     /*

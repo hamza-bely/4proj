@@ -1,17 +1,109 @@
 export interface User {
-    name: string
+    id: number
+    username: string;
     email: string
-    password: string
+    role: string
+}
+export interface UserComplete {
+    id: number
+    "firstName": string,
+    "lastName": string,
+    email: string
+    role: string
+}
+
+
+export interface UserResponse {
+    id: number
+    username: string;
+    email: string
+    role: string
+}
+
+export interface UserResponseFetchUsers {
+    message: string;
+    data: {
+        id: number
+        username: string;
+        email: string
+        role: string
+    }[];
+}
+
+export interface UserResponseFetchUser {
+    message : string;
+    data:{
+        id: number
+        username: string;
+        email: string
+        role: string
+    }
 }
 
 export interface UserRegisterRequest{
-    name: string
-    email: string
-    password: string
-    password_confirmation: string
+    firstName: string;
+    lastName: string;
+    email: string;
+    password: string;
 }
 
+export interface UserCreateRequest{
+    firstName: string;
+    lastName: string;
+    email: string;
+    password: string;
+    role : string
+}
+
+
 export interface UserLoginRequest{
-    email: string
-    password: string
+    email: string;
+    password: string;
+}
+
+export interface UserRegisterResponse{
+    message : string;
+    data:{
+        token : string
+        user : {
+            id: number
+            username: string;
+            email: string
+            role: string
+        }
+    }
+}
+
+export interface UserLoginResponse{
+    message : string;
+    data:{
+        token : string
+        user : {
+            id: number
+            username: string;
+            email: string
+            role: string
+        }
+    }
+}
+
+
+export interface UserCreateResponse{
+    message : string;
+    data:{
+            id: number
+            username: string;
+            email: string
+            role: string
+    }
+}
+
+export interface UserUpdateResponse{
+    message : string;
+    data:{
+        id: number
+        username: string;
+        email: string
+        role: string
+    }
 }
