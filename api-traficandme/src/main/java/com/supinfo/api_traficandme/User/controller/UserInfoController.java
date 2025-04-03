@@ -33,7 +33,7 @@ public class UserInfoController {
     public ResponseEntity<ApiResponse<UserResponse>> createUser(@Valid @RequestBody UserRequest request){
         try {
             UserResponse response = userService.createUser(request);
-            ApiResponse<UserResponse> apiResponse = new ApiResponse<>("List users", response);
+            ApiResponse<UserResponse> apiResponse = new ApiResponse<>("Created user", response);
             return ResponseEntity.ok(apiResponse);
         } catch (RuntimeException e) {
             ApiResponse<UserResponse> errorResponse = new ApiResponse<>(e.getMessage(), null);
@@ -66,7 +66,7 @@ public class UserInfoController {
     public ResponseEntity<ApiResponse<UserResponse>> updateUser(@PathVariable ("userId") String userId,@Valid @RequestBody UserRequest request){
         try {
             UserResponse response = userService.updateUser(Integer.valueOf(userId),request);
-            ApiResponse<UserResponse> apiResponse = new ApiResponse<>("Update User", response);
+            ApiResponse<UserResponse> apiResponse = new ApiResponse<>("Updated User", response);
             return ResponseEntity.ok(apiResponse);
         } catch (RuntimeException e) {
             ApiResponse<UserResponse> errorResponse = new ApiResponse<>(e.getMessage(), null);
