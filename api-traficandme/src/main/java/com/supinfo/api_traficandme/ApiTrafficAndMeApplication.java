@@ -2,7 +2,6 @@ package com.supinfo.api_traficandme;
 
 import com.supinfo.api_traficandme.User.dto.UserRequest;
 import com.supinfo.api_traficandme.User.service.UserService;
-import com.supinfo.api_traficandme.common.Role;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -18,12 +17,12 @@ public class ApiTrafficAndMeApplication {
 	public CommandLineRunner createDefaultUsers(UserService userService) {
 		return args -> {
 			if (userService.getOneUserByEmail("admin@example.com") == null) {
-				userService.createUser(new UserRequest(null,"Admin", "User", "admin@example.com", "AdminPass123!", "ADMIN"));
+				userService.createUser(new UserRequest(null,"Admin", "User", "admin@example.com", "AdminPass123!", "ADMIN","ACTIVE"));
 				System.out.println("Admin ajouté.");
 			}
 
 			if (userService.getOneUserByEmail("john.doe@example.com") == null) {
-				userService.createUser(new UserRequest(null,"John", "Doe", "john.doe@example.com", "UserPass123!", "USER"));
+				userService.createUser(new UserRequest(null,"John", "Doe", "john.doe@example.com", "UserPass123!", "USER","ACTIVE"));
 				System.out.println("Utilisateur ajouté.");
 			}
 		};

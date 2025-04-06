@@ -1,5 +1,6 @@
 package com.supinfo.api_traficandme.User.entity;
 
+import com.supinfo.api_traficandme.User.dto.StatusUser;
 import com.supinfo.api_traficandme.common.Role;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -10,6 +11,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -36,8 +38,31 @@ public class UserInfo implements UserDetails {
     @Transient
     private String pseudo;
 
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(nullable = false, updatable = false)
+    private Date createDate;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(nullable = false)
+    private Date updateDate;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private StatusUser status = StatusUser.ACTIVE;
+
     public UserInfo() {
 
+    }
+
+    @PrePersist
+    protected void onCreate() {
+        this.createDate = new Date();
+        this.updateDate = new Date();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updateDate = new Date();
     }
 
     public UserInfo(Integer id,String firstName, String lastName, String email, String password, Role roles) {
@@ -143,5 +168,32 @@ public class UserInfo implements UserDetails {
 
     public void setPseudo(String pseudo) {
         this.pseudo = pseudo;
+    }
+    public StatusUser getStatus() {
+        return status;
+    }
+
+    public void setStatus(StatusUser status) {
+        this.status = status;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public Date getUpdateDate() {
+        return updateDate;
+    }
+
+    public void setUpdateDate(Date updateDate) {
+        this.updateDate = updateDate;
+    }
+
+    public Date getCreateDate() {
+        return createDate;
+    }
+
+    public void setCreateDate(Date createDate) {
+        this.createDate = createDate;
     }
 }

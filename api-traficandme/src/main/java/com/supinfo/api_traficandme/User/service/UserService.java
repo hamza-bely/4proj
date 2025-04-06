@@ -1,12 +1,12 @@
 package com.supinfo.api_traficandme.User.service;
 
+import com.supinfo.api_traficandme.User.dto.StatusUser;
 import com.supinfo.api_traficandme.User.dto.UserMapper;
 import com.supinfo.api_traficandme.User.dto.UserRequest;
 import com.supinfo.api_traficandme.User.dto.UserResponse;
 import com.supinfo.api_traficandme.User.entity.UserInfo;
 import com.supinfo.api_traficandme.User.repository.UserRepository;
 import com.supinfo.api_traficandme.common.Role;
-import com.supinfo.api_traficandme.security.dto.AuthenticateResponse;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.util.List;
@@ -85,7 +85,10 @@ public class UserService {
                         user.getId(),
                         user.getFirstName() + " " + user.getLastName(),
                         user.getEmail(),
-                        user.getRoles().name()
+                        user.getRoles().name(),
+                        user.getStatus().name(),
+                        user.getCreateDate(),
+                        user.getUpdateDate()
         );
     }
 
@@ -127,12 +130,15 @@ public class UserService {
         user.setPassword(updatedPassword);
         user.setRoles(Role.valueOf(request.role().toUpperCase()));
 
-
+        if (request.status() != null) {
+            user.setStatus(StatusUser.valueOf(request.status().toUpperCase()));
+        }
 
         userRepository.save(user);
 
         return userMapper.toResponse(user);
     }
+
 
 
     public void mergeUser(UserInfo userToUpdate, UserRequest user){

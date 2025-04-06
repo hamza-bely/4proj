@@ -70,7 +70,10 @@ public class AuthService {
                         user.getId(),
                         user.getFirstName() + " " + user.getLastName(),
                         user.getEmail(),
-                        user.getRoles().name()
+                        user.getRoles().name(),
+                        user.getStatus().name(),
+                        user.getCreateDate(),
+                        user.getUpdateDate()
                 )
         );
 
@@ -98,7 +101,10 @@ public class AuthService {
                         user.getId(),
                         user.getFirstName() + " " + user.getLastName(),
                         user.getEmail(),
-                        user.getRoles().name()
+                        user.getRoles().name(),
+                        user.getStatus().name(),
+                        user.getCreateDate(),
+                        user.getUpdateDate()
                 )
         );
 

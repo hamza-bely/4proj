@@ -10,6 +10,7 @@ public record UserRequest(
         String lastName,
         String email,
         String password,
-        String role
+        String role,
+        String status
 ) {
 }
