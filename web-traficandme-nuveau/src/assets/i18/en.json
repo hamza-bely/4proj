@@ -126,7 +126,16 @@
   },
   "map": {
     "route-planner"  : "Route planner",
-    "look-place" : "Look for a place"
+    "look-place" : "Look for a place",
+    "fastest": "Fastest Route",
+    "shortest": "Shortest Route",
+    "no-tolls": "Without Tolls",
+    "with-tolls": "With Tolls",
+    "start-point": "Starting Point",
+    "destination": "Destination",
+    "available-routes": "Available Routes",
+    "calculating": "Calculating...",
+    "calculate-routes": "Calculate Routes"
   },
   "user-admin" :{
     "title" : "User Management",
@@ -148,6 +157,28 @@
     "save": "Save",
     "cancel": "Cancel",
     "edit": "Edit",
-    "no_user_info": "No user information found."
+    "delete": "Cancel the account",
+    "no_user_info": "No user information found.",
+    "modal": {
+      "title": "Confirm deletion",
+      "description": "Please type \"CONFIRME\" to validate the deletion of this user.",
+      "placeholder": "CONFIRME",
+      "cancel": "Cancel",
+      "confirm": "Delete"
+    }
+  },
+
+  "traffic": {
+    "title": "Trafic en temps réel",
+    "fast": "Rapide",
+    "slow": "Lent"
+  },
+
+  "about": {
+    "title": "Innover dans les Solutions de Navigation en Temps Réel",
+    "description": "Nous sommes une entreprise technologique spécialisée dans les solutions de navigation en temps réel. Notre mission est d'améliorer la mobilité en fournissant des outils de navigation précis, à jour et faciles à utiliser. Grâce à une technologie de pointe et une passion pour l'innovation, nous aidons les particuliers et les entreprises à se déplacer plus efficacement.",
+    "imageAlt": "Image illustrant la technologie de navigation de notre entreprise",
+    "bannerAlt": "Bannière représentant l'innovation dans la navigation en temps réel"
   }
+
 }

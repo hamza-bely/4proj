@@ -124,8 +124,17 @@
     }
   },
   "map": {
-    "route-planner"  : "Planificateur d'itinéraire",
-    "look-place" : "Chercher un endroit"
+    "route-planner": "Planificateur d'itinéraire",
+    "look-place" : "Chercher un endroit",
+    "fastest": "Itinéraire le plus rapide",
+    "shortest": "Itinéraire le plus court",
+    "no-tolls": "Sans péages",
+    "with-tolls": "Avec péages",
+    "start-point": "Point de départ",
+    "destination": "Destination",
+    "available-routes": "Itinéraires disponibles",
+    "calculating": "Calcul en cours...",
+    "calculate-routes": "Calculer les itinéraires"
   },
   "user-admin" :{
     "title" : "Gestion des utilisateurs",
@@ -147,6 +156,27 @@
     "save": "Sauvegarder",
     "cancel": "Annuler",
     "edit": "Modifier",
-    "no_user_info": "Aucune information utilisateur trouvée."
+    "delete": "Supprimer le compte",
+    "no_user_info": "Aucune information utilisateur trouvée.",
+    "modal": {
+      "title": "Confirmer la suppression",
+      "description": "Veuillez taper \"CONFIRME\" pour valider la suppression de cet utilisateur.",
+      "placeholder": "CONFIRME",
+      "cancel": "Annuler",
+      "confirm": "Supprimer"
+    }
+  },
+
+  "traffic": {
+    "title": "Real-time traffic",
+    "fast": "Fast",
+    "slow": "Slow"
+  },
+
+  "about": {
+    "title": "Innover dans les Solutions de Navigation en Temps Réel",
+    "description": "Nous sommes une entreprise technologique spécialisée dans les solutions de navigation en temps réel. Notre mission est d'améliorer la mobilité en fournissant des outils de navigation précis, à jour et faciles à utiliser. Grâce à une technologie de pointe et une passion pour l'innovation, nous aidons les particuliers et les entreprises à se déplacer plus efficacement.",
+    "imageAlt": "Image illustrant la technologie de navigation de notre entreprise",
+    "bannerAlt": "Bannière représentant l'innovation dans la navigation en temps réel"
   }
 }

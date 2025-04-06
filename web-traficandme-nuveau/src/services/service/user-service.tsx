@@ -1,11 +1,10 @@
 import axios, {AxiosError} from "axios";
 import {toast} from "react-toastify";
 import {
-    UserComplete,
     UserCreateRequest, UserCreateResponse,
     UserLoginRequest, UserLoginResponse,
     UserRegisterRequest, UserRegisterResponse,
-    UserResponseFetchUser, UserResponseFetchUsers, UserUpdateResponse
+    UserResponseFetchUser, UserResponseFetchUsers, UserUpdateResponse, UserUpdaterRequest
 } from "../model/user.tsx";
 import Cookies from "js-cookie";
 
@@ -105,17 +104,16 @@ export const fetchUsers = async (): Promise<UserResponseFetchUsers> => {
     } catch (error) {
         if (error instanceof AxiosError && error.response) {
             const errorMessage = error.response.data?.message || "Une erreur est survenue";
-            toast.error(errorMessage);
+            console.error(errorMessage);
         } else {
-            toast.error("Erreur inconnue");
+            console.error("Erreur inconnue");
         }
         throw error;
     }
 };
 
-export const updateUser = async (id: number, params: UserComplete): Promise<UserUpdateResponse> => {
+export const updateUserByAdmin = async (id: number, params: UserUpdaterRequest): Promise<UserUpdateResponse> => {
     try {
-        console.log(params)
         const response = await axios.put<UserUpdateResponse>(`${API_URL}users/update/${id}`, params, { headers: getAuthHeaders() });
         toast.success(response.data.message);
         return response.data;

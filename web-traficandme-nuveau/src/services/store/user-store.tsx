@@ -1,5 +1,5 @@
-import {User, UserComplete, UserCreateRequest} from "../model/user.tsx";
-import {fetchUser, fetchUsers, createUser, updateUser} from "../service/user-service.tsx";
+import {User, UserCreateRequest, UserUpdaterRequest} from "../model/user.tsx";
+import {fetchUser, fetchUsers, createUser, updateUserByAdmin} from "../service/user-service.tsx";
 import { create } from "zustand";
 
 interface UserState {
@@ -8,7 +8,7 @@ interface UserState {
     fetchUsers: () => Promise<void>;
     fetchUser: () => Promise<void>;
     createUser : (params: UserCreateRequest) => Promise<void>;
-    updateUser : (id: number, params : UserComplete) => Promise<void>;
+    updateUserByAdmin : (id: number, params : UserUpdaterRequest) => Promise<void>;
     deleteUser: (id: number) => Promise<void>;
 }
 
@@ -41,12 +41,11 @@ const useUserStore = create<UserState>((set) => ({
         }));
     },
 
-    updateUser: async ( id,params)  => {
+    updateUserByAdmin: async ( id,params)  => {
         try {
-            const response  = await updateUser(id,params);
+            const response  = await updateUserByAdmin(id,params);
             set((state ) => ({
                 users: state.users.map((h) => (h.id === response.data.id ? response.data : h)),
-                user: response.data,
             }));
         } catch (error) {
             console.error(error);

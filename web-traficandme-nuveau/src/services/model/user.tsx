@@ -3,21 +3,24 @@ export interface User {
     username: string;
     email: string
     role: string
+    status: string,
+    createDate: string,
+    updateDate: string
 }
 export interface UserComplete {
     id: number
-    "firstName": string,
-    "lastName": string,
+    firstName: string,
+    lastName: string,
     email: string
     role: string
 }
 
 
 export interface UserResponse {
-    id: number
+    id: number;
     username: string;
-    email: string
-    role: string
+    email: string;
+    role: string;
 }
 
 export interface UserResponseFetchUsers {
@@ -25,18 +28,24 @@ export interface UserResponseFetchUsers {
     data: {
         id: number
         username: string;
-        email: string
-        role: string
+        email: string;
+        role: string;
+        status: string,
+        createDate: string;
+        updateDate: string;
     }[];
 }
 
 export interface UserResponseFetchUser {
     message : string;
     data:{
-        id: number
+        id: number;
         username: string;
-        email: string
-        role: string
+        email: string;
+        role: string;
+        status: string;
+        createDate: string;
+        updateDate: string;
     }
 }
 
@@ -52,7 +61,7 @@ export interface UserCreateRequest{
     lastName: string;
     email: string;
     password: string;
-    role : string
+    role : string;
 }
 
 
@@ -64,12 +73,12 @@ export interface UserLoginRequest{
 export interface UserRegisterResponse{
     message : string;
     data:{
-        token : string
+        token : string;
         user : {
-            id: number
+            id: number;
             username: string;
-            email: string
-            role: string
+            email: string;
+            role: string;
         }
     }
 }
@@ -77,12 +86,12 @@ export interface UserRegisterResponse{
 export interface UserLoginResponse{
     message : string;
     data:{
-        token : string
+        token : string;
         user : {
-            id: number
+            id: number;
             username: string;
-            email: string
-            role: string
+            email: string;
+            role: string;
         }
     }
 }
@@ -91,19 +100,33 @@ export interface UserLoginResponse{
 export interface UserCreateResponse{
     message : string;
     data:{
-            id: number
-            username: string;
-            email: string
-            role: string
+        id: number;
+        username: string;
+        email: string;
+        role: string;
+        status: string,
+        createDate: string,
+        updateDate: string
     }
+}
+export interface UserUpdaterRequest {
+    firstName: string;
+    lastName: string;
+    email: string;
+    role: string;
+    password: string;
+    status: string;
 }
 
 export interface UserUpdateResponse{
     message : string;
     data:{
-        id: number
+        id: number;
         username: string;
-        email: string
-        role: string
+        email: string;
+        role: string;
+        status: string,
+        createDate: string,
+        updateDate: string
     }
 }

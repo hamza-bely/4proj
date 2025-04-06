@@ -9,7 +9,8 @@ const Map: React.FC = () => {
     const mapElement = useRef<HTMLDivElement>(null);
     const [map, setMap] = useState<tt.Map | null>(null);
     const apiKey = import.meta.env.VITE_TOMTOM_API_KEY;
-    const time : number = 90000000 //TODO
+    const time: number = 90000000;
+    let markers: tt.Marker[] = [];
 
     useEffect(() => {
         if (!mapElement.current || map) return;
@@ -26,8 +27,14 @@ const Map: React.FC = () => {
         mapInstance.on("load", () => {
             enableTrafficLayer(mapInstance);
 
-            const interval = setInterval(() => {
-                console.log("Mise à jour de la couche de trafic...");
+            // Mise à jour automatique des incidents
+            const incidentInterval = setInterval(() => {
+                markers.forEach(marker => marker.remove());
+                markers = [];
+            }, 300000); // Rafraîchit les incidents toutes les 5 minutes
+
+            // Mise à jour de la couche de trafic
+            const trafficInterval = setInterval(() => {
                 if (mapInstance.getSource("traffic-source")) {
                     mapInstance.removeLayer("traffic-layer");
                     mapInstance.removeSource("traffic-source");
@@ -35,7 +42,10 @@ const Map: React.FC = () => {
                 enableTrafficLayer(mapInstance);
             }, time);
 
-            return () => clearInterval(interval);
+            return () => {
+                clearInterval(incidentInterval);
+                clearInterval(trafficInterval);
+            };
         });
 
         return () => mapInstance.remove();
@@ -67,6 +77,7 @@ const Map: React.FC = () => {
     return (
         <div>
             <ContainerMap map={map} />
+
             {map && <Markers map={map} />}
             <div ref={mapElement} style={{ width: "100%", height: "890px" }} />
         </div>

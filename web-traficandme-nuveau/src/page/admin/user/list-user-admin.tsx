@@ -79,15 +79,25 @@ export default function ListUserAdmin() {
                                 <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
                                     {t("user-admin.role")}
                                 </th>
+
+                                <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                                    {t("user-admin.status")}
+                                </th>
+
+                                <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                                    {t("user-admin.createDate")}
+                                </th>
+
                                 <th scope="col" className="relative py-3.5 pr-4 pl-3 sm:pr-3">
                                     <span className="sr-only">{t("user-admin.edit")}</span>
                                 </th>
+
                             </tr>
                             </thead>
                             <tbody className="bg-white">
                             {isLoading ? (
                                 <tr>
-                                <td colSpan={4} className="py-4 text-center text-sm text-gray-500">
+                                    <td colSpan={4} className="py-4 text-center text-sm text-gray-500">
                                         <Spinner />
                                     </td>
                                 </tr>
@@ -106,6 +116,8 @@ export default function ListUserAdmin() {
                                         </td>
                                         <td className="px-3 py-4 text-sm whitespace-nowrap text-gray-500">{user.email}</td>
                                         <td className="px-3 py-4 text-sm whitespace-nowrap text-gray-500">{user.role}</td>
+                                        <td className="px-3 py-4 text-sm whitespace-nowrap text-gray-500">{user.status}</td>
+                                        <td className="px-3 py-4 text-sm whitespace-nowrap text-gray-500">{user.createDate}</td>
                                         <td className="relative py-4 pr-4 pl-3 text-right text-sm font-medium whitespace-nowrap sm:pr-3">
                                             <button
                                                 onClick={() => handleDelete(user.id)}

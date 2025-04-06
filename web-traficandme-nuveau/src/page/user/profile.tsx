@@ -3,6 +3,8 @@ import { UserCircleIcon, TicketIcon } from "@heroicons/react/24/outline";
 import { useTranslation } from "react-i18next";
 import Spinner from "../../components/sniper/sniper.tsx";
 import useUserStore from "../../services/store/user-store.tsx";
+import {Dialog} from "../../assets/kit-ui/dialog.tsx";
+import ModalDeleteUser from "./modal-delete-user.tsx";
 
 const secondaryNavigation = [
     { name: "General", href: "#", icon: UserCircleIcon },
@@ -12,7 +14,7 @@ const secondaryNavigation = [
 export default function Profile() {
     const { t } = useTranslation();
     const { user, updateUser, fetchUser } = useUserStore();
-
+    const [isOpen, setIsOpen] = useState(false);
     const [editMode, setEditMode] = useState(false);
     const [currentNavigation, setCurrentNavigation] = useState("General");
     const [formData, setFormData] = useState({
@@ -53,6 +55,10 @@ export default function Profile() {
             console.error("Erreur lors de la mise à jour de l'utilisateur:", error);
         }
     };
+
+    function handleDeleteUser(id : number) {
+        setIsOpen(true)
+    }
 
     return (
         <div className="mx-auto max-w-7xl pt-16 lg:flex lg:gap-x-16 lg:px-8">
@@ -160,12 +166,23 @@ export default function Profile() {
                                                 </button>
                                             </>
                                         ) : (
-                                            <button
-                                                onClick={() => setEditMode(true)}
-                                                className="px-4 py-2 text-white bg-gray-950 rounded-md hover:bg-white hover:text-gray-950"
-                                            >
-                                                {t("profile.edit")}
-                                            </button>
+                                            <div>
+
+                                                <button
+                                                    onClick={() => setEditMode(true)}
+                                                    className="px-4 py-2 text-white bg-gray-950 rounded-md hover:bg-gray-800 hover:text-white"
+                                                >
+                                                    {t("profile.edit")}
+                                                </button>
+
+                                                <button
+                                                    onClick={() => handleDeleteUser(user?.id)}
+                                                    className="px-4 ml-5 py-2 text-white bg-red-700 rounded-md hover:bg-red-600 hover:text-white"
+                                                >
+                                                    {t("profile.delete")}
+                                                </button>
+                                            </div>
+
                                         )}
                                     </div>
                                 </div>
@@ -175,13 +192,16 @@ export default function Profile() {
                         </div>
                     )}
 
-                    {currentNavigation === "Mes Tickets" && (
+                    {currentNavigation === "Routes" && (
                         <div>
 
-                         <p>todo</p>
+                        <p>todo</p>
                         </div>
                     )}
                 </div>
+                <Dialog style={{ zIndex: 11, position: "fixed", top: 0, left: 0, right: 0, bottom: 0, display: "flex", justifyContent: "center", alignItems: "center" }} open={isOpen} onClose={() => setIsOpen(false)}>
+                    <ModalDeleteUser closeModal={() => setIsOpen(false)}  userId={user?.id} />
+                </Dialog>
             </main>
         </div>
     );

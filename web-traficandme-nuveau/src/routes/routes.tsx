@@ -1,11 +1,11 @@
 import { Routes, Route } from "react-router-dom";
 import Home from "../page/public/home/home.tsx";
 import Map from "../page/public/map/map/map.tsx";
-import MapComponent from "../page/public/map/map/map.tsx";
 import AuthGuardAdmin from "./auth-guard-admin.tsx";
 import ListUserAdmin from "../page/admin/user/list-user-admin.tsx";
 import AuthGuard from "./auth-guard.tsx";
 import Profile from "../page/user/profile.tsx";
+import About from "../page/public/about/about.tsx";
 
 
 const AppRoutes = () => {
@@ -13,7 +13,7 @@ const AppRoutes = () => {
         <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/map" element={<Map />} />
-            <Route path="/about" element={<MapComponent />} />
+            <Route path="/about" element={<About />} />
             <Route
                 path="/admin/management-users"
                 element={
