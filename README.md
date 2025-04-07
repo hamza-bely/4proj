@@ -5,6 +5,10 @@ A comprehensive educational management system built with Node.js, React, and Gra
 ## Project Team
 
 - **Hamza Belyahiaoui**
+- **Abdoul-waris Konate**
+- **Fadel Biaou**
+- **Jean-philippe Delon**
+
 
 ## Project Structure
 
