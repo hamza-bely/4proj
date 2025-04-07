@@ -1,4 +1,4 @@
-# SchoolInc - Educational Management System
+# 4PROJ TRAFICANDME 
 
 A comprehensive educational management system built with Node.js, React, and GraphQL.
 
