@@ -26,7 +26,7 @@ public class TrafficService {
 
     public TrafficModel addTraffic(TrafficRequest request, UserResponse connectedUser) throws Exception {
 
-        if (isTrafficExists(request.getStartLongitude(), request.getStartLatitude(), request.getEndLongitude(), request.getEndLatitude(), user.email())) {
+        if (isTrafficExists(request.getStartLongitude(), request.getStartLatitude(), request.getEndLongitude(), request.getEndLatitude(), request.getUser())) {
             throw new Exception("Traffic record already exists for this route and user");
         }
 
@@ -38,7 +38,7 @@ public class TrafficService {
         stop.setAddress_start(request.getAddress_start());
         stop.setAddress_end(request.getAddress_end());
         stop.setMode(request.getMode());
-        stop.setUser(user.email());
+        stop.setUser(connectedUser.email());
         stop.setPeage(request.isPeage());
         stop.setCreateDate(new Date());
         stop.setUpdateDate(new Date());
