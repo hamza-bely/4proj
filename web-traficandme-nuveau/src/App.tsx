@@ -11,6 +11,7 @@ function App() {
   return (
     <>
         <ToastContainer
+            style={{ zIndex: 9999 }}
             position="top-right"
             autoClose={5000}
             hideProgressBar={false}

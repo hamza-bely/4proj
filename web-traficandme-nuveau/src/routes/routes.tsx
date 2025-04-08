@@ -4,8 +4,10 @@ import Map from "../page/public/map/map/map.tsx";
 import AuthGuardAdmin from "./auth-guard-admin.tsx";
 import ListUserAdmin from "../page/admin/user/list-user-admin.tsx";
 import AuthGuard from "./auth-guard.tsx";
-import Profile from "../page/user/profile.tsx";
+import ProfileUser from "../page/user/profile-user.tsx";
 import About from "../page/public/about/about.tsx";
+import TomTomApiDashboard from "../page/admin/map/tom-tom-dashboard.tsx";
+import ListReportAdmin from "../page/admin/report/list-report-admin.tsx";
 
 
 const AppRoutes = () => {
@@ -22,12 +24,28 @@ const AppRoutes = () => {
                     </AuthGuardAdmin>
                 }
             />
+            <Route
+                path="/admin/management-report"
+                element={
+                    <AuthGuardAdmin>
+                        <ListReportAdmin/>
+                    </AuthGuardAdmin>
+                }
+            />
+            <Route
+                path="/admin/dashboard"
+                element={
+                    <AuthGuardAdmin>
+                        <TomTomApiDashboard/>
+                    </AuthGuardAdmin>
+                }
+            />
 
             <Route
                 path="/profile"
                 element={
                     <AuthGuard>
-                        <Profile/>
+                        <ProfileUser/>
                     </AuthGuard>
                 }
             />

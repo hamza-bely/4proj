@@ -91,7 +91,7 @@ export default function Login({ closeModal }: { closeModal: () => void }) {
                             >
                                 {isLoading ? (
                                     <div className="flex justify-center items-center">
-                                        <span className="ml-2">{t('connection.loading')}</span>
+                                        <span className="ml-2">{t('common.loading')}</span>
                                     </div>
                                 ) : (
                                     <p>

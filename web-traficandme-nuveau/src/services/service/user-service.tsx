@@ -1,5 +1,6 @@
 import axios, {AxiosError} from "axios";
 import {toast} from "react-toastify";
+
 import {
     UserCreateRequest, UserCreateResponse,
     UserLoginRequest, UserLoginResponse,
@@ -112,12 +113,12 @@ export const fetchUsers = async (): Promise<UserResponseFetchUsers> => {
     }
 };
 
+
 export const updateUserByAdmin = async (id: number, params: UserUpdaterRequest): Promise<UserUpdateResponse> => {
     try {
         const response = await axios.put<UserUpdateResponse>(`${API_URL}users/update/${id}`, params, { headers: getAuthHeaders() });
         toast.success(response.data.message);
         return response.data;
-
     }catch (error) {
         if (error instanceof AxiosError && error.response) {
             const errorMessage = error.response.data?.message || "Une erreur est survenue";
@@ -130,9 +131,10 @@ export const updateUserByAdmin = async (id: number, params: UserUpdaterRequest):
     }
 };
 
-export const deleteUser = async (id: string): Promise<void> => {
+export const deleteUserForAnUser = async (): Promise<void> => {
     try {
-        const response = await axios.delete(`${API_URL}users/${id}`, { headers: getAuthHeaders() });
+        const status = "DELETED"
+        const response = await axios.patch(`${API_URL}users/update-status`,status, { headers: getAuthHeaders() });
         toast.success(response.data.message);
     } catch (error) {
         if (error instanceof AxiosError && error.response) {

@@ -1,17 +1,19 @@
 import { useEffect, useState } from "react";
-import { UserCircleIcon, TicketIcon } from "@heroicons/react/24/outline";
+import { UserCircleIcon } from "@heroicons/react/24/outline";
 import { useTranslation } from "react-i18next";
 import Spinner from "../../components/sniper/sniper.tsx";
 import useUserStore from "../../services/store/user-store.tsx";
 import {Dialog} from "../../assets/kit-ui/dialog.tsx";
 import ModalDeleteUser from "./modal-delete-user.tsx";
+import ReportsUser from "./reports-user.tsx";
+import {MdReportProblem} from "react-icons/md";
 
 const secondaryNavigation = [
     { name: "General", href: "#", icon: UserCircleIcon },
-    { name: "Routes", href: "#", icon: TicketIcon },
+    { name: "Routes", href: "#", icon: MdReportProblem  },
 ];
 
-export default function Profile() {
+export default function ProfileUser() {
     const { t } = useTranslation();
     const { user, updateUser, fetchUser } = useUserStore();
     const [isOpen, setIsOpen] = useState(false);
@@ -106,7 +108,7 @@ export default function Profile() {
                                                 <dd className="text-gray-900">{user.username}</dd>
                                             </div>
                                             <div className="flex justify-between py-3">
-                                                <dt className="text-gray-500">{t("profile.email")}</dt>
+                                                <dt className="text-gray-500">{t("common.email")}</dt>
                                                 <dd className="text-gray-900">{user.email}</dd>
                                             </div>
                                             <div className="flex justify-between py-3">
@@ -127,7 +129,7 @@ export default function Profile() {
                                                 />
                                             </div>
                                             <div>
-                                                <label className="block text-sm font-medium text-gray-700">{t("profile.email")}</label>
+                                                <label className="block text-sm font-medium text-gray-700">{t("common.email")}</label>
                                                 <input
                                                     type="email"
                                                     name="email"
@@ -193,10 +195,7 @@ export default function Profile() {
                     )}
 
                     {currentNavigation === "Routes" && (
-                        <div>
-
-                        <p>todo</p>
-                        </div>
+                        <ReportsUser/>
                     )}
                 </div>
                 <Dialog style={{ zIndex: 11, position: "fixed", top: 0, left: 0, right: 0, bottom: 0, display: "flex", justifyContent: "center", alignItems: "center" }} open={isOpen} onClose={() => setIsOpen(false)}>

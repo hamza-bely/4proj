@@ -1,6 +1,6 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import "./map.css";
+import "../css/map.css";
 
 const TrafficIndicator: React.FC = () => {
     const { t } = useTranslation(); // Hook pour les traductions

@@ -1,9 +1,14 @@
-import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
+import {Menu, MenuButton, MenuItem, MenuItems, Popover, PopoverButton, PopoverPanel} from "@headlessui/react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import Cookies from "js-cookie";
 import useUserStore from "../../services/store/user-store.tsx";
 import Languages from "../languages/languages.tsx";
+import {
+    ChartPieIcon, ChevronDownIcon,
+} from "@heroicons/react/16/solid";
+import {FaUserShield} from "react-icons/fa";
+import {MdReportProblem} from "react-icons/md";
 
 interface DesktopHeaderProps {
     role: string | string[] | null;
@@ -12,11 +17,17 @@ interface DesktopHeaderProps {
     openRegister: () => void;
 }
 
+const solutions = [
+    { name: 'Dashboard', href: 'admin/dashboard', icon: ChartPieIcon },
+    { name: 'utilisateurs',  href: '/admin/management-users', icon: FaUserShield},
+    { name: 'Report', href: '/admin/management-report', icon: MdReportProblem   },
+
+]
+
 export default function DesktopHeader({ role, navigationLinks, openLogin, openRegister }: DesktopHeaderProps) {
     const { t } = useTranslation();
     const { user } = useUserStore();
-
-    const languages: any[] = [
+    const languages = [
         { name: 'en', img: 'images/languages/english.png' },
         { name: 'fr', img: 'images/languages/french.png' },
         ]
@@ -39,6 +50,42 @@ export default function DesktopHeader({ role, navigationLinks, openLogin, openRe
                         {item.name}
                     </Link>
                 ))}
+
+                {role == "ROLE_ADMIN" &&
+                    <div>
+                        <Popover className="relative">
+                            <PopoverButton className="inline-flex items-center gap-x-1 text-sm/6 font-semibold text-gray-900">
+                                <span className="text-gray-900 hover:text-gray-700 px-3 py-2 text-sm font-medium">{t('admin')}</span>
+                                <ChevronDownIcon aria-hidden="true" className="size-5" />
+                            </PopoverButton>
+
+                            <PopoverPanel
+                                transition
+                                className="absolute left-1/2 z-10 mt-5 flex w-screen max-w-max -translate-x-1/2 px-4 transition data-closed:translate-y-1 data-closed:opacity-0 data-enter:duration-200 data-enter:ease-out data-leave:duration-150 data-leave:ease-in"
+                            >
+                                <div className="w-screen max-w-md flex-auto overflow-hidden rounded-3xl bg-white text-sm/6 ring-1 shadow-lg ring-gray-900/5">
+                                    <div className="p-4">
+                                        {solutions.map((item) => (
+                                            <Link to={item.href} className="cursor-pointer group relative flex gap-x-6 rounded-lg p-4 hover:bg-gray-50">
+                                                <div className="mt-1 flex size-5 flex-none items-center justify-center rounded-lg bg-gray-50 group-hover:bg-white">
+                                                    <item.icon aria-hidden="true" className="size- text-gray-600 group-hover:text-indigo-600" />
+                                                </div>
+                                                <div>
+                                                    <button className="font-semibold text-gray-900">
+                                                        {item.name}
+                                                        <span className="absolute inset-0" />
+                                                    </button>
+                                                </div>
+                                            </Link>
+                                        ))}
+                                    </div>
+
+                                </div>
+                            </PopoverPanel>
+                        </Popover>
+                    </div>
+                }
+
             </div>
             <a href="#" className="-m-1.5">
                 <img className="h-12 w-auto" src="/images/logo/logo_2.png" alt="Logo"/>

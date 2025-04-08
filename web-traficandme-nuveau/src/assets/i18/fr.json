@@ -1,48 +1,69 @@
 {
-  "loading" : "Chargement...",
   "languages": {
     "fr": "Français",
     "en": "Anglais"
   },
 
+  "common": {
+    "loading": "Chargement...",
+    "edit": "Modifier",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "delete-definitive": "Supprimer definitive",
+
+    "actions": "Actions",
+    "search" : "Recherche",
+    "confirm": "Confirm",
+    "message-confirm-delete" : "Êtes-vous sûr de vouloir supprimer ?"
+  },
+
+
+  "reportTypes": {
+    "accidents": "Accidents",
+    "traffic": "Circulation",
+    "roadsClosed": "Routes barrées",
+    "policeChecks": "Contrôles de police",
+    "obstacles": "Obstacles"
+  },
+  "reportStatus": {
+    "pending": "En attente",
+    "unavailable": "Inisponible",
+    "available": "Disponible",
+    "canceled": "Canceled"
+  },
+
   "header": {
-    "about" : "TraficAndMe",
-    "home" : "Accueil",
-    "map" : "Carte",
+    "about": "TraficAndMe",
+    "home": "Accueil",
+    "map": "Carte",
     "log-in": "Log in",
-    "register" : "Registre",
-    "login" : "Se connecter",
-    "company" : "TraficAndMe",
-    "users" : "Utilisateurs"
+    "register": "Registre",
+    "login": "Se connecter",
+    "company": "TraficAndMe",
+    "users": "Utilisateurs"
   },
-
   "home": {
-    "title-mobile" : "Découvrez votre monde différemment",
-    "description-mobile" : "Notre application mobile de cartographie vous offre une navigation fluide, des itinéraires précis et des recommandations personnalisées pour explorer votre environnement."
+    "title-mobile": "Découvrez votre monde différemment",
+    "description-mobile": "Notre application mobile de cartographie vous offre une navigation fluide, des itinéraires précis et des recommandations personnalisées pour explorer votre environnement."
   },
-
   "connection": {
     "title-login": "Connectez-vous à votre compte",
-    "title-register" : "Inscrivez-vous maintenant",
+    "title-register": "Inscrivez-vous maintenant",
     "name": "nom",
-    "email": "e-mail",
     "password": "mot de passe",
-    "password-forgot" : "Mot de passe oublié ?",
-    "not-member" : "Pas encore inscrit?",
+    "password-forgot": "Mot de passe oublié ?",
+    "not-member": "Pas encore inscrit?",
     "or": "ou",
     "button": {
       "sign-in": "Se connecter"
     }
   },
-
-  "footer" : {
+  "footer": {
     "title": "© 2025 TRAFICANDME, Inc. Tous droits réservés."
   },
-
-  "incentive" : {
-    "title" : "Transformez vos voyages avec notre application de navigation nouvelle génération",
-    "description" : "Découvrez comment notre application améliore votre expérience de conduite avec des itinéraires plus intelligents, des alertes en temps réel et une navigation économique.",
-
+  "incentive": {
+    "title": "Transformez vos voyages avec notre application de navigation nouvelle génération",
+    "description": "Découvrez comment notre application améliore votre expérience de conduite avec des itinéraires plus intelligents, des alertes en temps réel et une navigation économique.",
     "incentive1": {
       "title": "Optimisation des itinéraires en temps réel",
       "description": "Les applications de navigation modernes analysent le trafic en direct et ajustent votre itinéraire en conséquence. Grâce à ces mises à jour dynamiques, vous évitez les embouteillages et arrivez plus rapidement à destination."
@@ -56,21 +77,18 @@
       "description": "En proposant les trajets les plus courts et les plus rapides, ces applications réduisent votre consommation de carburant et votre empreinte écologique. Moins de temps sur la route signifie aussi plus de confort et moins de stress."
     }
   },
-
   "contact": {
     "get_in_touch": "Contactez-nous",
     "description": "Nullam risus blandit ac aliquam justo ipsum. Quam mauris volutpat massa dictumst amet. Sapien tortor lacus arcu.",
     "postal_address": "Adresse postale",
     "address_1": "742 Evergreen Terrace",
     "address_2": "Springfield, OR 12345",
-    "email": "Email",
     "career_inquiry": "Vous recherchez un emploi ?",
     "view_jobs": "Voir toutes les offres d'emploi",
     "full_name": "Nom complet",
     "message": "Message",
     "submit": "Envoyer"
   },
-
   "content-section": {
     "values_title": "Nos valeurs",
     "description": "Lorem ipsum dolor sit amet consect adipisicing elit. Possimus magnam voluptatum cupiditate veritatis in accusamus quisquam.",
@@ -87,7 +105,6 @@
     "enjoy_downtime": "Profitez de votre temps libre",
     "enjoy_downtime_desc": "Ipsa in earum deserunt aut. Quos minus aut animi et soluta. Ipsum dicta ut quia eius. Possimus reprehenderit iste aspernatur ut est velit consequatur distinctio."
   },
-
   "feature": {
     "real_time_updates": {
       "title": "Mises à jour en temps réel",
@@ -125,7 +142,7 @@
   },
   "map": {
     "route-planner": "Planificateur d'itinéraire",
-    "look-place" : "Chercher un endroit",
+    "look-place": "Chercher un endroit",
     "fastest": "Itinéraire le plus rapide",
     "shortest": "Itinéraire le plus court",
     "no-tolls": "Sans péages",
@@ -136,22 +153,17 @@
     "calculating": "Calcul en cours...",
     "calculate-routes": "Calculer les itinéraires"
   },
-  "user-admin" :{
-    "title" : "Gestion des utilisateurs",
-    "add-user" : "Ajouter un utilisateur",
-    "role" : "Role",
-    "username" : "Username",
-    "email" : "E-mail",
-    "delete" : "Supprimer",
-    "edit" : "Modifier",
-    "no_users" : "Aucun utilisateur"
-
+  "user-admin": {
+    "title": "Gestion des utilisateurs",
+    "add-user": "Ajouter un utilisateur",
+    "role": "Role",
+    "username": "Username",
+    "no_users": "Aucun utilisateur"
   },
   "profile": {
     "title": "Profil",
     "date-create-profile": "Date de création",
     "name": "Nom",
-    "email": "Email",
     "password": "Nouveau mot de passe",
     "save": "Sauvegarder",
     "cancel": "Annuler",
@@ -166,17 +178,49 @@
       "confirm": "Supprimer"
     }
   },
-
   "traffic": {
     "title": "Real-time traffic",
     "fast": "Fast",
     "slow": "Slow"
   },
-
   "about": {
     "title": "Innover dans les Solutions de Navigation en Temps Réel",
     "description": "Nous sommes une entreprise technologique spécialisée dans les solutions de navigation en temps réel. Notre mission est d'améliorer la mobilité en fournissant des outils de navigation précis, à jour et faciles à utiliser. Grâce à une technologie de pointe et une passion pour l'innovation, nous aidons les particuliers et les entreprises à se déplacer plus efficacement.",
     "imageAlt": "Image illustrant la technologie de navigation de notre entreprise",
     "bannerAlt": "Bannière représentant l'innovation dans la navigation en temps réel"
+  },
+
+  "id": "ID",
+  "confirm delete": "Êtes-vous sûr de vouloir supprimer ce rapport ?",
+  "report-admin": {
+    "title": "Signalements",
+    "add-report": "Ajouter un signalement",
+    "author": "Auteur",
+    "status": "Statut",
+    "status-pending": "En attente",
+    "status-available": "Disponible",
+    "status-unavailable": "Indisponible",
+    "status-canceled": "Canceled",
+    "likes": "J'aime",
+    "dislikes": "Je n'aime pas",
+    "createDate": "Date de création",
+    "edit": "Modifier",
+    "delete": "Supprimer",
+    "no_reports": "Aucun rapport trouvé."
+  },
+
+
+
+  "reports": {
+    "myReports": "Mes signalements",
+    "type": "Type",
+    "status": "Statut",
+    "date": "Date",
+    "location": "Localisation",
+    "deleteSuccess": "Signalement annulé avec succès.",
+    "noReports": "Aucun signalement trouvé.",
+    "view-on-map" : "See on the map"
   }
+
 }
+

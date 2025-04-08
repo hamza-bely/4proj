@@ -1,4 +1,4 @@
-import "./map.css";
+import "./css/map.css";
 import { useState, useRef, useEffect } from "react";
 import { LuSearch } from "react-icons/lu";
 import { TbRouteSquare } from "react-icons/tb";
@@ -6,7 +6,7 @@ import { MdOutlineGpsFixed } from "react-icons/md";
 import tt, { Popup, Marker } from "@tomtom-international/web-sdk-maps";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import TrafficIndicator from "./traffic-indicator.tsx";
+import TrafficIndicator from "./components/traffic-indicator.tsx";
 import Search from "./serach/search-bar.tsx";
 import RoutePlanner from "./serach/route-planner.tsx";
 import {createMarkerDOMElement} from "./serach/marker-icon.tsx";

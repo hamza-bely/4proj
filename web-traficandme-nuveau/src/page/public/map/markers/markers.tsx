@@ -5,39 +5,39 @@ import PopupContent from "./popup-content.tsx";
 import { getUserRole } from "../../../../services/service/token-service.tsx";
 import Cookies from "js-cookie";
 import { IoMdClose } from "react-icons/io";
-
-interface Signal {
-    type: string;
-    position: [number, number];
-    info: {
-        user: string;
-        status: "Available" | "Unavailable" | "Canceled" | "Pending";
-        creteDate: string;
-        like: number;
-        dislike: number;
-    };
-}
+import { Report } from "../../../../services/model/report.tsx"
+import { useTranslation } from "react-i18next";
+import useReportStore from "../../../../services/store/report-store.tsx";
+import {toast} from "react-toastify";
 
 interface MarkersProps {
     map: tt.Map | null;
 }
 
 const Markers: React.FC<MarkersProps> = ({ map }) => {
-    const [signals, setSignals] = useState<Signal[]>([
-        { type: "Danger", position: [2.3522, 48.8566], info: { status: "Available", user: "hamza33", creteDate: "202", like: 22, dislike: 5 } },
-        { type: "Police", position: [2.3622, 48.8566], info: { status: "Unavailable", user: "hamza", creteDate: "21", like: 22, dislike: 5 } },
-        { type: "Police", position: [2.3622, 45.8566], info: { status: "Available", user: "abdoul", creteDate: "200", like: 22, dislike: 5 } }
-    ]);
+    const { t } = useTranslation();
+    const { reports, fetchReports, createReport } = useReportStore();
 
     const token = Cookies.get("authToken");
     const [userRole, setRole] = useState<string | string[] | null>(null);
-    const [selectedSignal, setSelectedSignal] = useState<Signal | null>(null);
+    const [selectedSignal, setSelectedSignal] = useState<Report | null>(null);
     const [createdMarkers, setCreatedMarkers] = useState<tt.Marker[]>([]);
     const [currentZoom, setCurrentZoom] = useState<number>(0);
+    const [isAddingReport, setIsAddingReport] = useState<boolean>(false);
+    const [showAddReportModal, setShowAddReportModal] = useState<boolean>(false);
+    const [newReportData, setNewReportData] = useState<{
+        type: string;
+        latitude: number;
+        longitude: number;
+        status : string
+    }>({
+        type: "ACCIDENTS",
+        latitude: 0,
+        longitude: 0,
+        status : userRole === "ROLE_ADMIN" ? "PENDING" : "AVAILABLE"
+    });
 
-    // Fonction pour mettre à jour la visibilité des marqueurs en fonction du zoom
-    const updateMarkersVisibility = (zoom: any) => {
-        console.log(zoom , "zz")
+    const updateMarkersVisibility = (zoom: number) => {
         createdMarkers.forEach(marker => {
             if (zoom >= 12) {
                 marker.getElement().style.display = 'block';
@@ -50,26 +50,57 @@ const Markers: React.FC<MarkersProps> = ({ map }) => {
     const createMarkers = () => {
         if (!map) return;
 
-        // Supprimer les marqueurs existants d'abord
         createdMarkers.forEach(marker => marker.remove());
 
         const markers: tt.Marker[] = [];
 
-        signals.forEach((signal) => {
-            const coordinates = signal.position;
-            const markerElement = document.createElement("div");
-            markerElement.className = "rounded-full overflow-hidden shadow-lg border-2 border-white";
-            markerElement.style.marginBottom = "50px";
-            markerElement.innerHTML = `
-                <img src="/images/icon-map/police.jpg" alt="User Avatar" class="rounded-full w-10 h-10 border-2 border-white shadow-md" />
-            `;
 
+        reports.filter(report => report.status === "AVAILABLE")
+            .forEach((report) => {
+            const coordinates = [report.longitude ?? 0,report.latitude ?? 0];
+            const markerElement = document.createElement("div");
+            markerElement.className = "rounded-full overflow-hidden  border-white";
+            markerElement.style.marginBottom = "50px";
+            const imageSrc = (() => {
+                switch (report.type) {
+                    case "ACCIDENTS":
+                        return "/images/icon-map/accidents.jpg";
+                    case "TRAFFIC":
+                        return "/images/icon-map/traffic.jpg";
+                    case "ROADS_CLOSED":
+                        return "/images/icon-map/roads_closed.jpg";
+                    case "POLICE_CHECKS":
+                        return "/images/icon-map/police.jpg";
+                    case "OBSTACLES":
+                        return "/images/icon-map/obstacles.jpg";
+                    default:
+                        return "/images/icon-map/default.jpg";
+                }
+            })();
+
+                    markerElement.innerHTML = `
+            <div class="flex flex-col items-center">
+                <img src="${imageSrc}" alt="Signal Icon"
+                    class="rounded-full w-10 h-10 border-2 border-white shadow-md" />
+                <div class="w-0 h-0 border-l-[10px] border-r-[10px] border-t-[10px] border-l-transparent border-r-transparent border-t-blue-500"></div>
+            </div>
+        `;
+
+            markerElement.innerHTML = `
+                <div class="flex flex-col items-center">
+                    <img src="${imageSrc}" alt="Signal Icon"
+                        class="rounded-full w-10 h-10 border-2 border-white shadow-md" />
+                    <div class="w-0 h-0 border-l-[10px] border-r-[10px] border-t-[10px] border-l-transparent border-r-transparent border-t-blue-500"></div>
+                </div>
+       
+                   `;
+            
             const marker = new tt.Marker({ element: markerElement })
                 .setLngLat(coordinates)
                 .addTo(map);
 
             marker.getElement().addEventListener("click", () => {
-                setSelectedSignal(signal);
+                setSelectedSignal(report);
             });
 
             markers.push(marker);
@@ -77,7 +108,6 @@ const Markers: React.FC<MarkersProps> = ({ map }) => {
 
         setCreatedMarkers(markers);
 
-        // Appliquer la visibilité initiale en fonction du zoom actuel
         const currentZoom = map.getZoom();
         updateMarkersVisibility(currentZoom);
     };
@@ -86,9 +116,47 @@ const Markers: React.FC<MarkersProps> = ({ map }) => {
         if (!map) return;
 
         const zoom = map.getZoom();
-        console.log(zoom)
         setCurrentZoom(zoom);
         updateMarkersVisibility(currentZoom);
+    };
+
+    const handleAddReportClick = () => {
+        toast.info("click sur la map") //TODO TRADUCTION
+        setIsAddingReport(true);
+        const messageContainer = document.createElement("div");
+        messageContainer.id = "click-message";
+        messageContainer.className = "fixed top-4 left-1/2 transform -translate-x-1/2 bg-blue-500 text-white py-2 px-4 rounded-lg shadow-lg z-50";
+        messageContainer.textContent = t("Cliquez sur un point de la carte pour créer un rapport");
+        document.body.appendChild(messageContainer);
+    };
+
+    const handleMapClick = (e: any) => {
+        if (!isAddingReport) return;
+
+        const messageContainer = document.getElementById("click-message");
+        if (messageContainer) {
+            document.body.removeChild(messageContainer);
+        }
+        const { lng, lat } = e.lngLat;
+
+        setNewReportData({
+            ...newReportData,
+            latitude: lat,
+            longitude: lng
+        });
+
+        setShowAddReportModal(true);
+        setIsAddingReport(false);
+    };
+
+    const handleSubmitNewReport = async () => {
+        try {
+            await createReport(newReportData);
+            setShowAddReportModal(false);
+            await fetchReports();
+        } catch (error) {
+            console.error("Erreur lors de l'ajout du rapport", error);
+        }
     };
 
     useEffect(() => {
@@ -96,28 +164,44 @@ const Markers: React.FC<MarkersProps> = ({ map }) => {
 
         if (!map) return;
 
-        // Obtenir le zoom initial
         const initialZoom = map.getZoom();
         setCurrentZoom(initialZoom);
 
-        // Créer les marqueurs
         createMarkers();
 
-        // Ajouter l'écouteur d'événement zoom
         map.on('zoom', handleZoomChange);
+        map.on('click', handleMapClick);
 
-        // Nettoyage lors du démontage du composant
         return () => {
             createdMarkers.forEach(marker => marker.remove());
             map.off('zoom', handleZoomChange);
+            map.off('click', handleMapClick);
+
+            // Nettoyer le message si on quitte le composant pendant l'ajout
+            const messageContainer = document.getElementById("click-message");
+            if (messageContainer) {
+                document.body.removeChild(messageContainer);
+            }
         };
-    }, [map, signals, token]);
+    }, [map, reports, token, isAddingReport]);
 
     useEffect(() => {
         if (map) {
             createMarkers();
         }
-    }, [signals]);
+    }, [reports]);
+
+    useEffect(() => {
+        const loadReports = async () => {
+            try {
+                await fetchReports();
+            } catch (error) {
+                console.error("Erreur lors du chargement des rapports", error);
+            }
+        };
+
+        loadReports();
+    }, []);
 
     return (
         <>
@@ -128,19 +212,60 @@ const Markers: React.FC<MarkersProps> = ({ map }) => {
                             <IoMdClose onClick={() => setSelectedSignal(null)} />
                         </div>
                         <PopupContent
-                            type={selectedSignal.type}
-                            user={selectedSignal.info.user}
-                            creteDate={selectedSignal.info.creteDate}
-                            like={selectedSignal.info.like}
-                            dislike={selectedSignal.info.dislike}
+                            info={selectedSignal}
                         />
                     </div>
                 )}
             </Alert>
+
+            {showAddReportModal && (
+                <div className="fixed inset-0   flex items-center justify-center z-50">
+                    <div className="bg-white p-6 rounded-lg w-96 max-w-md">
+                        <h2 className="text-xl font-bold mb-4">{t("Ajouter un nouveau rapport")}</h2>
+
+                        <div className="mb-4">
+                            <label className="block text-sm font-medium text-gray-700 mb-1">{t("Type")}</label>
+                            <select
+                                className="w-full p-2 border border-gray-300 rounded-md"
+                                value={newReportData.type}
+                                onChange={(e) => setNewReportData({...newReportData, type: e.target.value})}
+                            >
+                                <option value="ACCIDENTS">{t("Accidents")}</option>
+                                <option value="TRAFFIC">{t("Traffic")}</option>
+                                <option value="ROADS_CLOSED">{t("road-closed")}</option>
+                                <option value="POLICE_CHECKS">{t("police")}</option>
+                                <option value="OBSTACLES">{t("obstacles")}</option>
+                            </select>
+                        </div>
+                        <div className="mb-4">
+                            <p className="text-sm text-gray-600">
+                                {t("Coordonnées")}: {newReportData.latitude.toFixed(6)}, {newReportData.longitude.toFixed(6)}
+                            </p>
+                        </div>
+
+                        <div className="flex justify-end space-x-2">
+                            <button
+                                className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400"
+                                onClick={() => setShowAddReportModal(false)}
+                            >
+                                {t("Annuler")}
+                            </button>
+                            <button
+                                className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+                                onClick={handleSubmitNewReport}
+                            >
+                                {t("Ajouter")}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {userRole &&
                 <button
                     style={{zIndex: "1001"}}
                     className="fixed bottom-10 right-10 bg-blue-500 text-white rounded-full p-4 shadow-lg hover:bg-blue-600"
+                    onClick={handleAddReportClick}
                 >
                     +
                 </button>

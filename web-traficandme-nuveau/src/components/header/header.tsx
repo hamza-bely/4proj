@@ -23,12 +23,6 @@ export default function Header() {
         { name: t("header.company"), href: "/about" },
     ];
 
-    const navigationAdmin = [
-        ...navigation,
-        { name: t("header.users"), href: "/admin/management-users" }
-    ];
-
-    const navigationLinks = role === "ROLE_ADMIN" ? navigationAdmin : navigation;
 
     useEffect(() => {
         setRole(getUserRole());
@@ -38,11 +32,11 @@ export default function Header() {
     return (
         <header className="bg-white">
             <nav className="mx-auto flex max-w-7xl items-center justify-between p-4 lg:px-8" aria-label="Global">
-                <MobileHeader navigationLinks={navigationLinks} />
+                <MobileHeader navigationLinks={navigation} />
 
                 <DesktopHeader
                     role={role}
-                    navigationLinks={navigationLinks}
+                    navigationLinks={navigation}
                     openLogin={() => setIsOpenLogin(true)}
                     openRegister={() => setIsOpenRegister(true)}
                 />

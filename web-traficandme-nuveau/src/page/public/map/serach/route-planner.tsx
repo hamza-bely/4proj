@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import "../map.css";
+import "../css/map.css";
 import { toast } from "react-toastify";
 import Search from "./search-bar.tsx";
 import { useTranslation } from "react-i18next";
