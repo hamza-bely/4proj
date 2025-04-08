@@ -1,5 +1,6 @@
 package com.supinfo.api_traficandme.User.controller;
 
+import com.supinfo.api_traficandme.User.dto.StatusUser;
 import com.supinfo.api_traficandme.User.dto.UserRequest;
 import com.supinfo.api_traficandme.User.dto.UserResponse;
 import com.supinfo.api_traficandme.User.entity.UserInfo;
@@ -75,11 +76,20 @@ public class UserInfoController {
         }
     }
 
-    @DeleteMapping("delete/{userId}")
-    //@PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<Void> deleteUser(@PathVariable("userId") Integer userId){
-        userService.deleteUser(userId);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    @PatchMapping("update-status")
+    public ResponseEntity<ApiResponse<UserInfo>> changeStatus(
+            @RequestBody StatusUser status) {
+        try {
+            Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            UserResponse userConnected = userService.getUserByEmail(((UserDetails) principal).getUsername());
+            if(userConnected.username() == null){
+                throw new IllegalArgumentException("User undefined");
+            }
+            UserInfo updated = userService.changeStatusUser(status,userConnected);
+            return ResponseEntity.ok(new ApiResponse<>("Status changed", updated));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(new ApiResponse<>(e.getMessage(), null));
+        }
     }
 
     @GetMapping("/info")

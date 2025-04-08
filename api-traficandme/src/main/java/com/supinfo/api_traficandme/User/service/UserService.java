@@ -9,8 +9,8 @@ import com.supinfo.api_traficandme.User.repository.UserRepository;
 import com.supinfo.api_traficandme.common.Role;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import java.util.List;
-import java.util.Optional;
+
+import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -139,8 +139,6 @@ public class UserService {
         return userMapper.toResponse(user);
     }
 
-
-
     public void mergeUser(UserInfo userToUpdate, UserRequest user){
         userToUpdate.setFirstName(user.firstName());
         userToUpdate.setLastName(user.lastName());
@@ -150,13 +148,28 @@ public class UserService {
         userRepository.save(userToUpdate);
     }
 
-    public boolean deleteUser(String email){
-        Optional<UserInfo> user = userRepository.findByEmail(email);
-        if(user.isPresent()){
-            userRepository.delete(user.get());
-            return true;
+    public UserInfo changeStatusUser(StatusUser newStatus,UserResponse userConnected) {
+
+        if (newStatus == null || !EnumSet.allOf(StatusUser.class).contains(newStatus)) {
+            throw new IllegalArgumentException("Status \"" + newStatus + "\" does not exist");
         }
-        return false;
+
+        UserInfo user = userRepository.findById(userConnected.id()).orElseThrow(() ->
+                new RuntimeException("User not found with id: " + userConnected.id()));
+
+        user.setStatus(newStatus);
+        user.setUpdateDate(new Date());
+
+        if (newStatus == StatusUser.DELETED) {
+            String randomSuffix = UUID.randomUUID().toString().substring(0, 8);
+
+            user.setEmail("deleted_" + randomSuffix + "@example.com");
+            user.setFirstName("Anonymous");
+            user.setLastName("User");
+            user.setPassword(UUID.randomUUID().toString());
+        }
+
+        return userRepository.save(user);
     }
 
     public UserInfo getOneUserByEmail(String email){

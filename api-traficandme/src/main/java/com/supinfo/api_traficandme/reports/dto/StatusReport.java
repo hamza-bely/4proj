@@ -1,2 +1,8 @@
-package com.supinfo.api_traficandme.reports.dto;public class StatusReport {
+package com.supinfo.api_traficandme.reports.dto;
+
+public enum StatusReport {
+    AVAILABLE, UNAVAILABLE, CANCELED, PENDING
 }
+
+
+
