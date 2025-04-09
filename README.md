@@ -17,8 +17,8 @@ Containérisation : 20 points
 Fonctionnalités : 150 points
 (Une note inférieure à 75 points sur cette partie entraînera un ajournement à ce projet)
 
-Connexion utilisateur : 10 points
-OAuth : 5 points
+- Connexion utilisateur : 10 points
+- OAuth : 5 points
 Connexion standard : 5 points
 Affichage carte : 10 points
 Choix itinéraires : 30 points
