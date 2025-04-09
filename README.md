@@ -4,6 +4,7 @@ A comprehensive educational management system built with Node.js, React, and Gra
 
 
 
+```
 🚀 Fonctionnalités du projet
 Fonctionnalité	Web	Mobile	API
 Connexion utilisateur	✔️	❌	❌
@@ -29,6 +30,7 @@ Données (Data)	✔️	❌	❌
 Stockage et gestion des données	✔️	❌	❌
 Analyse et statistiques trafic	✔️	❌	❌
 Prédiction des embouteillages	✔️	❌	❌
+```
 
 
 
