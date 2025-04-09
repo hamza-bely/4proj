@@ -5,31 +5,50 @@ A comprehensive educational management system built with Node.js, React, and Gra
 
 
 ```
-🚀 Fonctionnalités du projet
-Fonctionnalité	Web	Mobile	API
-Connexion utilisateur	✔️	❌	❌
-Connexion standard	✔️	❌	❌
-OAuth	❌	❌	❌
-Affichage carte	✔️	❌	❌
-Choix itinéraires	✔️	❌	❌
-Plusieurs trajets proposés avec durée	✔️	❌	❌
-Choix d’itinéraire sans péage	✔️	❌	❌
-Choix des informations du trajet	❌	❌	❌
-Navigation en temps réel	✔️	❌	❌
-Instructions de conduite	❌	❌	❌
-Géolocalisation & avancée visuelle du transport	✔️	❌	❌
-Signalement d'incidents	✔️	❌	❌
-Gestion des alertes	❌	❌	❌
-Vérification des infos à l'approche	❌	❌	❌
-Recalcul de l'itinéraire	✔️	❌	❌
-Envoi vers téléphone + génération QR code	❌	❌	❌
-Sécurité	✔️	❌	❌
-Chiffrement & sécurité des communications	✔️	❌	❌
-Protection XSS / CSRF / SQL Injection	✔️	❌	❌
-Données (Data)	✔️	❌	❌
-Stockage et gestion des données	✔️	❌	❌
-Analyse et statistiques trafic	✔️	❌	❌
-Prédiction des embouteillages	✔️	❌	❌
+# Project Evaluation Criteria
+
+This document outlines the evaluation criteria for the project, highlighting the implementation status across web, mobile, and API components.
+
+> ⚠️ **Note**: Scoring less than 30/50 on Documentation, 30/50 on Deployment, or 75/150 on Features will result in project failure.
+
+## Summary Table of Features
+
+| Category | Subcategory | Points | Web | Mobile | API |
+|----------|-------------|--------|-----|--------|-----|
+| **Documentation** (50 pts) | Technical Documentation | 30 | - | - | - |
+|  | User Manual | 20 | - | - | - |
+| **Deployment** (50 pts) | Architecture | 30 | - | - | - |
+|  | Containerization | 20 | - | - | - |
+| **Features** (150 pts) | | | | | |
+| User Authentication | OAuth | 5 | ❌ | ❌ | - |
+|  | Standard Login | 5 | ✅ | ❌ | - |
+| Map Features | Map Display | 10 | ✅ | ❌ | - |
+|  | Route Selection | 30 | ✅ | ❌ | - |
+|  | Multiple Route Options with Duration | 20 | ✅ | ❌ | - |
+|  | Toll-Free Route Options | 5 | ✅ | ❌ | - |
+|  | Trip Information Selection | 5 | ❌ | ❌ | - |
+| Real-time Navigation | Live Navigation | 30 | ✅ | ❌ | - |
+|  | Driving Instructions | 20 | ❌ | ❌ | - |
+|  | Geolocation and Transport Visualization | 10 | ✅ | ❌ | - |
+| Incident Management | Incident Reporting | 20 | ✅ | ❌ | - |
+| Alert System | Alert Management | 40 | ❌ | ❌ | - |
+|  | Proximity Information Verification | 15 | ❌ | ❌ | - |
+|  | Route Recalculation | 25 | ✅ | ❌ | - |
+| Sharing | Route Sharing to Phone & QR Code Generation | 10 | ❌ | ❌ | - |
+| Security | Communication Encryption & Security | 20 | ✅ | ❌ | - |
+|  | Protection against XSS/CSRF/SQL Injection | 10 | ✅ | ❌ | - |
+| Data Management | Data Storage and Management | 30 | ✅ | ❌ | - |
+|  | Traffic Data Analysis & Statistics | 20 | ✅ | ❌ | - |
+|  | Traffic Jam Prediction | 20 | ✅ | ❌ | - |
+
+## Legend
+- ✅: Implemented
+- ❌: Not implemented
+- -: Not applicable or not evaluated
+
+## Progress Summary
+
+Currently, most feature
 ```
 
 
