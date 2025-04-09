@@ -1,5 +1,6 @@
 package com.supinfo.api_traficandme.traffic.controller;
 
+import com.supinfo.api_traficandme.User.dto.StatusUser;
 import com.supinfo.api_traficandme.User.dto.UserResponse;
 import com.supinfo.api_traficandme.User.service.UserService;
 import com.supinfo.api_traficandme.security.dto.ApiResponse;
@@ -18,6 +19,8 @@ import java.util.List;
 @RequestMapping("/api/traffic")
 @CrossOrigin (origins = "*")
 public class TrafficController {
+    //TODO AJOUTER LE @PreAuthorize
+
     private final TrafficService trafficService;
     private final UserService userService;
     public TrafficController(TrafficService trafficService, UserService userService) {
@@ -25,51 +28,64 @@ public class TrafficController {
         this.userService = userService;
     }
 
-    @PostMapping("/add")
-    public ResponseEntity<TrafficModel> addTraffic(@RequestBody TrafficRequest request) {
+    @PostMapping("/create")
+    public ResponseEntity<ApiResponse<TrafficModel>> create(@RequestBody TrafficRequest request) {
         try {
-
             Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             UserResponse connectedUser = userService.getUserByEmail(((UserDetails) principal).getUsername());
             if(connectedUser.username() == null){
                 throw new IllegalArgumentException("User not found");
             }
 
-            TrafficModel trafficModel = trafficService.addTraffic(request, connectedUser);
-            return new ResponseEntity<>(trafficModel, HttpStatus.CREATED);
+            TrafficModel traffic = trafficService.createTraffic(request, connectedUser);
+            return ResponseEntity.ok(new ApiResponse<>("TrafficData fetched successfully", traffic));
         } catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+            return ResponseEntity.badRequest().body(new ApiResponse<>(e.getMessage(), null));
         }
     }
 
     @GetMapping("/get-all")
-    public ResponseEntity<ApiResponse<List<TrafficModel>>> getAllTraffic() {
+    public ResponseEntity<ApiResponse<List<TrafficModel>>> getAll() {
         try {
             List<TrafficModel> trafficList = trafficService.getAllTraffic();
             return ResponseEntity.ok(new ApiResponse<>("TrafficData fetched successfully", trafficList));
         } catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+            return ResponseEntity.badRequest().body(new ApiResponse<>(e.getMessage(), null));
         }
     }
 
-    @GetMapping("findBy/{id}")
-    public ResponseEntity<ApiResponse<TrafficModel>> getTrafficById(@PathVariable int id) {
+    @GetMapping("/user")
+    public ResponseEntity<ApiResponse<List<TrafficModel>>> getAllByUser() {
         try {
-            TrafficModel trafficModel = trafficService.findById(id);
-            return ResponseEntity.ok(new ApiResponse<>("Traffic found", trafficModel));
-        } catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-        }
-
-    }
-
-    @GetMapping("traffic/user")
-    public ResponseEntity<ApiResponse<List<TrafficModel>>> getAllTrafficByUser() {
-        try {
-            List<TrafficModel> userTrafficList = trafficService.getAllTrafficByUser();
+            Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            UserResponse userConnected = userService.getUserByEmail(((UserDetails) principal).getUsername());
+            if(userConnected.username() == null){
+                throw new IllegalArgumentException("User undefined");
+            }
+            List<TrafficModel> userTrafficList = trafficService.getAllTrafficByUser(userConnected);
             return ResponseEntity.ok(new ApiResponse<>("traffic by user was successfully fetched",userTrafficList ));
         } catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+            return ResponseEntity.badRequest().body(new ApiResponse<>(e.getMessage(), null));
+        }
+    }
+
+    @DeleteMapping("{id}/delete-for-an-user")
+    public ResponseEntity<ApiResponse<TrafficModel>> deleteForAnUSer(@PathVariable Integer id) {
+        try {
+            TrafficModel traffic = trafficService.deleteTrafficForAnUser(id);
+            return ResponseEntity.ok(new ApiResponse<>("Report deleted successfully", traffic));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(new ApiResponse<>(e.getMessage(), null));
+        }
+    }
+
+    @DeleteMapping("{id}/delete-definitive")
+    public ResponseEntity<ApiResponse<Void>> deleteDefinitive(@PathVariable Integer id) {
+        try {
+            trafficService.deleteDefinitiveTrafficForAnAdmin(id);
+            return ResponseEntity.ok(new ApiResponse<>("Report deleted successfully", null));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(new ApiResponse<>(e.getMessage(), null));
         }
     }
 }

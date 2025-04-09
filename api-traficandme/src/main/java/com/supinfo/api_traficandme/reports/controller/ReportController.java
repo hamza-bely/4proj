@@ -20,7 +20,7 @@ import java.util.List;
 @CrossOrigin(origins = "*")
 public class ReportController {
 
-    //TODO ACCESS
+    //TODO AJOUTE LE PREAUHORIZE
     private final ReportService reportService;
     private final UserService userService;
 
@@ -30,7 +30,7 @@ public class ReportController {
     }
 
     @PostMapping("create")
-    public ResponseEntity<ApiResponse<Report>> create(@RequestBody CreateReportRequest report) {
+    public ResponseEntity<ApiResponse<Report>> create(@RequestBody CreateReportRequest request) {
         try {
             Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             UserResponse userConnected = userService.getUserByEmail(((UserDetails) principal).getUsername());
@@ -38,8 +38,8 @@ public class ReportController {
                 throw new IllegalArgumentException("User undefined");
             }
 
-            Report saved = reportService.createReport(report,userConnected);
-            return ResponseEntity.ok(new ApiResponse<>("Report created successfully", saved));
+            Report report = reportService.createReport(request,userConnected);
+            return ResponseEntity.ok(new ApiResponse<>("Report created successfully", report));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(new ApiResponse<>(e.getMessage(), null));
         }
@@ -65,12 +65,12 @@ public class ReportController {
     }
 
     @PostMapping("{id}/like")
-    public ResponseEntity<ApiResponse<Report>> like(@PathVariable String id) {
+    public ResponseEntity<ApiResponse<Report>> like(@PathVariable String idReport) {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String userEmail = ((UserDetails) principal).getUsername();
 
         try {
-            Report updated = reportService.likeReport(id, userEmail);
+            Report updated = reportService.likeReport(idReport, userEmail);
             return ResponseEntity.ok(new ApiResponse<>("Report liked", updated));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(new ApiResponse<>(e.getMessage(), null));
@@ -109,14 +109,14 @@ public class ReportController {
             @RequestBody TypeReport status) {
         try {
             Report updated = reportService.changeType(id, status);
-            return ResponseEntity.ok(new ApiResponse<>("Status changed", updated));
+            return ResponseEntity.ok(new ApiResponse<>("Type changed", updated));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(new ApiResponse<>(e.getMessage(), null));
         }
     }
 
 
-    @DeleteMapping("{id}/delete")
+    @DeleteMapping("{id}/delete-definitive")
     public ResponseEntity<ApiResponse<Void>> permanentlyDelete(@PathVariable String id) {
         try {
             reportService.deleteReport(id);

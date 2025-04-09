@@ -4,5 +4,4 @@ public enum ModeCirculation {
     Rapide,
     Normal,
     Lent,
-
 }

@@ -1,7 +1,6 @@
 package com.supinfo.api_traficandme.reports.service;
 
 import com.supinfo.api_traficandme.User.dto.UserResponse;
-import com.supinfo.api_traficandme.User.service.UserService;
 import com.supinfo.api_traficandme.reports.dto.CreateReportRequest;
 import com.supinfo.api_traficandme.reports.dto.StatusReport;
 import com.supinfo.api_traficandme.reports.dto.TypeReport;
@@ -27,14 +26,24 @@ public class ReportService {
     private final ReportRepository reportRepository;
     private final ReportInteractionRepository reportInteractionRepository;
 
-
     public ReportService(ReportRepository reportRepository,ReportInteractionRepository reportInteractionRepository) {
         this.reportRepository = reportRepository;
         this.reportInteractionRepository =reportInteractionRepository;
     }
 
     public Report createReport(CreateReportRequest request,UserResponse userConnected) {
-
+        if (request.getType() == null) {
+            throw new IllegalArgumentException("Type is required.");
+        }
+        if (request.getStatus() == null) {
+            throw new IllegalArgumentException("Status is required.");
+        }
+        if (request.getLatitude() < -90 || request.getLatitude() > 90) {
+            throw new IllegalArgumentException("Latitude must be between -90 and 90.");
+        }
+        if (request.getLongitude() < -180 || request.getLongitude() > 180) {
+            throw new IllegalArgumentException("Longitude must be between -180 and 180.");
+        }
 
         Report report = new Report();
         report.setType(request.getType());
@@ -46,7 +55,6 @@ public class ReportService {
         report.setUpdateDate(new Date());
         report.setLikeCount(0);
         report.setDislikeCount(0);
-
 
         return reportRepository.save(report);
     }
@@ -144,8 +152,15 @@ public class ReportService {
 
         Report report = reportRepository.findById(id).orElseThrow(() ->
                 new RuntimeException("Report not found with id: " + id));
+
+
+        report.setStatus(newStatus);
         report.setStatus(newStatus);
         report.setUpdateDate(new Date());
+        if(newStatus.equals(StatusReport.CANCELED)){
+            report.setUser("Anonymous User");
+        }
+
         return reportRepository.save(report);
     }
 
@@ -160,7 +175,6 @@ public class ReportService {
         report.setUpdateDate(new Date());
         return reportRepository.save(report);
     }
-
 
     public void deleteReport(String id) {
         Report report = reportRepository.findById(id)

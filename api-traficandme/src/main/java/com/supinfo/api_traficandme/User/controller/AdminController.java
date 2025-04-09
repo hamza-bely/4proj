@@ -3,7 +3,6 @@ package com.supinfo.api_traficandme.User.controller;
 import com.supinfo.api_traficandme.User.dto.StatusUser;
 import com.supinfo.api_traficandme.User.dto.UserRequest;
 import com.supinfo.api_traficandme.User.dto.UserResponse;
-import com.supinfo.api_traficandme.User.entity.UserInfo;
 import com.supinfo.api_traficandme.User.service.AdminService;
 import com.supinfo.api_traficandme.User.service.UserService;
 import com.supinfo.api_traficandme.security.dto.ApiResponse;
@@ -20,6 +19,8 @@ import java.util.List;
 
 
 public class AdminController {
+    //TODO AJOUTER LES PREAUTHORIZE
+
     private  final UserService userService;
     private  final AdminService adminService;
 
@@ -68,11 +69,11 @@ public class AdminController {
     }
 
     @PatchMapping("{id}/update-status")
-    public ResponseEntity<ApiResponse<UserInfo>> changeStatus(
+    public ResponseEntity<ApiResponse<UserResponse>> changeStatus(
             @PathVariable Integer id,
             @RequestBody StatusUser status) {
         try {
-            UserInfo updated = adminService.changeStatusUserForAnAdmin(id, status);
+            UserResponse updated = adminService.changeStatusUserForAnAdmin(id, status);
             return ResponseEntity.ok(new ApiResponse<>("Status changed", updated));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(new ApiResponse<>(e.getMessage(), null));

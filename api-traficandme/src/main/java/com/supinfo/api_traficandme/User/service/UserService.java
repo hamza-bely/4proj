@@ -7,6 +7,8 @@ import com.supinfo.api_traficandme.User.dto.UserResponse;
 import com.supinfo.api_traficandme.User.entity.UserInfo;
 import com.supinfo.api_traficandme.User.repository.UserRepository;
 import com.supinfo.api_traficandme.common.Role;
+import com.supinfo.api_traficandme.reports.entity.Report;
+import com.supinfo.api_traficandme.reports.repository.ReportRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -19,11 +21,13 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
+    private final ReportRepository reportRepository;
 
-    public UserService (UserRepository userRepository,UserMapper userMapper,PasswordEncoder passwordEncoder) {
+    public UserService (ReportRepository reportRepository,UserRepository userRepository,UserMapper userMapper,PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.userMapper= userMapper;
         this.passwordEncoder =passwordEncoder;
+        this.reportRepository = reportRepository;
     }
 
     public UserInfo findUser(String Username){
@@ -160,13 +164,25 @@ public class UserService {
         user.setStatus(newStatus);
         user.setUpdateDate(new Date());
 
+        ///TODO FAIRE LA MEMEM CHOSE AVEC LE ROUTE CHANGE  LE EMAIL  AVEC "Anonymous User"
         if (newStatus == StatusUser.DELETED) {
             String randomSuffix = UUID.randomUUID().toString().substring(0, 8);
+
+            String originalUsername = user.getUsername();
 
             user.setEmail("deleted_" + randomSuffix + "@example.com");
             user.setFirstName("Anonymous");
             user.setLastName("User");
             user.setPassword(UUID.randomUUID().toString());
+
+
+            List<Report> userReports = reportRepository.findAll().stream()
+                    .filter(report -> report.getUser().equals(originalUsername))
+                    .collect(Collectors.toList());
+
+            for (Report report : userReports) {
+                report.setUser("Anonymous User");
+            }
         }
 
         return userRepository.save(user);

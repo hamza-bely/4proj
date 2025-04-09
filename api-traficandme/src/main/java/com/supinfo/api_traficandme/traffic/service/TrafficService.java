@@ -1,18 +1,13 @@
 package com.supinfo.api_traficandme.traffic.service;
 
 import com.supinfo.api_traficandme.User.dto.UserResponse;
+import com.supinfo.api_traficandme.traffic.dto.StatusTraffic;
 import com.supinfo.api_traficandme.traffic.dto.TrafficRequest;
 import com.supinfo.api_traficandme.traffic.fetch.TrafficRepository;
-import com.supinfo.api_traficandme.traffic.messages.StopExceptionMessages;
 import com.supinfo.api_traficandme.traffic.model.TrafficModel;
-import org.springframework.data.geo.Point;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -24,9 +19,38 @@ public class TrafficService {
         this.trafficRepository = trafficRepository;
     }
 
-    public TrafficModel addTraffic(TrafficRequest request, UserResponse connectedUser) throws Exception {
+    public TrafficModel createTraffic(TrafficRequest request, UserResponse connectedUser) throws Exception {
 
-        if (isTrafficExists(request.getStartLongitude(), request.getStartLatitude(), request.getEndLongitude(), request.getEndLatitude(), request.getUser())) {
+        if (request.getStartLongitude() == null || request.getStartLongitude().isBlank()) {
+            throw new IllegalArgumentException("Start longitude is required.");
+        }
+        if (request.getStartLatitude() == null || request.getStartLatitude().isBlank()) {
+            throw new IllegalArgumentException("Start latitude is required.");
+        }
+        if (request.getEndLongitude() == null || request.getEndLongitude().isBlank()) {
+            throw new IllegalArgumentException("End longitude is required.");
+        }
+        if (request.getEndLatitude() == null || request.getEndLatitude().isBlank()) {
+            throw new IllegalArgumentException("End latitude is required.");
+        }
+        if (request.getMode() == null) {
+            throw new IllegalArgumentException("Mode of circulation is required.");
+        }
+        if (connectedUser == null || connectedUser.email() == null || connectedUser.email().isBlank()) {
+            throw new IllegalArgumentException("Authenticated user is required.");
+        }
+
+        int userTrafficCount = trafficRepository.countByUser(connectedUser.email());
+        if (userTrafficCount >= 10) {
+            throw new IllegalStateException("You have reached the maximum number of 10 saved routes. Please delete one before creating a new one.");
+        }
+
+        if (isTrafficExists(
+                request.getStartLongitude(),
+                request.getStartLatitude(),
+                request.getEndLongitude(),
+                request.getEndLatitude(),
+                request.getUser())) {
             throw new Exception("Traffic record already exists for this route and user");
         }
 
@@ -50,33 +74,40 @@ public class TrafficService {
         return trafficRepository.findAll();
     }
 
-    public List<TrafficModel> getAllTrafficByUser() {
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
-        if (!(principal instanceof UserDetails)) {
-            throw new IllegalStateException("User not found");
-        }
-        String username = ((UserDetails) principal).getUsername();
-
+    public List<TrafficModel> getAllTrafficByUser(UserResponse userConnected) {
         return  trafficRepository.findAll().stream()
-                .filter(report -> report.getUser().equals(username))
+                .filter(report -> report.getUser().equals(userConnected.email()))
                 .collect(Collectors.toList());
     }
 
-    public List<TrafficModel> getAllTrafficByUser(String user) {
-        return trafficRepository.findByUser(user);
+    public TrafficModel deleteTrafficForAnUser(Integer idTraffic) throws Exception {
+
+        Optional<TrafficModel> optionalTraffic = trafficRepository.findById(idTraffic);
+
+        if (optionalTraffic.isEmpty()) {
+            throw new Exception("No traffic found for this user.");
+        }
+
+        TrafficModel traffic = optionalTraffic.get();
+        traffic.setStatus(StatusTraffic.DELETED);
+        traffic.setUser("Anonymous");
+        traffic.setUpdateDate(new Date());
+
+        return trafficRepository.save(traffic);
     }
 
-    public TrafficModel findById(int id) throws Exception {
-
-        return trafficRepository.findById(id)
-                .orElseThrow(() -> new Exception("Traffic record not found"));
+    public Boolean deleteDefinitiveTrafficForAnAdmin(Integer id){
+        Optional<TrafficModel> traffic = trafficRepository.findById(id);
+        if(traffic.isPresent()){
+            trafficRepository.delete(traffic.get());
+            return true;
+        }
+        return false;
     }
 
     public boolean isTrafficExists(String startLongitude, String startLatitude, String endLongitude, String endLatitude, String user) {
         return trafficRepository.existsByStartLongitudeAndStartLatitudeAndEndLongitudeAndEndLatitudeAndUser(
                 startLongitude, startLatitude, endLongitude, endLatitude, user);
     }
-
 
 }

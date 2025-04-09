@@ -2,7 +2,7 @@ package com.supinfo.api_traficandme.User.service;
 
 import com.supinfo.api_traficandme.User.dto.StatusUser;
 import com.supinfo.api_traficandme.User.dto.UserMapper;
-
+import com.supinfo.api_traficandme.User.dto.UserResponse;
 import com.supinfo.api_traficandme.User.entity.UserInfo;
 import com.supinfo.api_traficandme.User.repository.UserRepository;
 import com.supinfo.api_traficandme.reports.entity.Report;
@@ -36,7 +36,7 @@ public class AdminService {
         return false;
     }
 
-    public UserInfo changeStatusUserForAnAdmin(Integer id, StatusUser newStatus) {
+    public UserResponse changeStatusUserForAnAdmin(Integer id, StatusUser newStatus) {
         if (newStatus == null || !EnumSet.allOf(StatusUser.class).contains(newStatus)) {
             throw new IllegalArgumentException("Status \"" + newStatus + "\" does not exist");
         }
@@ -47,6 +47,8 @@ public class AdminService {
         user.setStatus(newStatus);
         user.setUpdateDate(new Date());
 
+
+        ///TODO FAIRE LA MEMEM CHOSE AVEC LE ROUTE CHANGE le EMAIL "Anonymous User"
         if (newStatus == StatusUser.DELETED) {
             String randomSuffix = UUID.randomUUID().toString().substring(0, 8);
 
@@ -68,6 +70,10 @@ public class AdminService {
             reportRepository.saveAll(userReports);
         }
 
-        return userRepository.save(user);
+        UserResponse userCanceled = userRepository.findById(user.getId())
+                .map(this.userMapper::toResponse)
+                .orElseThrow();;
+
+        return userCanceled;
     }
 }

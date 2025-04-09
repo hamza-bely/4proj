@@ -112,7 +112,6 @@ public class AuthService {
 
     public UserInfo getOneUserByEmail(String email){
         return userRepository.findOneByEmail(email);
-
     }
 
     private boolean isNullOrEmpty(String value) {
