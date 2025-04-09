@@ -4,87 +4,33 @@
 ```
 # Project Evaluation Criteria
 
-This document outlines the evaluation criteria for the project, highlighting the implementation status across web, mobile, and API components.
-
-
-
-# Project Evaluation Criteria
-
-This document outlines the evaluation criteria for the project, highlighting the implementation status across web, mobile, and API components.
-# Project Evaluation Criteria
-
-## Key Requirements
-- Minimum score requirements:
-  - Documentation: 30/50 points
-  - Deployment: 30/50 points
-  - Features: 75/150 points
-
-## Grading Table
-
-### Documentation (50 points)
-| Item | Points | Status |
-|------|--------|--------|
-| Technical Documentation | 30 | Pending |
-| User Manual | 20 | Pending |
-
-### Deployment (50 points)
-| Item | Points | Status |
-|------|--------|--------|
-| Architecture | 30 | Pending |
-| Containerization | 20 | Pending |
-
-### Features (150 points)
-
-#### User Authentication
-| Feature | Points | Web | Mobile |
-|---------|--------|-----|--------|
-| OAuth | 5 | No | No |
-| Standard Login | 5 | Yes | No |
-
-#### Map Features
-| Feature | Points | Web | Mobile |
-|---------|--------|-----|--------|
-| Map Display | 10 | Yes | No |
-| Route Selection | 30 | Yes | No |
-| Multiple Route Options with Duration | 20 | Yes | No |
-| Toll-Free Route Options | 5 | Yes | No |
-| Trip Information Selection | 5 | No | No |
-
-#### Navigation
-| Feature | Points | Web | Mobile |
-|---------|--------|-----|--------|
-| Live Navigation | 30 | Yes | No |
-| Driving Instructions | 20 | No | No |
-| Geolocation and Transport Visualization | 10 | Yes | No |
-
-#### Incident & Alerts
-| Feature | Points | Web | Mobile |
-|---------|--------|-----|--------|
-| Incident Reporting | 20 | Yes | No |
-| Alert Management | 40 | No | No |
-| Proximity Information Verification | 15 | No | No |
-| Route Recalculation | 25 | Yes | No |
-
-#### Additional Features
-| Feature | Points | Web | Mobile |
-|---------|--------|-----|--------|
-| Route Sharing (QR Code) | 10 | No | No |
-| Communication Encryption | 20 | Yes | No |
-| XSS/CSRF/SQL Injection Protection | 10 | Yes | No |
-| Data Storage and Management | 30 | Yes | No |
-| Traffic Analysis & Statistics | 20 | Yes | No |
-| Traffic Jam Prediction | 20 | Yes | No |
-
-## Current Progress
-- Web application: Many features implemented
-- Mobile application: Development not started
-- API implementation: In progress
-
-## Development Priorities
-1. Mobile implementation
-2. Alert management system
-3. Driving instructions feature
-4. Route sharing functionality
+| Category | Subcategory | Points | Web | Mobile | API |
+|----------|-------------|--------|-----|--------|-----|
+| **Documentation** (50 pts) | Technical Documentation | 30 | - | - | - |
+|  | User Manual | 20 | - | - | - |
+| **Deployment** (50 pts) | Architecture | 30 | - | - | - |
+|  | Containerization | 20 | - | - | - |
+| **Features** (150 pts) | | | | | |
+| User Authentication | OAuth | 5 | ❌ | ❌ | - |
+|  | Standard Login | 5 | ✅ | ❌ | - |
+| Map Features | Map Display | 10 | ✅ | ❌ | - |
+|  | Route Selection | 30 | ✅ | ❌ | - |
+|  | Multiple Route Options with Duration | 20 | ✅ | ❌ | - |
+|  | Toll-Free Route Options | 5 | ✅ | ❌ | - |
+|  | Trip Information Selection | 5 | ❌ | ❌ | - |
+| Real-time Navigation | Live Navigation | 30 | ✅ | ❌ | - |
+|  | Driving Instructions | 20 | ❌ | ❌ | - |
+|  | Geolocation and Transport Visualization | 10 | ✅ | ❌ | - |
+| Incident Management | Incident Reporting | 20 | ✅ | ❌ | - |
+| Alert System | Alert Management | 40 | ❌ | ❌ | - |
+|  | Proximity Information Verification | 15 | ❌ | ❌ | - |
+|  | Route Recalculation | 25 | ✅ | ❌ | - |
+| Sharing | Route Sharing to Phone & QR Code Generation | 10 | ❌ | ❌ | - |
+| Security | Communication Encryption & Security | 20 | ✅ | ❌ | - |
+|  | Protection against XSS/CSRF/SQL Injection | 10 | ✅ | ❌ | - |
+| Data Management | Data Storage and Management | 30 | ✅ | ❌ | - |
+|  | Traffic Data Analysis & Statistics | 20 | ✅ | ❌ | - |
+|  | Traffic Jam Prediction | 20 | ✅ | ❌ | - |
 
 ## Progress Summary
 
