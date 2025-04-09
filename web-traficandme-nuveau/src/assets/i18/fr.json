@@ -10,13 +10,18 @@
     "cancel": "Annuler",
     "delete": "Supprimer",
     "delete-definitive": "Supprimer definitive",
-
+    "email" : "Email",
     "actions": "Actions",
     "search" : "Recherche",
     "confirm": "Confirm",
     "message-confirm-delete" : "Êtes-vous sûr de vouloir supprimer ?"
   },
 
+  "status" : {
+    "pending": "En attente",
+    "rejected": "Rejeté",
+    "active": "Actif"
+  },
 
   "reportTypes": {
     "accidents": "Accidents",
@@ -27,7 +32,6 @@
   },
   "reportStatus": {
     "pending": "En attente",
-    "unavailable": "Inisponible",
     "available": "Disponible",
     "canceled": "Canceled"
   },
@@ -199,7 +203,6 @@
     "status": "Statut",
     "status-pending": "En attente",
     "status-available": "Disponible",
-    "status-unavailable": "Indisponible",
     "status-canceled": "Canceled",
     "likes": "J'aime",
     "dislikes": "Je n'aime pas",
@@ -220,6 +223,31 @@
     "deleteSuccess": "Signalement annulé avec succès.",
     "noReports": "Aucun signalement trouvé.",
     "view-on-map" : "See on the map"
+  },
+
+  "route": {
+    "title": "Mes itinéraires sauvegardés",
+    "mode": {
+      "fastest": "Rapide",
+      "shortest": "Court"
+    }
+  },
+  "routes": {
+    "mode": "Mode",
+    "peage": "Péage",
+    "status": "Statut",
+    "date": "Date",
+    "start": "Adresse de départ",
+    "end": "Adresse d'arrivée",
+    "viewOnMap": "Voir sur la carte",
+    "delete": "Supprimer",
+    "deleting": "Suppression...",
+    "deleteSuccess": "Itinéraire supprimé avec succès.",
+    "deleteError": "Erreur lors de la suppression de l'itinéraire.",
+    "confirmDelete": "Êtes-vous sûr de vouloir supprimer cet itinéraire ?",
+    "noRoutes": "Vous n'avez aucun itinéraire sauvegardé.",
+    "withTolls": "Avec péage",
+    "withoutTolls": "Sans péage"
   }
 
 }

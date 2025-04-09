@@ -32,7 +32,12 @@ export default function Header() {
     return (
         <header className="bg-white">
             <nav className="mx-auto flex max-w-7xl items-center justify-between p-4 lg:px-8" aria-label="Global">
-                <MobileHeader navigationLinks={navigation} />
+                <MobileHeader
+                    role={role}
+                    navigationLinks={navigation}
+                    openLogin={() => setIsOpenLogin(true)}
+                    openRegister={() => setIsOpenRegister(true)}
+                />
 
                 <DesktopHeader
                     role={role}

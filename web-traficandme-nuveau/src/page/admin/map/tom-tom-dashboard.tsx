@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import Routes from "../../../routes/routes.tsx";
 
 // Types pour les données
 interface ApiUsageData {
@@ -165,7 +166,7 @@ const TomTomApiDashboard: React.FC = () => {
                                 fill="#8884d8"
                                 dataKey="count"
                             >
-                                {routeData.map((entry, index) => (
+                                {routeData.map((entry , index) => (
                                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                                 ))}
                             </Pie>

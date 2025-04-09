@@ -8,6 +8,7 @@ import ProfileUser from "../page/user/profile-user.tsx";
 import About from "../page/public/about/about.tsx";
 import TomTomApiDashboard from "../page/admin/map/tom-tom-dashboard.tsx";
 import ListReportAdmin from "../page/admin/report/list-report-admin.tsx";
+import ListRouteAdmin from "../page/admin/routes/list-route-admin.tsx";
 
 
 const AppRoutes = () => {
@@ -37,6 +38,15 @@ const AppRoutes = () => {
                 element={
                     <AuthGuardAdmin>
                         <TomTomApiDashboard/>
+                    </AuthGuardAdmin>
+                }
+            />
+
+            <Route
+                path="/admin/management-routes"
+                element={
+                    <AuthGuardAdmin>
+                        <ListRouteAdmin/>
                     </AuthGuardAdmin>
                 }
             />

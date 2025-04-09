@@ -7,15 +7,18 @@ import {Dialog} from "../../assets/kit-ui/dialog.tsx";
 import ModalDeleteUser from "./modal-delete-user.tsx";
 import ReportsUser from "./reports-user.tsx";
 import {MdReportProblem} from "react-icons/md";
+import RoutesUser from "./routes-user.tsx";
+import {FaRoute} from "react-icons/fa";
 
 const secondaryNavigation = [
     { name: "General", href: "#", icon: UserCircleIcon },
-    { name: "Routes", href: "#", icon: MdReportProblem  },
+    { name: "Reports", href: "#", icon: MdReportProblem  },
+    { name: "Routes", href: "#", icon: FaRoute   },
 ];
 
 export default function ProfileUser() {
     const { t } = useTranslation();
-    const { user, updateUser, fetchUser } = useUserStore();
+    const { user, fetchUser } = useUserStore();
     const [isOpen, setIsOpen] = useState(false);
     const [editMode, setEditMode] = useState(false);
     const [currentNavigation, setCurrentNavigation] = useState("General");
@@ -50,17 +53,12 @@ export default function ProfileUser() {
 
     const handleSubmit = async () => {
         try {
-            const id = 1;
-            await updateUser(id, formData);
+            //await updateUser(formData); //TODO A FAIRE
             setEditMode(false);
         } catch (error) {
             console.error("Erreur lors de la mise à jour de l'utilisateur:", error);
         }
     };
-
-    function handleDeleteUser(id : number) {
-        setIsOpen(true)
-    }
 
     return (
         <div className="mx-auto max-w-7xl pt-16 lg:flex lg:gap-x-16 lg:px-8">
@@ -178,7 +176,7 @@ export default function ProfileUser() {
                                                 </button>
 
                                                 <button
-                                                    onClick={() => handleDeleteUser(user?.id)}
+                                                    onClick={() =>   setIsOpen(true)}
                                                     className="px-4 ml-5 py-2 text-white bg-red-700 rounded-md hover:bg-red-600 hover:text-white"
                                                 >
                                                     {t("profile.delete")}
@@ -194,8 +192,12 @@ export default function ProfileUser() {
                         </div>
                     )}
 
-                    {currentNavigation === "Routes" && (
+                    {currentNavigation === "Reports" && (
                         <ReportsUser/>
+                    )}
+
+                    {currentNavigation === "Routes" && (
+                        <RoutesUser/>
                     )}
                 </div>
                 <Dialog style={{ zIndex: 11, position: "fixed", top: 0, left: 0, right: 0, bottom: 0, display: "flex", justifyContent: "center", alignItems: "center" }} open={isOpen} onClose={() => setIsOpen(false)}>

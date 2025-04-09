@@ -1,13 +1,16 @@
 import {User, UserCreateRequest, UserUpdaterRequest} from "../model/user.tsx";
 import {
     fetchUser,
-    fetchUsers,
-    createUser,
-    updateUserByAdmin,
-    deleteUserForAnUser
+    deleteUserForAnUser, updateUser
 } from "../service/user-service.tsx";
 import { create } from "zustand";
-import {deleteDefinitiveUserFoAnAdmin, deleteUserFoAnAdmin} from "../service/admin-serivce.tsx";
+import {
+    createUser,
+    deleteDefinitiveUserFoAnAdmin,
+    deleteUserFoAnAdmin,
+    fetchUsers,
+    updateUserByAdmin
+} from "../service/admin-serivce.tsx";
 
 interface UserState {
     users: User[];
@@ -15,9 +18,10 @@ interface UserState {
     fetchUsers: () => Promise<void>;
     fetchUser: () => Promise<void>;
     createUser : (params: UserCreateRequest) => Promise<void>;
-    updateUserByAdmin : (id: number, params : UserUpdaterRequest) => Promise<void>;
+    updateUser : (params : UserUpdaterRequest) => Promise<void>;
+    updateUserForAnAdmin : (id: number, params : UserUpdaterRequest) => Promise<void>;
 
-    deleteUserForAnUser: (id: number) => Promise<void>;
+    deleteUserForAnUser: (id: number | undefined) => Promise<void>;
     deleteUserForAnAdmin: (id: number) => Promise<void>;
     deleteDefinitiveUserFoAnAdmin: (id: number) => Promise<void>;
 
@@ -44,7 +48,14 @@ const useUserStore = create<UserState>((set) => ({
         }));
     },
 
-    updateUserByAdmin: async ( id,params)  => {
+    updateUser: async ( params)  => {
+        const response  = await updateUser(params);
+        set((state ) => ({
+            users: state.users.map((h) => (h.id === response.data.id ? response.data : h)),
+        }));
+    },
+
+    updateUserForAnAdmin: async ( id,params)  => {
             const response  = await updateUserByAdmin(id,params);
             set((state ) => ({
                 users: state.users.map((h) => (h.id === response.data.id ? response.data : h)),

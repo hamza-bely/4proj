@@ -10,7 +10,7 @@ export default function UpdateUserAdmin({
     id: number;
     setIsOpenUpdate: (open: boolean) => void;
 }) {
-    const { updateUserByAdmin, users } = useUserStore();
+    const { updateUserForAnAdmin, users } = useUserStore();
     const [userData, setUserData] = useState<UserUpdaterRequest>({
         firstName: "",
         lastName: "",
@@ -50,8 +50,7 @@ export default function UpdateUserAdmin({
 
         try {
             const updatePayload = { ...userData };
-
-            await updateUserByAdmin(id, updatePayload);
+            await updateUserForAnAdmin(id, updatePayload);
             setIsOpenUpdate(false);
         } catch (error) {
             console.error("Erreur lors de la mise à jour :", error);

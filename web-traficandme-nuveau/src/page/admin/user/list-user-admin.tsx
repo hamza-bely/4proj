@@ -6,8 +6,6 @@ import CreateUserAdmin from "./create-user-admin.tsx";
 import Spinner from "../../../components/sniper/sniper.tsx";
 import { Dialog } from "../../../assets/kit-ui/dialog";
 import { ToastContainer } from "react-toastify";
-import { Menu } from '@headlessui/react';
-import { ChevronDownIcon } from '@heroicons/react/20/solid';
 import ConfirmDialog from "../../../components/dialog/dialog.tsx";
 
 export default function ListUserAdmin() {

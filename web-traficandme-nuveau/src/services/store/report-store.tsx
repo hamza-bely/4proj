@@ -12,6 +12,7 @@ interface ReportState {
     reports: Report[];
     report: Report | null;
     reportsUser :  Report[];
+    fetchReportsByUser: () => Promise<void>;
 
     fetchReports: () => Promise<void>;
     createReport: (data: any) => Promise<void>;

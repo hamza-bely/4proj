@@ -58,10 +58,9 @@ export const createReport = async (data: any): Promise<Report> => {
 
 export const deleteReport = async (id: number): Promise<ReportDeleteResponse> => {
     try {
-        const response = await  axios.delete(`${API_URL}reports/${id}/delete`, {
+        const response = await  axios.delete(`${API_URL}reports/${id}/delete-definitive`, {
             headers: getAuthHeaders(),
         });
-        console.log(response.data.message)
         toast.success(response.data.message);
         return response.data;
     } catch (error: any) {

@@ -1,12 +1,17 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState} from "react";
 import "../css/map.css";
 import { toast } from "react-toastify";
 import Search from "./search-bar.tsx";
 import { useTranslation } from "react-i18next";
-import { LuRabbit, LuArrowLeft } from "react-icons/lu";
-import {TbBarrierBlockOff, TbRoute2} from "react-icons/tb";
+import { LuRabbit, LuArrowLeft, LuSave } from "react-icons/lu";
+import { TbBarrierBlockOff, TbRoute2 } from "react-icons/tb";
+import useRouteStore from "../../../../services/store/route-store.tsx";
+import Cookies from "js-cookie";
+import {getUserRole} from "../../../../services/service/token-service.tsx";
+import {fetchUser} from "../../../../services/service/user-service.tsx";
+import { useNavigate } from "react-router-dom";
 
 type Coordinate = {
     lat: number;
@@ -39,6 +44,18 @@ interface RouteOption {
     avoidTolls: boolean;
 }
 
+interface RouteSaveData {
+    startLongitude: string;
+    startLatitude: string;
+    endLongitude: string;
+    endLatitude: string;
+    address_start: string;
+    address_end: string;
+    user: string;
+    mode: string;
+    peage: boolean;
+}
+
 interface RoutePlannerProps {
     onRouteCalculated: (route: string) => void;
 }
@@ -47,14 +64,23 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated }) => {
     const [start, setStart] = useState<Coordinate>({ lat: 47.6640, lon: 2.8357 });
     const [end, setEnd] = useState<Coordinate>({ lat: 45.7640, lon: 4.835 });
     const { t } = useTranslation();
-
+    const { createRoute } = useRouteStore();
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [routeOptions, setRouteOptions] = useState<RouteOption[]>([]);
     const [selectedRouteId, setSelectedRouteId] = useState<string | null>(null);
-
+    const [role, setRole] = useState<string | string[] | null>(null);
+    const token = Cookies.get("authToken");
+    const [startAddress, setStartAddress] = useState<string>("");
+    const [endAddress, setEndAddress] = useState<string>("");
+    const [isSaving, setIsSaving] = useState<boolean>(false);
+    const navigate = useNavigate();
     const [showResults, setShowResults] = useState<boolean>(false);
-
     const apiKey: string = import.meta.env.VITE_TOMTOM_API_KEY;
+
+    useEffect(() => {
+        setRole(getUserRole());
+        if (token) fetchUser().catch(console.error);
+    }, [token]);
 
     const formatDuration = (seconds: number): string => {
         const hours = Math.floor(seconds / 3600);
@@ -106,8 +132,12 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated }) => {
             return;
         }
 
+        onRouteCalculated("[]");
+
+
         setIsLoading(true);
         setRouteOptions([]);
+        setSelectedRouteId(null); // on désélectionne aussi l'ancien itinéraire
 
         try {
             const routePromises = [
@@ -123,19 +153,16 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated }) => {
             if (validRoutes.length > 0) {
                 setRouteOptions(validRoutes);
                 setSelectedRouteId(validRoutes[0].id);
-                onRouteCalculated(JSON.stringify(validRoutes[0].coordinates));
-                // Afficher les résultats et cacher les champs de recherche
+                onRouteCalculated(JSON.stringify(validRoutes[0].coordinates)); // afficher la première route
                 setShowResults(true);
-            } else {
-                toast.error("Aucun itinéraire trouvé");
             }
         } catch (error) {
             console.error("Erreur lors du calcul des itinéraires :", error);
-            toast.error("Une erreur s'est produite lors du calcul des itinéraires.");
         } finally {
             setIsLoading(false);
         }
     };
+
 
     const handleRouteSelect = (routeId: string) => {
         const selectedRoute = routeOptions.find(route => route.id === routeId);
@@ -147,6 +174,41 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated }) => {
 
     const handleBackToSearch = () => {
         setShowResults(false);
+    };
+
+    const handleSaveRoute = async () => {
+        if (!selectedRouteId) {
+            toast.error("Veuillez sélectionner un itinéraire à sauvegarder");
+            return;
+        }
+
+        setIsSaving(true);
+        try {
+            const selectedRoute = routeOptions.find(route => route.id === selectedRouteId);
+            if (!selectedRoute) {
+                toast.error("Itinéraire non trouvé");
+                return;
+            }
+
+            const routeData: RouteSaveData = {
+                startLongitude: start.lon.toString(),
+                startLatitude: start.lat.toString(),
+                endLongitude: end.lon.toString(),
+                endLatitude: end.lat.toString(),
+                address_start: startAddress,
+                address_end: endAddress,
+                user: "", // This will be filled in by the backend or auth context
+                mode: selectedRoute.type === "fastest" ? "Rapide" : "Court",
+                peage: !selectedRoute.avoidTolls
+            };
+
+
+            await createRoute(routeData);
+        } catch (error) {
+            console.error("Erreur lors de la sauvegarde de l'itinéraire :", error);
+        } finally {
+            setIsSaving(false);
+        }
     };
 
     return (
@@ -167,11 +229,16 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated }) => {
             {!showResults ? (
                 <>
                     <Search
-                        onSearchResultSelect={(position: Coordinate) => setStart(position)}
-
+                        onSearchResultSelect={(position: Coordinate, address?: string) => {
+                            setStart(position);
+                            if (address) setStartAddress(address);
+                        }}
                     />
                     <Search
-                        onSearchResultSelect={(position: Coordinate) => setEnd(position)}
+                        onSearchResultSelect={(position: Coordinate, address?: string) => {
+                            setEnd(position);
+                            if (address) setEndAddress(address);
+                        }}
                     />
 
                     <div className="flex justify-center">
@@ -215,6 +282,17 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated }) => {
                             </div>
                         ))}
                     </div>
+
+                    {role &&  <div className="flex justify-center mt-4">
+                        <button
+                            onClick={handleSaveRoute}
+                            disabled={isSaving || !selectedRouteId}
+                            className="rounded-sm px-4 py-2 text-sm font-semibold text-white bg-green-600 hover:bg-green-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-600 flex items-center"
+                        >
+                            <LuSave className="mr-2" />
+                            {isSaving ? "Sauvegarde en cours..." : "Sauvegarder l'itinéraire"}
+                        </button>
+                    </div>}
                 </div>
             )}
         </div>

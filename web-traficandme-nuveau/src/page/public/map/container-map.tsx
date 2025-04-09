@@ -34,7 +34,6 @@ export default function ContainerMap({ map }: ContainerMapProps) {
     const lastTrafficInfoRef = useRef<TrafficInfo | null>(null);
 
     useEffect(() => {
-        // Nettoyage de l'intervalle à la destruction du composant
         return () => {
             if (routeIntervalRef.current) {
                 clearInterval(routeIntervalRef.current);
@@ -263,7 +262,6 @@ export default function ContainerMap({ map }: ContainerMapProps) {
         if (map) {
             map.flyTo({ center: [position.lon, position.lat], zoom: 15 });
 
-            // Utilisation du nouveau composant pour le marqueur de recherche
             const searchMarker = new tt.Marker({
                 element: createMarkerDOMElement("Recherche")
             }).setLngLat([position.lon, position.lat]).addTo(map);

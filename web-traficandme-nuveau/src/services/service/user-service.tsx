@@ -2,10 +2,9 @@ import axios, {AxiosError} from "axios";
 import {toast} from "react-toastify";
 
 import {
-    UserCreateRequest, UserCreateResponse,
     UserLoginRequest, UserLoginResponse,
     UserRegisterRequest, UserRegisterResponse,
-    UserResponseFetchUser, UserResponseFetchUsers, UserUpdateResponse, UserUpdaterRequest
+    UserResponseFetchUser, UserUpdateResponse, UserUpdaterRequest
 } from "../model/user.tsx";
 import Cookies from "js-cookie";
 
@@ -41,27 +40,6 @@ export const register = async (params: UserRegisterRequest): Promise<UserRegiste
     }
 };
 
-export const createUser = async (params: UserCreateRequest): Promise<UserCreateResponse> => {
-    try {
-        const response = await axios.post<UserCreateResponse>(API_URL +'users/create', params, { headers: getAuthHeaders() });
-        toast.success(response.data.message);
-        return response.data;
-    }catch (error : any) {
-        console.log(error)
-        const errorData = error.response.data;
-        if (errorData.errors && Array.isArray(errorData.errors)) {
-            errorData.errors.forEach((err: any) => {
-                if (err.msg) {
-                    toast.error(err.msg);
-                }
-            });
-        } else {
-            toast.error(errorData.error||  error.response.data.error ||  error.response.data.message);
-        }
-        throw error;
-
-    }
-};
 
 export const login = async (params: UserLoginRequest): Promise<UserLoginResponse> => {
     try {
@@ -98,25 +76,11 @@ export const fetchUser = async (): Promise<UserResponseFetchUser> => {
     }
 };
 
-export const fetchUsers = async (): Promise<UserResponseFetchUsers> => {
-    try {
-        const response = await axios.get<UserResponseFetchUsers>(`${API_URL}users/list`, { headers: getAuthHeaders() });
-        return response.data;
-    } catch (error) {
-        if (error instanceof AxiosError && error.response) {
-            const errorMessage = error.response.data?.message || "Une erreur est survenue";
-            console.error(errorMessage);
-        } else {
-            console.error("Erreur inconnue");
-        }
-        throw error;
-    }
-};
 
-
-export const updateUserByAdmin = async (id: number, params: UserUpdaterRequest): Promise<UserUpdateResponse> => {
+//TODO A FAIRE
+export const updateUser = async ( params: UserUpdaterRequest): Promise<UserUpdateResponse> => {
     try {
-        const response = await axios.put<UserUpdateResponse>(`${API_URL}users/update/${id}`, params, { headers: getAuthHeaders() });
+        const response = await axios.put<UserUpdateResponse>(`${API_URL}users/update`, params, { headers: getAuthHeaders() });
         toast.success(response.data.message);
         return response.data;
     }catch (error) {

@@ -3,11 +3,11 @@ import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import Cookies from "js-cookie";
 import useUserStore from "../../services/store/user-store.tsx";
-import Languages from "../languages/languages.tsx";
+import Languages  from "../languages/languages.tsx";
 import {
     ChartPieIcon, ChevronDownIcon,
 } from "@heroicons/react/16/solid";
-import {FaUserShield} from "react-icons/fa";
+import {FaRoute, FaUserShield} from "react-icons/fa";
 import {MdReportProblem} from "react-icons/md";
 
 interface DesktopHeaderProps {
@@ -21,16 +21,16 @@ const solutions = [
     { name: 'Dashboard', href: 'admin/dashboard', icon: ChartPieIcon },
     { name: 'utilisateurs',  href: '/admin/management-users', icon: FaUserShield},
     { name: 'Report', href: '/admin/management-report', icon: MdReportProblem   },
-
+    { name: 'Route', href: '/admin/management-routes', icon: FaRoute }
 ]
 
 export default function DesktopHeader({ role, navigationLinks, openLogin, openRegister }: DesktopHeaderProps) {
     const { t } = useTranslation();
     const { user } = useUserStore();
-    const languages = [
-        { name: 'en', img: 'images/languages/english.png' },
-        { name: 'fr', img: 'images/languages/french.png' },
-        ]
+    const languageOptions = [
+        { name: "fr", label: "Français", img: "/flags/fr.svg" },
+        { name: "en", label: "English", img: "/flags/gb.svg" },
+    ];
 
     const getInitials = (username: string) => {
         return username ? username.charAt(0).toUpperCase() : "";
@@ -55,7 +55,7 @@ export default function DesktopHeader({ role, navigationLinks, openLogin, openRe
                     <div>
                         <Popover className="relative">
                             <PopoverButton className="inline-flex items-center gap-x-1 text-sm/6 font-semibold text-gray-900">
-                                <span className="text-gray-900 hover:text-gray-700 px-3 py-2 text-sm font-medium">{t('admin')}</span>
+                                <span className="cursor-pointer text-gray-900 hover:text-gray-700 px-3 py-2 text-sm font-medium">{t('admin')}</span>
                                 <ChevronDownIcon aria-hidden="true" className="size-5" />
                             </PopoverButton>
 
@@ -67,8 +67,8 @@ export default function DesktopHeader({ role, navigationLinks, openLogin, openRe
                                     <div className="p-4">
                                         {solutions.map((item) => (
                                             <Link to={item.href} className="cursor-pointer group relative flex gap-x-6 rounded-lg p-4 hover:bg-gray-50">
-                                                <div className="mt-1 flex size-5 flex-none items-center justify-center rounded-lg bg-gray-50 group-hover:bg-white">
-                                                    <item.icon aria-hidden="true" className="size- text-gray-600 group-hover:text-indigo-600" />
+                                                <div className="mt-1 flex size-6 flex-none items-center justify-center rounded-lg bg-gray-50 group-hover:bg-white">
+                                                    <item.icon aria-hidden="true" className=" text-gray-600 group-hover:text-indigo-600" />
                                                 </div>
                                                 <div>
                                                     <button className="font-semibold text-gray-900">
@@ -79,7 +79,6 @@ export default function DesktopHeader({ role, navigationLinks, openLogin, openRe
                                             </Link>
                                         ))}
                                     </div>
-
                                 </div>
                             </PopoverPanel>
                         </Popover>
@@ -87,9 +86,9 @@ export default function DesktopHeader({ role, navigationLinks, openLogin, openRe
                 }
 
             </div>
-            <a href="#" className="-m-1.5">
+            <Link to="/" className="-m-1.5">
                 <img className="h-12 w-auto" src="/images/logo/logo_2.png" alt="Logo"/>
-            </a>
+            </Link>
 
             <div className="flex items-center">
                 {role ? (
@@ -130,7 +129,7 @@ export default function DesktopHeader({ role, navigationLinks, openLogin, openRe
                         </button>
                     </div>
                 )}
-                <Languages languages={languages}/>
+                <Languages languages={languageOptions}  />
             </div>
         </div>
     );

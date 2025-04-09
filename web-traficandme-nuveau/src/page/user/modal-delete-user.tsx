@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import useUserStore from "../../services/store/user-store.tsx";
+import Cookies from "js-cookie";
 
 interface ModalDeleteUserProps {
     closeModal: () => void;
@@ -9,11 +11,19 @@ interface ModalDeleteUserProps {
 export default function ModalDeleteUser({ closeModal, userId }: ModalDeleteUserProps) {
     const { t } = useTranslation(); // Hook pour les traductions
     const [inputValue, setInputValue] = useState("");
-
+    const {  deleteUserForAnUser } = useUserStore();
     const isConfirmed = inputValue.trim().toUpperCase() === "CONFIRME";
+    //const  [isLoading,setIsLoading] = useState<boolean>(false)
 
-    function HandleDeteleteUser() {
-                console.log(userId)
+    const HandleDeleteUser =  async () => {
+           console.log(userId)
+            try{
+                await deleteUserForAnUser(userId)
+                Cookies.remove("authToken");
+                window.location.reload();
+            }catch(err) {
+               console.log(err)
+            }
     }
 
     return (
@@ -41,7 +51,7 @@ export default function ModalDeleteUser({ closeModal, userId }: ModalDeleteUserP
                         </button>
                         <button
                             type="button"
-                            onClick={HandleDeteleteUser}
+                            onClick={HandleDeleteUser}
                             disabled={!isConfirmed}
                             className={`rounded-md px-4 py-2 text-sm font-semibold text-white shadow-sm transition ${
                                 isConfirmed ? "bg-red-600 hover:bg-red-500" : "bg-gray-400 cursor-not-allowed"

@@ -3,20 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { fetchReportsByUser } from "../../services/service/report-service.tsx";
 import Spinner from "../../components/sniper/sniper.tsx";
 import { useNavigate } from 'react-router-dom';
+import {Report} from '../../services/model/report.tsx'
 
-// Types
-type Report = {
-    id: number;
-    type: 'ACCIDENTS' | 'TRAFFIC' | 'ROADS_CLOSED' | 'POLICE_CHECKS' | 'OBSTACLES';
-    latitude: number;
-    longitude: number;
-    user: string;
-    createDate: string;
-    updateDate: string;
-    status: string;
-    likeCount: number;
-    dislikeCount: number;
-};
 
 export default function ReportsUser() {
     const { t } = useTranslation();
@@ -41,7 +29,6 @@ export default function ReportsUser() {
     };
 
     const handleViewOnMap = (latitude: number, longitude: number) => {
-        // Naviguer vers la page de carte avec les coordonnées
         navigate(`/map?lat=${latitude}&lng=${longitude}`);
     };
 
@@ -108,7 +95,9 @@ export default function ReportsUser() {
                         </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-200">
-                        {reports.map((report) => (
+                        {reports
+                            .filter((report) => report.status !== "CANCELED")
+                            .map((report) => (
                             <tr key={report.id}>
                                 <td className="px-6 py-4 whitespace-nowrap">
                                     <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
