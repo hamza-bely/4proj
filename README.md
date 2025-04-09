@@ -4,42 +4,32 @@ A comprehensive educational management system built with Node.js, React, and Gra
 
 
 
-Documentations : 50 points
-(Une note inférieure à 30 points sur cette partie entraînera un ajournement à ce projet)
+🚀 Fonctionnalités du projet
+Fonctionnalité	Web	Mobile	API
+Connexion utilisateur	✔️	❌	❌
+Connexion standard	✔️	❌	❌
+OAuth	❌	❌	❌
+Affichage carte	✔️	❌	❌
+Choix itinéraires	✔️	❌	❌
+Plusieurs trajets proposés avec durée	✔️	❌	❌
+Choix d’itinéraire sans péage	✔️	❌	❌
+Choix des informations du trajet	❌	❌	❌
+Navigation en temps réel	✔️	❌	❌
+Instructions de conduite	❌	❌	❌
+Géolocalisation & avancée visuelle du transport	✔️	❌	❌
+Signalement d'incidents	✔️	❌	❌
+Gestion des alertes	❌	❌	❌
+Vérification des infos à l'approche	❌	❌	❌
+Recalcul de l'itinéraire	✔️	❌	❌
+Envoi vers téléphone + génération QR code	❌	❌	❌
+Sécurité	✔️	❌	❌
+Chiffrement & sécurité des communications	✔️	❌	❌
+Protection XSS / CSRF / SQL Injection	✔️	❌	❌
+Données (Data)	✔️	❌	❌
+Stockage et gestion des données	✔️	❌	❌
+Analyse et statistiques trafic	✔️	❌	❌
+Prédiction des embouteillages	✔️	❌	❌
 
-Documentation technique : 30 points
-Manuel utilisateur : 20 points
-Déploiement : 50 points
-(Une note inférieure à 30 points sur cette partie entraînera un ajournement à ce projet)
-
-Architecture : 30 points
-Containérisation : 20 points
-Fonctionnalités : 150 points
-(Une note inférieure à 75 points sur cette partie entraînera un ajournement à ce projet)
-
-- Connexion utilisateur : 10 points ✔️ web ❌ mobile
-- OAuth : 5 points
-- Connexion standard : 5 points
-- Affichage carte : 10 points
-- Choix itinéraires : 30 points
-- Plusieurs trajets proposés avec leur durée : 20 points
-- Choix d’itinéraire sans péage : 5 points
-- Choix des informations du trajet : 5 points
-- Navigation en temps réel : 30 points
-- Instructions de conduite : 20 points
-- Géolocalisation et avancée visuelle du moyen de transport : 10 points
-- Signalement d'incidents : 20 points
-- Gestion des alertes : 40 points
-- Vérification des infos à l'approche : 15 points
-- Recalcul de l'itinéraire : 25 points
-- Envoi de l'itinéraire vers le téléphone et génération de code QR : 10 points
-- Sécurité : 30 points
-- Chiffrement et sécurité des communications : 20 points
-- Protection contre les attaques XSS/CSRF/SQL Injection : 10 points
-- Data : 70 points
-- Stockage et gestion des données : 30 points
-- Analyse et statistiques des données de trafic : 20 points
-- Prédiction des embouteillages : 20 points
 
 
 
