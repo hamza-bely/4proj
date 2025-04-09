@@ -36,23 +36,6 @@
 |                                   | Prédiction des embouteillages                  | 20     | ✅   | ❌    | -   |
 
 
-## Progress Summary
-
-Currently, most features have been implemented for web, while mobile development remains pending. The project shows strong implementation in map functionality, real-time navigation, security, and data management areas on the web platform.
-
-## Development Priorities
-
-Based on the evaluation table, the following areas require immediate attention:
-1. Mobile implementation across all features
-2. Alert management system for web platform
-3. Trip information selection and driving instructions for web platform
-4. Route sharing functionality
-
-
-
-
-
-
 
 ## Progress Summary
 
