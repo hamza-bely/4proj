@@ -14,26 +14,26 @@
 | **Déploiement** (50 pts)          | Architecture                                   | 30     | -    | -      | -   |
 |                                   | Containérisation                               | 20     | -    | -      | -   |
 | **Fonctionnalités** (150 pts)     |                                                |        |      |        |     |
-| Authentification utilisateur      | OAuth                                          | 5      | ❌   | ❌     | -   |
-|                                   | Connexion standard                             | 5      | ✅   | ❌     | -   |
-| Carte                             | Affichage carte                                | 10     | ✅   | ❌     | -   |
-|                                   | Choix itinéraires                              | 30     | ✅   | ❌     | -   |
-|                                   | Plusieurs trajets avec durée                   | 20     | ✅   | ❌     | -   |
-|                                   | Itinéraire sans péage                          | 5      | ✅   | ❌     | -   |
-|                                   | Choix infos du trajet                          | 5      | ❌   | ❌     | -   |
-| Navigation en temps réel          | Navigation live                                | 30     | ✅   | ❌     | -   |
-|                                   | Instructions de conduite                       | 20     | ❌   | ❌     | -   |
-|                                   | Géolocalisation et visualisation transport     | 10     | ✅   | ❌     | -   |
-| Signalements                      | Signalement d'incidents                        | 20     | ✅   | ❌     | -   |
-| Alertes                           | Gestion des alertes                            | 40     | ❌   | ❌     | -   |
-|                                   | Vérification à l'approche                      | 15     | ❌   | ❌     | -   |
-|                                   | Recalcul d'itinéraire                          | 25     | ✅   | ❌     | -   |
-| Partage                           | Partage vers téléphone + QR                    | 10     | ❌   | ❌     | -   |
-| Sécurité                          | Chiffrement & sécurité des communications      | 20     | ✅   | ❌     | -   |
-|                                   | Protection XSS/CSRF/SQLi                       | 10     | ✅   | ❌     | -   |
-| Données                           | Stockage & gestion des données                 | 30     | ✅   | ❌     | -   |
-|                                   | Analyse & stats de trafic                      | 20     | ✅   | ❌     | -   |
-|                                   | Prédiction des embouteillages                  | 20     | ✅   | ❌     | -   |
+| Authentification utilisateur      | OAuth                                          | 5      | ❌   | ❌    | -   |
+|                                   | Connexion standard                             | 5      | ✅   | ❌    | -   |
+| Carte                             | Affichage carte                                | 10     | ✅   | ❌    | -   |
+|                                   | Choix itinéraires                              | 30     | ✅   | ❌    | -   |
+|                                   | Plusieurs trajets avec durée                   | 20     | ✅   | ❌    | -   |
+|                                   | Itinéraire sans péage                          | 5      | ✅   | ❌    | -   |
+|                                   | Choix infos du trajet                          | 5      | ❌   | ❌    | -   |
+| Navigation en temps réel          | Navigation live                                | 30     | ✅   | ❌    | -   |
+|                                   | Instructions de conduite                       | 20     | ❌   | ❌    | -   |
+|                                   | Géolocalisation et visualisation transport     | 10     | ✅   | ❌    | -   |
+| Signalements                      | Signalement d'incidents                        | 20     | ✅   | ❌    | -   |
+| Alertes                           | Gestion des alertes                            | 40     | ❌   | ❌    | -   |
+|                                   | Vérification à l'approche                      | 15     | ❌   | ❌    | -   |
+|                                   | Recalcul d'itinéraire                          | 25     | ✅   | ❌    | -   |
+| Partage                           | Partage vers téléphone + QR                    | 10     | ❌   | ❌    | -   |
+| Sécurité                          | Chiffrement & sécurité des communications      | 20     | ✅   | ❌    | -   |
+|                                   | Protection XSS/CSRF/SQLi                       | 10     | ✅   | ❌    | -   |
+| Données                           | Stockage & gestion des données                 | 30     | ✅   | ❌    | -   |
+|                                   | Analyse & stats de trafic                      | 20     | ✅   | ❌    | -   |
+|                                   | Prédiction des embouteillages                  | 20     | ✅   | ❌    | -   |
 
 
 ## Progress Summary
