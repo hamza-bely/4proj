@@ -65,12 +65,12 @@ public class ReportController {
     }
 
     @PostMapping("{id}/like")
-    public ResponseEntity<ApiResponse<Report>> like(@PathVariable String idReport) {
+    public ResponseEntity<ApiResponse<Report>> like(@PathVariable String id) {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String userEmail = ((UserDetails) principal).getUsername();
 
         try {
-            Report updated = reportService.likeReport(idReport, userEmail);
+            Report updated = reportService.likeReport(id, userEmail);
             return ResponseEntity.ok(new ApiResponse<>("Report liked", updated));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(new ApiResponse<>(e.getMessage(), null));
