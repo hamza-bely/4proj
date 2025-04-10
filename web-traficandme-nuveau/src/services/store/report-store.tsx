@@ -17,9 +17,9 @@ interface ReportState {
     fetchReports: () => Promise<void>;
     createReport: (data: any) => Promise<void>;
     deleteReport: (id: number) => Promise<void>;
-    likeReport: (id: number) => Promise<void>;
-    dislikeReport: (id: number) => Promise<void>;
-    changeReportStatus: (id: number, status: string) => Promise<void>;
+    likeReport: (id: number) => Promise<Report>;
+    dislikeReport: (id: number) => Promise<Report>;
+    changeReportStatus: (id: number, status: string) => Promise<Report>;
     changeReportType: (id: number, status: string) => Promise<void>;
 }
 
@@ -49,6 +49,7 @@ const useReportStore = create<ReportState>((set, get) => ({
         set({
             reports: get().reports.map((r) => (r.id === id ? updated : r)),
         });
+        return updated;
     },
 
     dislikeReport: async (id) => {
@@ -56,6 +57,7 @@ const useReportStore = create<ReportState>((set, get) => ({
         set({
             reports: get().reports.map((r) => (r.id === id ? updated : r)),
         });
+        return updated;
     },
 
     changeReportStatus: async (id, status) => {
@@ -63,6 +65,7 @@ const useReportStore = create<ReportState>((set, get) => ({
         set({
             reports: get().reports.map((r) => (r.id === id ? updated : r)),
         });
+        return updated;
     },
 
     changeReportType: async (id, status) => {

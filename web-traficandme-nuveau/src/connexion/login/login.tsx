@@ -29,6 +29,7 @@ export default function Login({ closeModal }: { closeModal: () => void }) {
                     path: "/"
                 });
                 closeModal()
+                window.location.reload();
             }
         } catch (error) {
             console.error(error);

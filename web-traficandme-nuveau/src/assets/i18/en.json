@@ -13,7 +13,11 @@
     "actions": "Actions",
     "search" : "Search",
     "confirm": "Confirmer",
-    "message-confirm-delete" : "Are you sure you want to delete ?"
+    "message-confirm-delete" : "Are you sure you want to delete ?",
+    "status" : "Status",
+    "role" : "Role",
+    "createDate" : "Create date",
+    "admin" : "Administration"
   },
 
   "reportStatus": {
@@ -159,7 +163,8 @@
     "destination": "Destination",
     "available-routes": "Available Routes",
     "calculating": "Calculating...",
-    "calculate-routes": "Calculate Routes"
+    "calculate-routes": "Calculate Routes",
+    "click-map" : "Click on the map"
   },
   "user-admin" :{
     "title" : "User Management",
@@ -226,7 +231,11 @@
     "location": "Location",
     "deleteSuccess": "Report successfully canceled.",
     "noReports": "No reports found.",
-    "view-on-map" : "Voir sur la map"
+    "view-on-map" : "Voir sur la map",
+    "signalDetails": "Report Details",
+    "createdBy": "Created by",
+    "createdAt": "Created at",
+    "votes": "Votes"
   },
 
 

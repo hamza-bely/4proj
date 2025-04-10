@@ -28,12 +28,6 @@ export default function MobileHeader({ navigationLinks, role, openLogin, openReg
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [adminMenuOpen, setAdminMenuOpen] = useState(false);
 
-    const languageOptions = [
-        { name: "fr", label: "Français", img: "/flags/fr.svg" },
-        { name: "en", label: "English", img: "/flags/gb.svg" },
-    ];
-
-
     const toggleMobileMenu = () => setMobileMenuOpen(!mobileMenuOpen);
     const toggleAdminMenu = () => setAdminMenuOpen(!adminMenuOpen);
 
@@ -75,7 +69,6 @@ export default function MobileHeader({ navigationLinks, role, openLogin, openReg
                             </button>
                         </div>
 
-                        {/* User profile section */}
                         {role ? (
                             <div className="mt-6 border-t border-gray-200 pt-4">
                                 <div className="flex items-center space-x-3 py-3">
@@ -181,12 +174,11 @@ export default function MobileHeader({ navigationLinks, role, openLogin, openReg
                             </div>
                         </div>
 
-                        {/* Language selector */}
                         <div className="mt-6 border-t border-gray-200 pt-4">
                             <div className="px-3 py-2">
                                 <p className="text-base font-medium text-gray-900 mb-2">{t('language')}</p>
                                 <div className="flex space-x-2">
-                                    <Languages languages={languageOptions} />
+                                    <Languages />
                                 </div>
                             </div>
                         </div>

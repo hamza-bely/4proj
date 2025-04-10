@@ -22,42 +22,20 @@ const PopupContent = ({ info: initialInfo, onClose }: { info: Report, onClose?: 
     useEffect(() => {
         setRole(getUserRole());
         setCurrentUsername(user?.email);
-    }, []);
+    }, [user]);
 
     const handleOnLike = async () => {
         try {
             const response = await likeReport(reportInfo.id);
 
-            if (userVote === 'like') {
-                setReportInfo(prev => ({
-                    ...prev,
-                    likeCount: prev.likeCount > 0 ? prev.likeCount - 1 : 0
-                }));
-                setUserVote(null);
-            } else if (userVote === 'dislike') {
-                // User switches from dislike to like
-                setReportInfo(prev => ({
-                    ...prev,
-                    likeCount: prev.likeCount + 1,
-                    dislikeCount: prev.dislikeCount > 0 ? prev.dislikeCount - 1 : 0
-                }));
-                setUserVote('like');
-            } else {
-                // User had no vote, so they're adding a like
-                setReportInfo(prev => ({
-                    ...prev,
-                    likeCount: prev.likeCount + 1
-                }));
-                setUserVote('like');
-            }
+            if (response && response) {
+                setReportInfo(response);
 
-            // If your API returns the updated report, use those values instead
-            if (response) {
-                setReportInfo(prev => ({
-                    ...prev,
-                    likeCount: response.likeCount,
-                    dislikeCount: response.dislikeCount
-                }));
+                if (reportInfo.likeCount < response.likeCount) {
+                    setUserVote('like');
+                } else if (reportInfo.likeCount > response.likeCount) {
+                    setUserVote(null);
+                }
             }
         } catch (error) {
             console.error("Erreur lors du like du rapport", error);
@@ -67,39 +45,14 @@ const PopupContent = ({ info: initialInfo, onClose }: { info: Report, onClose?: 
     const handleOnDislike = async () => {
         try {
             const response = await dislikeReport(reportInfo.id);
+            if (response && response) {
+                setReportInfo(response);
 
-            // Update local state based on what the toggle action would do
-            if (userVote === 'dislike') {
-                // User already disliked, so they're removing their dislike
-                setReportInfo(prev => ({
-                    ...prev,
-                    dislikeCount: prev.dislikeCount > 0 ? prev.dislikeCount - 1 : 0
-                }));
-                setUserVote(null);
-            } else if (userVote === 'like') {
-                // User switches from like to dislike
-                setReportInfo(prev => ({
-                    ...prev,
-                    dislikeCount: prev.dislikeCount + 1,
-                    likeCount: prev.likeCount > 0 ? prev.likeCount - 1 : 0
-                }));
-                setUserVote('dislike');
-            } else {
-                // User had no vote, so they're adding a dislike
-                setReportInfo(prev => ({
-                    ...prev,
-                    dislikeCount: prev.dislikeCount + 1
-                }));
-                setUserVote('dislike');
-            }
-
-            // If your API returns the updated report, use those values instead
-            if (response) {
-                setReportInfo(prev => ({
-                    ...prev,
-                    likeCount: response.likeCount,
-                    dislikeCount: response.dislikeCount
-                }));
+                if (reportInfo.dislikeCount < response.dislikeCount) {
+                    setUserVote('dislike');
+                } else if (reportInfo.dislikeCount > response.dislikeCount) {
+                    setUserVote(null);
+                }
             }
         } catch (error) {
             console.error("Erreur lors du dislike du rapport", error);
@@ -111,16 +64,8 @@ const PopupContent = ({ info: initialInfo, onClose }: { info: Report, onClose?: 
             const response = await changeReportStatus(reportInfo.id, status);
             setShowStatusOptions(false);
 
-            setReportInfo(prev => ({
-                ...prev,
-                status: status
-            }));
-
-            if (response) {
-                setReportInfo(prev => ({
-                    ...prev,
-                    status: response.status
-                }));
+            if (response && response) {
+                setReportInfo(response);
             }
         } catch (error) {
             console.error("Erreur lors du changement de statut", error);
@@ -129,14 +74,13 @@ const PopupContent = ({ info: initialInfo, onClose }: { info: Report, onClose?: 
 
     const handleDelete = async () => {
         try {
-            if(isAdmin){
+            if (isAdmin) {
                 await deleteReport(reportInfo.id);
             } else {
-                await changeReportStatus(reportInfo.id, "CANCELED");
-                setReportInfo(prev => ({
-                    ...prev,
-                    status: "CANCELED"
-                }));
+                const response = await changeReportStatus(reportInfo.id, "CANCELED");
+                if (response && response) {
+                    setReportInfo(response);
+                }
             }
 
             if (onClose) {
@@ -144,10 +88,14 @@ const PopupContent = ({ info: initialInfo, onClose }: { info: Report, onClose?: 
             } else if (typeof close === 'function') {
                 close();
             }
+
+            window.location.reload();
+
         } catch (error) {
             console.error("Erreur lors de la suppression du rapport", error);
         }
     };
+
 
     const formatDate = (dateString: string) => {
         const date = new Date(dateString);
@@ -202,8 +150,8 @@ const PopupContent = ({ info: initialInfo, onClose }: { info: Report, onClose?: 
                             <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
                                 reportInfo.status === 'PENDING' ? 'bg-yellow-100 text-yellow-800' :
                                     reportInfo.status === 'AVAILABLE' ? 'bg-green-100 text-green-800' :
-                                            reportInfo.status === 'CANCELED' ? 'bg-gray-100 text-gray-800' :
-                                                'bg-gray-100 text-gray-800'
+                                        reportInfo.status === 'CANCELED' ? 'bg-gray-100 text-gray-800' :
+                                            'bg-gray-100 text-gray-800'
                             }`}>
                                 {getStatusLabel(reportInfo.status)}
                             </span>
@@ -242,7 +190,7 @@ const PopupContent = ({ info: initialInfo, onClose }: { info: Report, onClose?: 
                             </div>
                         )}
                     </div>
-                    <div className="relative flex justify-between items-center pt-2">
+                    {role && <div className="relative flex justify-between items-center pt-2">
                         <span className="font-medium text-gray-900">{t('reports.votes')} :</span>
                         <div className="flex space-x-4">
                             <button
@@ -262,7 +210,7 @@ const PopupContent = ({ info: initialInfo, onClose }: { info: Report, onClose?: 
                                 <AiFillDislike /> <span>{reportInfo.dislikeCount}</span>
                             </button>
                         </div>
-                    </div>
+                    </div>}
 
                     {canDelete && (
                         <div className="pt-4">

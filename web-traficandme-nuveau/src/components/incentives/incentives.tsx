@@ -11,7 +11,6 @@ export default function Incentives() {
                 <div className="bg-indigo-50">
                     <div className="mx-auto max-w-7xl py-24 sm:px-2 sm:py-32 lg:px-4">
                         <div className="mx-auto grid max-w-2xl grid-cols-1 gap-x-8 gap-y-10 px-4 lg:max-w-none lg:grid-cols-3">
-                            {/* Real Time Updates */}
                             <div className="text-center sm:flex sm:text-left lg:block lg:text-center">
                                 <div className="sm:shrink-0">
                                     <div className="flow-root">
@@ -23,8 +22,6 @@ export default function Incentives() {
                                     <p className="mt-2 text-sm text-gray-500">{t('feature.real_time_updates.description')}</p>
                                 </div>
                             </div>
-
-                            {/* 24/7 Support */}
                             <div className="text-center sm:flex sm:text-left lg:block lg:text-center">
                                 <div className="sm:shrink-0">
                                     <div className="flow-root">
@@ -36,8 +33,6 @@ export default function Incentives() {
                                     <p className="mt-2 text-sm text-gray-500">{t('feature.support_24_7.description')}</p>
                                 </div>
                             </div>
-
-                            {/* Optimized Navigation */}
                             <div className="text-center sm:flex sm:text-left lg:block lg:text-center">
                                 <div className="sm:shrink-0">
                                     <div className="flow-root">

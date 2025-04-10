@@ -5,7 +5,6 @@ import AuthGuardAdmin from "./auth-guard-admin.tsx";
 import ListUserAdmin from "../page/admin/user/list-user-admin.tsx";
 import AuthGuard from "./auth-guard.tsx";
 import ProfileUser from "../page/user/profile-user.tsx";
-import About from "../page/public/about/about.tsx";
 import TomTomApiDashboard from "../page/admin/map/tom-tom-dashboard.tsx";
 import ListReportAdmin from "../page/admin/report/list-report-admin.tsx";
 import ListRouteAdmin from "../page/admin/routes/list-route-admin.tsx";
@@ -16,7 +15,6 @@ const AppRoutes = () => {
         <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/map" element={<Map />} />
-            <Route path="/about" element={<About />} />
             <Route
                 path="/admin/management-users"
                 element={

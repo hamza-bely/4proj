@@ -11,54 +11,10 @@ import useRouteStore from "../../../../services/store/route-store.tsx";
 import Cookies from "js-cookie";
 import {getUserRole} from "../../../../services/service/token-service.tsx";
 import {fetchUser} from "../../../../services/service/user-service.tsx";
-import { useNavigate } from "react-router-dom";
+import {RouteOption, RoutePlannerProps, RouteSaveData} from "../model/route-planner-model.tsx";
+import {Coordinate, RouteResponse} from "../model/map.tsx";
 
-type Coordinate = {
-    lat: number;
-    lon: number;
-};
 
-type RouteResponse = {
-    routes: Array<{
-        summary: {
-            lengthInMeters: number;
-            travelTimeInSeconds: number;
-            trafficDelayInSeconds: number;
-        };
-        legs: Array<{
-            points: Array<{
-                latitude: number;
-                longitude: number;
-            }>;
-        }>;
-    }>;
-};
-
-interface RouteOption {
-    id: string;
-    name: string;
-    coordinates: Array<[number, number]>;
-    distance: number;
-    duration: number;
-    type: "fastest" | "shortest" | "eco";
-    avoidTolls: boolean;
-}
-
-interface RouteSaveData {
-    startLongitude: string;
-    startLatitude: string;
-    endLongitude: string;
-    endLatitude: string;
-    address_start: string;
-    address_end: string;
-    user: string;
-    mode: string;
-    peage: boolean;
-}
-
-interface RoutePlannerProps {
-    onRouteCalculated: (route: string) => void;
-}
 
 const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated }) => {
     const [start, setStart] = useState<Coordinate>({ lat: 47.6640, lon: 2.8357 });
@@ -73,7 +29,6 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated }) => {
     const [startAddress, setStartAddress] = useState<string>("");
     const [endAddress, setEndAddress] = useState<string>("");
     const [isSaving, setIsSaving] = useState<boolean>(false);
-    const navigate = useNavigate();
     const [showResults, setShowResults] = useState<boolean>(false);
     const apiKey: string = import.meta.env.VITE_TOMTOM_API_KEY;
 

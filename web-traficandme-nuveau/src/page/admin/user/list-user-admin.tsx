@@ -22,12 +22,9 @@ export default function ListUserAdmin() {
 
     useEffect(() => {
         const fetchData = async () => {
-            try {
+            setIsLoading(true);
                 await fetchUsers();
                 setIsLoading(false);
-            } catch (error) {
-                console.error("Erreur lors de la mise à jour de l'utilisateur:", error);
-            }
         };
         fetchData();
     }, [fetchUsers]);
@@ -139,15 +136,15 @@ export default function ListUserAdmin() {
                                 </th>
 
                                 <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                                    {t("user-admin.role")}
+                                    {t("common.role")}
                                 </th>
 
                                 <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                                    {t("user-admin.status")}
+                                    {t("common.status")}
                                 </th>
 
                                 <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                                    {t("user-admin.createDate")}
+                                    {t("common.createDate")}
                                 </th>
 
                                 <th scope="col" className="relative py-3.5 pr-4 pl-3 sm:pr-3">

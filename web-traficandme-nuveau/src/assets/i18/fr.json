@@ -14,7 +14,11 @@
     "actions": "Actions",
     "search" : "Recherche",
     "confirm": "Confirm",
-    "message-confirm-delete" : "Êtes-vous sûr de vouloir supprimer ?"
+    "message-confirm-delete" : "Êtes-vous sûr de vouloir supprimer ?",
+    "status" : "Status",
+    "role" : "Role",
+    "createDate" : "Date de création",
+    "admin" : "Administrateur"
   },
 
   "status" : {
@@ -155,7 +159,8 @@
     "destination": "Destination",
     "available-routes": "Itinéraires disponibles",
     "calculating": "Calcul en cours...",
-    "calculate-routes": "Calculer les itinéraires"
+    "calculate-routes": "Calculer les itinéraires",
+    "click-map" : "Cliquez sur la carte"
   },
   "user-admin": {
     "title": "Gestion des utilisateurs",
@@ -212,8 +217,6 @@
     "no_reports": "Aucun rapport trouvé."
   },
 
-
-
   "reports": {
     "myReports": "Mes signalements",
     "type": "Type",
@@ -222,7 +225,11 @@
     "location": "Localisation",
     "deleteSuccess": "Signalement annulé avec succès.",
     "noReports": "Aucun signalement trouvé.",
-    "view-on-map" : "See on the map"
+    "view-on-map" : "See on the map",
+    "signalDetails": "Détails du signalement",
+    "createdBy": "Créé par",
+    "createdAt": "Date de création",
+    "votes": "Votes"
   },
 
   "route": {

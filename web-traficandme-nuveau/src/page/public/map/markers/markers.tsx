@@ -9,6 +9,7 @@ import { Report } from "../../../../services/model/report.tsx"
 import { useTranslation } from "react-i18next";
 import useReportStore from "../../../../services/store/report-store.tsx";
 import {toast} from "react-toastify";
+import {MarkerModel} from "../model/map.tsx";
 
 interface MarkersProps {
     map: tt.Map | null;
@@ -17,7 +18,6 @@ interface MarkersProps {
 const Markers: React.FC<MarkersProps> = ({ map }) => {
     const { t } = useTranslation();
     const { reports, fetchReports, createReport } = useReportStore();
-
     const token = Cookies.get("authToken");
     const [userRole, setRole] = useState<string | string[] | null>(null);
     const [selectedSignal, setSelectedSignal] = useState<Report | null>(null);
@@ -25,16 +25,11 @@ const Markers: React.FC<MarkersProps> = ({ map }) => {
     const [currentZoom, setCurrentZoom] = useState<number>(0);
     const [isAddingReport, setIsAddingReport] = useState<boolean>(false);
     const [showAddReportModal, setShowAddReportModal] = useState<boolean>(false);
-    const [newReportData, setNewReportData] = useState<{
-        type: string;
-        latitude: number;
-        longitude: number;
-        status : string
-    }>({
+    const [newReportData, setNewReportData] = useState<MarkerModel>({
         type: "ACCIDENTS",
         latitude: 0,
         longitude: 0,
-        status : userRole === "ROLE_ADMIN" ? "PENDING" : "AVAILABLE"
+        status : ""
     });
 
     const updateMarkersVisibility = (zoom: number) => {
@@ -49,12 +44,9 @@ const Markers: React.FC<MarkersProps> = ({ map }) => {
 
     const createMarkers = () => {
         if (!map) return;
-
         createdMarkers.forEach(marker => marker.remove());
 
         const markers: tt.Marker[] = [];
-
-
         reports.filter(report => report.status === "AVAILABLE")
             .forEach((report) => {
             const coordinates = [report.longitude ?? 0,report.latitude ?? 0];
@@ -77,24 +69,13 @@ const Markers: React.FC<MarkersProps> = ({ map }) => {
                         return "/images/icon-map/default.jpg";
                 }
             })();
-
                     markerElement.innerHTML = `
             <div class="flex flex-col items-center">
                 <img src="${imageSrc}" alt="Signal Icon"
                     class="rounded-full w-10 h-10 border-2 border-white shadow-md" />
                 <div class="w-0 h-0 border-l-[10px] border-r-[10px] border-t-[10px] border-l-transparent border-r-transparent border-t-blue-500"></div>
             </div>
-        `;
-
-            markerElement.innerHTML = `
-                <div class="flex flex-col items-center">
-                    <img src="${imageSrc}" alt="Signal Icon"
-                        class="rounded-full w-10 h-10 border-2 border-white shadow-md" />
-                    <div class="w-0 h-0 border-l-[10px] border-r-[10px] border-t-[10px] border-l-transparent border-r-transparent border-t-blue-500"></div>
-                </div>
-       
-                   `;
-            
+            `;
             const marker = new tt.Marker({ element: markerElement })
                 .setLngLat(coordinates)
                 .addTo(map);
@@ -121,7 +102,7 @@ const Markers: React.FC<MarkersProps> = ({ map }) => {
     };
 
     const handleAddReportClick = () => {
-        toast.info("click sur la map") //TODO TRADUCTION
+        toast.info(t('map.click-map'));
         setIsAddingReport(true);
         const messageContainer = document.createElement("div");
         messageContainer.id = "click-message";
@@ -151,6 +132,7 @@ const Markers: React.FC<MarkersProps> = ({ map }) => {
 
     const handleSubmitNewReport = async () => {
         try {
+            newReportData.status = userRole === "ROLE_ADMIN" ?  "AVAILABLE" : "PENDING"
             await createReport(newReportData);
             setShowAddReportModal(false);
             await fetchReports();
@@ -177,13 +159,12 @@ const Markers: React.FC<MarkersProps> = ({ map }) => {
             map.off('zoom', handleZoomChange);
             map.off('click', handleMapClick);
 
-            // Nettoyer le message si on quitte le composant pendant l'ajout
             const messageContainer = document.getElementById("click-message");
             if (messageContainer) {
                 document.body.removeChild(messageContainer);
             }
         };
-    }, [map, reports, token, isAddingReport]);
+    }, [map, reports, token, isAddingReport,userRole]);
 
     useEffect(() => {
         if (map) {

@@ -27,11 +27,6 @@ const solutions = [
 export default function DesktopHeader({ role, navigationLinks, openLogin, openRegister }: DesktopHeaderProps) {
     const { t } = useTranslation();
     const { user } = useUserStore();
-    const languageOptions = [
-        { name: "fr", label: "Français", img: "/flags/fr.svg" },
-        { name: "en", label: "English", img: "/flags/gb.svg" },
-    ];
-
     const getInitials = (username: string) => {
         return username ? username.charAt(0).toUpperCase() : "";
     };
@@ -42,7 +37,7 @@ export default function DesktopHeader({ role, navigationLinks, openLogin, openRe
     }
 
     return (
-        <div className="hidden lg:flex flex-1 justify-between items-center">
+        <div className="hidden lg:flex flex-1 justify-between items-center" >
             <div className="flex gap-x-12">
                 {navigationLinks.map((item) => (
                     <Link key={item.name} to={item.href}
@@ -50,40 +45,48 @@ export default function DesktopHeader({ role, navigationLinks, openLogin, openRe
                         {item.name}
                     </Link>
                 ))}
-
-                {role == "ROLE_ADMIN" &&
+                {role === "ROLE_ADMIN" && (
                     <div>
                         <Popover className="relative">
-                            <PopoverButton className="inline-flex items-center gap-x-1 text-sm/6 font-semibold text-gray-900">
-                                <span className="cursor-pointer text-gray-900 hover:text-gray-700 px-3 py-2 text-sm font-medium">{t('admin')}</span>
-                                <ChevronDownIcon aria-hidden="true" className="size-5" />
-                            </PopoverButton>
+                                <>
+                                     <PopoverButton className="inline-flex items-center gap-x-1 text-sm/6 font-semibold text-gray-900">
+                                            <span className="cursor-pointer text-gray-900 hover:text-gray-700 px-3 py-2 text-sm font-medium">
+                                              {t("common.admin")}
+                                            </span>
+                                        <ChevronDownIcon aria-hidden="true" className="size-5" />
+                                    </PopoverButton>
 
-                            <PopoverPanel
-                                transition
-                                className="absolute left-1/2 z-10 mt-5 flex w-screen max-w-max -translate-x-1/2 px-4 transition data-closed:translate-y-1 data-closed:opacity-0 data-enter:duration-200 data-enter:ease-out data-leave:duration-150 data-leave:ease-in"
-                            >
-                                <div className="w-screen max-w-md flex-auto overflow-hidden rounded-3xl bg-white text-sm/6 ring-1 shadow-lg ring-gray-900/5">
-                                    <div className="p-4">
-                                        {solutions.map((item) => (
-                                            <Link to={item.href} className="cursor-pointer group relative flex gap-x-6 rounded-lg p-4 hover:bg-gray-50">
-                                                <div className="mt-1 flex size-6 flex-none items-center justify-center rounded-lg bg-gray-50 group-hover:bg-white">
-                                                    <item.icon aria-hidden="true" className=" text-gray-600 group-hover:text-indigo-600" />
-                                                </div>
-                                                <div>
-                                                    <button className="font-semibold text-gray-900">
-                                                        {item.name}
-                                                        <span className="absolute inset-0" />
-                                                    </button>
-                                                </div>
-                                            </Link>
-                                        ))}
-                                    </div>
-                                </div>
-                            </PopoverPanel>
+                                    <PopoverPanel
+                                        style={{zIndex : "9999"}}
+                                        className="absolute left-1/2 z-10 mt-2 flex w-screen max-w-max -translate-x-1/2 px-4 transition data-closed:translate-y-1 data-closed:opacity-0 data-enter:duration-200 data-enter:ease-out data-leave:duration-150 data-leave:ease-in"
+                                    >
+                                        <div className="w-screen max-w-md flex-auto overflow-hidden rounded-3xl bg-white text-sm/6 ring-1 ring-gray-900/5">
+                                            <div className="p-4">
+                                                {solutions.map((item) => (
+                                                    <Popover.Button
+                                                        key={item.name}
+                                                        as={Link}
+                                                        to={item.href}
+                                                        className="cursor-pointer group relative flex gap-x-6 rounded-lg p-3 hover:bg-gray-50"
+                                                    >
+                                                        <div className="flex size-5 flex-none items-center justify-center rounded-lg group-hover:bg-white">
+                                                            <item.icon aria-hidden="true" className="text-gray-600" />
+                                                        </div>
+                                                        <div>
+                                                            <span className="font-semibold text-gray-900">{item.name}</span>
+                                                        </div>
+                                                    </Popover.Button>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    </PopoverPanel>
+                                </>
+
                         </Popover>
+
                     </div>
-                }
+                )}
+
 
             </div>
             <Link to="/" className="-m-1.5">
@@ -129,7 +132,7 @@ export default function DesktopHeader({ role, navigationLinks, openLogin, openRe
                         </button>
                     </div>
                 )}
-                <Languages languages={languageOptions}  />
+                <Languages />
             </div>
         </div>
     );

@@ -20,9 +20,7 @@ export default function Header() {
     const navigation = [
         { name: t("header.home"), href: "/" },
         { name: t("header.map"), href: "/map" },
-        { name: t("header.company"), href: "/about" },
     ];
-
 
     useEffect(() => {
         setRole(getUserRole());
