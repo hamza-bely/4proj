@@ -63,7 +63,7 @@ public class TrafficController {
                 throw new IllegalArgumentException("User undefined");
             }
             List<TrafficModel> userTrafficList = trafficService.getAllTrafficByUser(userConnected);
-            return ResponseEntity.ok(new ApiResponse<>("traffic by user was successfully fetched",userTrafficList ));
+            return ResponseEntity.ok(new ApiResponse<>("Traffic by user was successfully fetched",userTrafficList ));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(new ApiResponse<>(e.getMessage(), null));
         }
@@ -73,7 +73,7 @@ public class TrafficController {
     public ResponseEntity<ApiResponse<TrafficModel>> deleteForAnUSer(@PathVariable Integer id) {
         try {
             TrafficModel traffic = trafficService.deleteTrafficForAnUser(id);
-            return ResponseEntity.ok(new ApiResponse<>("Report deleted successfully", traffic));
+            return ResponseEntity.ok(new ApiResponse<>("Traffic deleted successfully", traffic));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(new ApiResponse<>(e.getMessage(), null));
         }
@@ -83,7 +83,7 @@ public class TrafficController {
     public ResponseEntity<ApiResponse<Void>> deleteDefinitive(@PathVariable Integer id) {
         try {
             trafficService.deleteDefinitiveTrafficForAnAdmin(id);
-            return ResponseEntity.ok(new ApiResponse<>("Report deleted successfully", null));
+            return ResponseEntity.ok(new ApiResponse<>("Traffic deleted successfully", null));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(new ApiResponse<>(e.getMessage(), null));
         }
