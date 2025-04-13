@@ -5,9 +5,10 @@ import "../css/map.css";
 import { toast } from "react-toastify";
 import Search from "./search-bar.tsx";
 import { useTranslation } from "react-i18next";
-import { LuRabbit, LuArrowLeft, LuSave, LuX, LuCrosshair } from "react-icons/lu";
+import { LuRabbit, LuArrowLeft, LuSave, LuX } from "react-icons/lu";
 import { TbBarrierBlockOff, TbRoute2 } from "react-icons/tb";
-import { MdQrCode2, MdDirectionsCar, MdDirectionsBike, MdDirectionsWalk } from "react-icons/md";
+import { MdQrCode2, MdDirectionsCar, MdDirectionsWalk } from "react-icons/md";
+import { FaBus } from "react-icons/fa"; // Importation de l'icône de bus
 import useRouteStore from "../../../../services/store/route-store.tsx";
 import Cookies from "js-cookie";
 import {getUserRole} from "../../../../services/service/token-service.tsx";
@@ -17,8 +18,41 @@ import {Coordinate, RouteResponse} from "../model/map.tsx";
 
 import { QRCodeSVG } from 'qrcode.react';
 
-// Type pour le moyen de transport
-type TransportMode = "car" | "bike" | "walk";
+// Type pour le moyen de transport - ajout de "bus"
+type TransportMode = "car" | "bike" | "walk" | "bus";
+
+/**
+ * Récupère l'adresse à partir de coordonnées géographiques
+ * @param {number} lat - Latitude
+ * @param {number} lon - Longitude
+ * @returns {Promise<string>} - L'adresse correspondante
+ */
+const getAddressFromCoordinates = async (lat: number, lon: number): Promise<string> => {
+    const apiKey: string = import.meta.env.VITE_TOMTOM_API_KEY;
+    const url = `https://api.tomtom.com/search/2/reverseGeocode/${lat},${lon}.json?key=${apiKey}`;
+
+    try {
+        const response = await fetch(url);
+        const data = await response.json();
+
+        if (data.addresses && data.addresses.length > 0) {
+            const address = data.addresses[0].address;
+            const formattedAddress = [
+                address.streetNumber,
+                address.streetName,
+                address.municipality,
+                address.postalCode,
+                address.countrySubdivision
+            ].filter(Boolean).join(', ');
+
+            return formattedAddress;
+        }
+        return "Adresse non trouvée";
+    } catch (error) {
+        console.error("Erreur lors de la récupération de l'adresse:", error);
+        return "Erreur lors de la récupération de l'adresse";
+    }
+};
 
 const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated }) => {
     const [start, setStart] = useState<Coordinate>({ lat: 47.6640, lon: 2.8357 });
@@ -36,7 +70,6 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated }) => {
     const [showResults, setShowResults] = useState<boolean>(false);
     const [showQRCode, setShowQRCode] = useState<boolean>(false);
     const [qrCodeData, setQrCodeData] = useState<string>("");
-    const [isLocating, setIsLocating] = useState<boolean>(false);
     const [transportMode, setTransportMode] = useState<TransportMode>("car");
     const [currentPosition, setCurrentPosition] = useState<number>(0);
     const simulationIntervalRef = useRef<number | null>(null);
@@ -46,7 +79,6 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated }) => {
         setRole(getUserRole());
         if (token) fetchUser().catch(console.error);
 
-        // Nettoyage de l'intervalle de simulation à la fermeture du composant
         return () => {
             if (simulationIntervalRef.current) {
                 window.clearInterval(simulationIntervalRef.current);
@@ -54,20 +86,35 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated }) => {
         };
     }, [token]);
 
-    // Effet pour envoyer la position actuelle au composant parent lors de la simulation
+    // Récupérer l'adresse de départ lorsque les coordonnées changent
+    useEffect(() => {
+        if (start && start.lat && start.lon) {
+            getAddressFromCoordinates(start.lat, start.lon)
+                .then(address => setStartAddress(address))
+                .catch(error => console.error("Erreur:", error));
+        }
+    }, [start]);
+
+    // Récupérer l'adresse de destination lorsque les coordonnées changent
+    useEffect(() => {
+        if (end && end.lat && end.lon) {
+            getAddressFromCoordinates(end.lat, end.lon)
+                .then(address => setEndAddress(address))
+                .catch(error => console.error("Erreur:", error));
+        }
+    }, [end]);
+
     useEffect(() => {
         if ( selectedRouteId) {
             const selectedRoute = routeOptions.find(route => route.id === selectedRouteId);
             if (selectedRoute && selectedRoute.coordinates && selectedRoute.coordinates.length > 0) {
                 const currentCoordIndex = Math.floor(currentPosition * (selectedRoute.coordinates.length - 1));
                 const currentCoord = selectedRoute.coordinates[currentCoordIndex];
-                // Mise à jour de la position du véhicule sur la carte (via le parent)
                 const vehiclePosition = {
                     position: [currentCoord[0], currentCoord[1]],
                     type: transportMode,
                     progress: currentPosition
                 };
-                // On envoie cette information au composant parent via un événement personnalisé
                 const event = new CustomEvent("vehiclePositionUpdate", { detail: vehiclePosition });
                 window.dispatchEvent(event);
             }
@@ -86,7 +133,6 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated }) => {
     };
 
     const calculateRoute = async (routeType: "fastest" | "shortest", avoidTolls: boolean): Promise<RouteOption | null> => {
-        // Ajout du paramètre travelMode en fonction du mode de transport sélectionné
         let travelMode = "car";
         switch (transportMode) {
             case "bike":
@@ -95,11 +141,16 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated }) => {
             case "walk":
                 travelMode = "pedestrian";
                 break;
+            case "bus":
+                travelMode = "truck";
+                break;
             default:
                 travelMode = "car";
         }
 
-        const avoid = avoidTolls ? "&avoid=tollRoads" : "";
+        const shouldAvoidTolls = avoidTolls && transportMode !== "walk";
+        const avoid = shouldAvoidTolls ? "&avoid=tollRoads" : "";
+
         const url = `https://api.tomtom.com/routing/1/calculateRoute/${start.lat},${start.lon}:${end.lat},${end.lon}/json?key=${apiKey}&routeType=${routeType}${avoid}&travelMode=${travelMode}`;
 
         try {
@@ -111,8 +162,8 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated }) => {
                 const points = route.legs[0].points;
                 const coordinates = points.map((p) => [p.longitude, p.latitude] as [number, number]);
 
-                const id = `${routeType}-${avoidTolls ? 'no-tolls' : 'with-tolls'}-${travelMode}-${Date.now()}`;
-                const name = `${routeType === 'fastest' ? t('map.fastest') : t('map.shortest')}${avoidTolls ? ` (${t('map.no-tolls')})` : ''}`;
+                const id = `${routeType}-${shouldAvoidTolls ? 'no-tolls' : 'with-tolls'}-${travelMode}-${Date.now()}`;
+                const name = `${routeType === 'fastest' ? t('map.fastest') : t('map.shortest')}${shouldAvoidTolls ? ` (${t('map.no-tolls')})` : ''}`;
 
                 return {
                     id,
@@ -121,7 +172,7 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated }) => {
                     distance: route.summary.lengthInMeters,
                     duration: route.summary.travelTimeInSeconds,
                     type: routeType,
-                    avoidTolls,
+                    avoidTolls: shouldAvoidTolls,
                     travelMode
                 };
             }
@@ -142,15 +193,23 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated }) => {
 
         setIsLoading(true);
         setRouteOptions([]);
-        setSelectedRouteId(null); // on désélectionne aussi l'ancien itinéraire
+        setSelectedRouteId(null);
 
         try {
-            const routePromises = [
-                calculateRoute("fastest", false),
-                calculateRoute("shortest", false),
-                calculateRoute("fastest", true),
-                calculateRoute("shortest", true)
-            ];
+            let routePromises = [];
+            if (transportMode === "walk") {
+                routePromises = [
+                    calculateRoute("fastest", false),
+                    calculateRoute("shortest", false)
+                ];
+            } else {
+                routePromises = [
+                    calculateRoute("fastest", false),
+                    calculateRoute("shortest", false),
+                    calculateRoute("fastest", true),
+                    calculateRoute("shortest", true)
+                ];
+            }
 
             const results = await Promise.all(routePromises);
             const validRoutes = results.filter(route => route !== null) as RouteOption[];
@@ -173,8 +232,6 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated }) => {
         if (selectedRoute) {
             setSelectedRouteId(routeId);
             onRouteCalculated(JSON.stringify(selectedRoute.coordinates));
-
-            // On arrête la simulation actuelle si elle est en cours
         }
     };
 
@@ -203,7 +260,7 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated }) => {
                 endLatitude: end.lat.toString(),
                 address_start: startAddress,
                 address_end: endAddress,
-                user: "", // This will be filled in by the backend or auth context
+                user: "",
                 mode: selectedRoute.type === "fastest" ? "Rapide" : "Court",
                 peage: !selectedRoute.avoidTolls
             };
@@ -267,45 +324,6 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated }) => {
         setShowQRCode(false);
     };
 
-    // Fonction pour géolocaliser l'utilisateur
-    const handleGeolocation = () => {
-        if (!navigator.geolocation) {
-            toast.error("La géolocalisation n'est pas prise en charge par votre navigateur.");
-            return;
-        }
-
-        setIsLocating(true);
-        navigator.geolocation.getCurrentPosition(
-            (position) => {
-                const { latitude, longitude } = position.coords;
-                setStart({ lat: latitude, lon: longitude });
-
-                fetch(`https://api.tomtom.com/search/2/reverseGeocode/${latitude},${longitude}.json?key=${apiKey}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.addresses && data.addresses.length > 0) {
-                            const address = data.addresses[0].address;
-                            const formattedAddress = `${address.streetName || ''} ${address.municipalitySubdivision || ''} ${address.municipality || ''}`;
-                            setStartAddress(formattedAddress);
-                            toast.success("Position actuelle définie comme point de départ");
-                        }
-                    })
-                    .catch(error => {
-                        console.error("Erreur lors de la récupération de l'adresse:", error);
-                    })
-                    .finally(() => {
-                        setIsLocating(false);
-                    });
-            },
-            (error) => {
-                console.error("Erreur de géolocalisation:", error);
-                toast.error("Impossible d'obtenir votre position actuelle.");
-                setIsLocating(false);
-            },
-            { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
-        );
-    };
-
     const handleTransportModeChange = (mode: TransportMode) => {
         setTransportMode(mode);
         if (start && end && showResults) {
@@ -314,13 +332,20 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated }) => {
     };
 
     const renderTransportModeSelector = () => (
-        <div className="flex justify-center mb-4  p-2 rounded">
+        <div className="flex justify-center mb-4 p-2 rounded">
             <button
                 onClick={() => handleTransportModeChange("car")}
                 className={`mx-2 p-2 rounded ${transportMode === "car" ? "bg-blue-500 text-white" : "bg-white text-gray-700"}`}
                 title="Voiture"
             >
                 <MdDirectionsCar size={24} />
+            </button>
+            <button
+                onClick={() => handleTransportModeChange("bus")}
+                className={`mx-2 p-2 rounded ${transportMode === "bus" ? "bg-blue-500 text-white" : "bg-white text-gray-700"}`}
+                title="Bus/Camion"
+            >
+                <FaBus size={24} />
             </button>
             <button
                 onClick={() => handleTransportModeChange("walk")}
@@ -459,7 +484,8 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated }) => {
                             <p>À: {endAddress}</p>
                             <p>Mode de transport: {
                                 transportMode === "car" ? "Voiture" :
-                                    transportMode === "bike" ? "Vélo" : "À pied"
+                                    transportMode === "bike" ? "Vélo" :
+                                        transportMode === "bus" ? "Bus/Camion" : "À pied"
                             }</p>
                         </div>
 

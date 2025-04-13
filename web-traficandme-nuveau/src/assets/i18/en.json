@@ -262,7 +262,22 @@
     "noRoutes": "You have no saved routes.",
     "withTolls": "With tolls",
     "withoutTolls": "Without tolls"
+  },
+
+  "axios-report": {
+    "create_success": "Rapport créé avec succès",
+    "fetch_success": "Rapports récupérés avec succès",
+    "like_success": "Rapport aimé",
+    "dislike_success": "Rapport non aimé",
+    "status_changed": "Statut modifié",
+    "type_changed": "Type modifié",
+    "delete_success": "Rapport supprimé avec succès"
+  },
+  "axios-report-error": {
+    "user_undefined": "Utilisateur non défini",
+    "generic": "Une erreur s'est produite"
   }
+
 
 
 }

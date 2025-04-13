@@ -255,7 +255,22 @@
     "noRoutes": "Vous n'avez aucun itinéraire sauvegardé.",
     "withTolls": "Avec péage",
     "withoutTolls": "Sans péage"
+  },
+
+  "axios-report": {
+    "create_success": "Report created successfully",
+    "fetch_success": "Reports fetched successfully",
+    "like_success": "Report liked",
+    "dislike_success": "Report disliked",
+    "status_changed": "Status changed",
+    "type_changed": "Type changed",
+    "delete_success": "Report deleted successfully"
+  },
+  "axios-report-error": {
+    "user_undefined": "User undefined",
+    "generic": "An error occurred"
   }
+
 
 }
 

@@ -13,10 +13,8 @@ export default function ModalDeleteUser({ closeModal, userId }: ModalDeleteUserP
     const [inputValue, setInputValue] = useState("");
     const {  deleteUserForAnUser } = useUserStore();
     const isConfirmed = inputValue.trim().toUpperCase() === "CONFIRME";
-    //const  [isLoading,setIsLoading] = useState<boolean>(false)
 
     const HandleDeleteUser =  async () => {
-           console.log(userId)
             try{
                 await deleteUserForAnUser(userId)
                 Cookies.remove("authToken");

@@ -13,7 +13,7 @@ const PopupContent = ({ info: initialInfo, onClose }: { info: Report, onClose?: 
     const { likeReport, dislikeReport, deleteReport, changeReportStatus } = useReportStore();
     const { user } = useUserStore();
     const [role, setRole] = useState<string | string[] | null>(null);
-    const [currentUsername, setCurrentUsername] = useState<string | undefined>(null);
+    const [currentUsername, setCurrentUsername] = useState<string | undefined>();
     const [showStatusOptions, setShowStatusOptions] = useState(false);
 
     const [reportInfo, setReportInfo] = useState<Report>(initialInfo);
