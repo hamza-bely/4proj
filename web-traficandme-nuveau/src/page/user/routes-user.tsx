@@ -35,7 +35,7 @@ export default function RoutesUser() {
     const loadData = async () => {
         try {
             setLoading(true);
-             await fetchRoutesByUser();
+            await fetchRoutesByUser();
         } catch (error) {
             console.error('Failed to load data:', error);
         } finally {
@@ -106,92 +106,96 @@ export default function RoutesUser() {
     return (
         <div className="bg-white p-6 sm:rounded-lg">
             <h2 className="text-xl font-semibold mb-4">{t('route.title')}</h2>
-                <>
-                    {routeUser.length === 0 ? (
-                        <p className="text-gray-500">{t('routes.noRoutes')}</p>
-                    ) : (
-                        <div className="overflow-x-auto">
-                            <table className="min-w-full divide-y divide-gray-200">
-                                <thead className="bg-gray-50">
-                                <tr>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        {t('routes.mode')}
-                                    </th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        {t('routes.peage')}
-                                    </th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        {t('routes.status')}
-                                    </th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        {t('routes.date')}
-                                    </th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        {t('routes.start')}
-                                    </th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        {t('routes.end')}
-                                    </th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        {t('common.actions')}
-                                    </th>
-                                </tr>
-                                </thead>
-                                <tbody className="bg-white divide-y divide-gray-200">
-                                {routeUser.map((route) => (
-                                    <tr key={route.id}>
-                                        <td className="px-6 py-4 whitespace-nowrap">
+            <>
+                {routeUser.length === 0 ? (
+                    <p className="text-gray-500">{t('routes.noRoutes')}</p>
+                ) : (
+                    <div className="overflow-x-auto">
+                        <table className="min-w-full divide-y divide-gray-200 table-fixed">
+                            <thead className="bg-gray-50">
+                            <tr>
+                                <th className="w-1/12 px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    {t('routes.mode')}
+                                </th>
+                                <th className="w-1/12 px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    {t('routes.peage')}
+                                </th>
+                                <th className="w-1/12 px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    {t('routes.status')}
+                                </th>
+                                <th className="w-1/12 px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    {t('routes.date')}
+                                </th>
+                                <th className="w-3/12 px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    {t('routes.start')}
+                                </th>
+                                <th className="w-3/12 px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    {t('routes.end')}
+                                </th>
+                                <th className="w-2/12 px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    {t('common.actions')}
+                                </th>
+                            </tr>
+                            </thead>
+                            <tbody className="bg-white divide-y divide-gray-200">
+                            {routeUser.map((route) => (
+                                <tr key={route.id}>
+                                    <td className="px-3 py-4 whitespace-nowrap">
                                             <span
                                                 className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
                                                 {getModeLabel(route.mode)}
                                             </span>
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            {route.peage ? t('routes.withTolls') : t('routes.withoutTolls')}
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap">
+                                    </td>
+                                    <td className="px-3 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        {route.peage ? t('routes.withTolls') : t('routes.withoutTolls')}
+                                    </td>
+                                    <td className="px-3 py-4 whitespace-nowrap">
                                             <span
                                                 className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
                                                     route.status === 'ACTIVE' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
                                                 }`}>
                                                 {getStatusLabel(route.status)}
                                             </span>
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            {formatDate(route.createDate)}
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    </td>
+                                    <td className="px-3 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        {formatDate(route.createDate)}
+                                    </td>
+                                    <td className="px-3 py-4 text-sm text-gray-500 break-words">
+                                        <div className="min-h-12">
                                             {route.address_start || `${route.startLatitude}, ${route.startLongitude}`}
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        </div>
+                                    </td>
+                                    <td className="px-3 py-4 text-sm text-gray-500 break-words">
+                                        <div className="min-h-12">
                                             {route.address_end || `${route.endLatitude}, ${route.endLongitude}`}
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                            <div className="flex space-x-4">
-                                                <button
-                                                    className="text-indigo-600 hover:text-indigo-900 flex items-center"
-                                                    onClick={() => handleViewRouteOnMap(route)}
-                                                >
-                                                    <LuMap className="h-5 w-5 mr-1"/>
-                                                    {t('routes.viewOnMap')}
-                                                </button>
-                                                <button
-                                                    className="text-red-600 hover:text-red-900 flex items-center"
-                                                    onClick={() => handleDeleteRoute(route.id)}
-                                                    disabled={deleting === route.id}
-                                                >
-                                                    <LuTrash2 className="h-5 w-5 mr-1"/>
-                                                    {deleting === route.id ? t('routes.deleting') : t('routes.delete')}
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    )}
-                </>
+                                        </div>
+                                    </td>
+                                    <td className="px-3 py-4 text-sm font-medium">
+                                        <div className="flex flex-col space-y-2">
+                                            <button
+                                                className="text-indigo-600 hover:text-indigo-900 flex items-center"
+                                                onClick={() => handleViewRouteOnMap(route)}
+                                            >
+                                                <LuMap className="h-5 w-5 mr-1"/>
+                                                {t('routes.viewOnMap')}
+                                            </button>
+                                            <button
+                                                className="text-red-600 hover:text-red-900 flex items-center"
+                                                onClick={() => handleDeleteRoute(route.id)}
+                                                disabled={deleting === route.id}
+                                            >
+                                                <LuTrash2 className="h-5 w-5 mr-1"/>
+                                                {deleting === route.id ? t('routes.deleting') : t('routes.delete')}
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))}
+                            </tbody>
+                        </table>
+                    </div>
+                )}
+            </>
         </div>
     );
 }
