@@ -2,7 +2,6 @@ import axios  from "axios";
 import Cookies from "js-cookie";
 import { toast } from "react-toastify";
 import { Report, ReportDeleteResponse, ReportFetchResponse } from "../model/report";
-import i18n from "i18next";
 import { translateMessage } from "../../../src/assets/i18/translateMessage.tsx";
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -19,8 +18,8 @@ export const fetchReports = async (): Promise<ReportFetchResponse> => {
     try {
         const response = await axios.get<ReportFetchResponse>(`${API_URL}reports/get-all`, { headers: getAuthHeaders() });
         return response.data;
-    } catch (error) {
-        toast.error(i18n.t("error.generic"));
+    } catch (error: any) {
+        toast.success(await translateMessage(error.response.data.message || "An error has occurred"));
         throw error;
     }
 };
@@ -29,8 +28,8 @@ export const fetchReportsByUser = async (): Promise<ReportFetchResponse> => {
     try {
         const response = await axios.get<ReportFetchResponse>(`${API_URL}reports/get-all-by-user`, { headers: getAuthHeaders() });
         return response.data;
-    } catch (error) {
-        toast.error(i18n.t("error.generic"));
+    } catch (error: any) {
+        toast.success(await translateMessage(error.response.data.message || "An error has occurred"));
         throw error;
     }
 };
@@ -41,14 +40,10 @@ export const createReport = async (data: any): Promise<Report> => {
         const response = await axios.post(`${API_URL}reports/create`, data, {
             headers: getAuthHeaders(),
         });
-
-        const translated = await translateMessage("Report created successfully");
-        toast.success(translated);
+        toast.success(await translateMessage(response.data.message));
         return response.data.data;
     } catch (error: any) {
-        const rawMessage = error.response?.data?.message || "Error creating report";
-        const translated = await translateMessage(rawMessage);
-        toast.error(translated);
+        toast.success(await translateMessage(error.response.data.message || "An error has occurred"));
         throw error;
     }
 };
@@ -59,10 +54,10 @@ export const deleteReport = async (id: number): Promise<ReportDeleteResponse> =>
         const response = await axios.delete(`${API_URL}reports/${id}/delete-definitive`, {
             headers: getAuthHeaders(),
         });
-        toast.success(i18n.t("report.delete_success"));
+        toast.success(await translateMessage(response.data.message));
         return response.data;
     } catch (error: any) {
-        toast.error(error.response?.data?.message || i18n.t("error.generic"));
+        toast.success(await translateMessage(error.response.data.message || "An error has occurred"));
         throw error;
     }
 };
@@ -72,10 +67,10 @@ export const likeReport = async (id: number): Promise<Report> => {
         const response = await axios.post(`${API_URL}reports/${id}/like`, {}, {
             headers: getAuthHeaders(),
         });
-        toast.success(i18n.t("report.like_success"));
+        toast.success(await translateMessage(response.data.message));
         return response.data.data;
     } catch (error: any) {
-        toast.error(error.response?.data?.message || i18n.t("error.generic"));
+        toast.success(await translateMessage(error.response.data.message || "An error has occurred"));
         throw error;
     }
 };
@@ -85,10 +80,10 @@ export const dislikeReport = async (id: number): Promise<Report> => {
         const response = await axios.post(`${API_URL}reports/${id}/dislike`, {}, {
             headers: getAuthHeaders(),
         });
-        toast.success(i18n.t("report.dislike_success"));
+        toast.success(await translateMessage(response.data.message));
         return response.data.data;
     } catch (error: any) {
-        toast.error(error.response?.data?.message || i18n.t("error.generic"));
+        toast.success(await translateMessage(error.response.data.message || "An error has occurred"));
         throw error;
     }
 };
@@ -98,10 +93,10 @@ export const changeReportStatus = async (id: number, status: string): Promise<Re
         const response = await axios.patch(`${API_URL}reports/${id}/update-status`, status, {
             headers: getAuthHeaders(),
         });
-        toast.success(i18n.t("report.status_changed"));
+        toast.success(await translateMessage(response.data.message));
         return response.data.data;
     } catch (error: any) {
-        toast.error(error.response?.data?.message || i18n.t("error.generic"));
+        toast.success(await translateMessage(error.response.data.message || "An error has occurred"));
         throw error;
     }
 };
@@ -111,10 +106,10 @@ export const changeReportType = async (id: number, type: string): Promise<Report
         const response = await axios.patch(`${API_URL}reports/${id}/update-type`, type, {
             headers: getAuthHeaders(),
         });
-        toast.success(i18n.t("report.type_changed"));
+        toast.success(await translateMessage(response.data.message));
         return response.data.data;
     } catch (error: any) {
-        toast.error(error.response?.data?.message || i18n.t("error.generic"));
+        toast.success(await translateMessage(error.response.data.message || "An error has occurred"));
         throw error;
     }
 };

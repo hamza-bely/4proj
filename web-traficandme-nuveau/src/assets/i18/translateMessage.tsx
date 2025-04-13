@@ -1,7 +1,8 @@
 import axios from "axios";
+import i18n from "i18next";
 
 export const translateMessage = async (message: string): Promise<string> => {
-    const currentLang = "fr"; // ou récupère depuis i18n.language
+    const currentLang = i18n.language || "fr";
 
     if (currentLang === "en") return message;
 

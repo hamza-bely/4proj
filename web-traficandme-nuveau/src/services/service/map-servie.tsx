@@ -18,12 +18,10 @@ export const calculateRoute = async (startCoords: number[], endCoords: number[],
 };
 
 export const searchAddress = async (query: any): Promise<any> => {
-    console.log(query)
     const url = `${API_TOM_TOM}search/2/search/${encodeURIComponent(query)}.json?key=${KEY}&limit=5`;
 
     try {
         const response = await axios.get<any>(url);
-        console.log(response);
         return response.data;
     } catch (error) {
         toast.error("Error fetching route information");

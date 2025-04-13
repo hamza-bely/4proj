@@ -1,4 +1,4 @@
-import axios, {AxiosError} from "axios";
+import axios from "axios";
 import {toast} from "react-toastify";
 import Cookies from "js-cookie";
 import {
@@ -8,6 +8,7 @@ import {
     UserUpdateResponse,
     UserUpdaterRequest
 } from "../model/user.tsx";
+import {translateMessage} from "../../assets/i18/translateMessage.tsx";
 const API_URL = import.meta.env.VITE_API_URL;
 
 const getAuthHeaders = () => {
@@ -24,12 +25,7 @@ export const fetchUsers = async (): Promise<UserResponseFetchUsers> => {
         const response = await axios.get<UserResponseFetchUsers>(`${API_URL}admin/users/list`, { headers: getAuthHeaders() });
         return response.data;
     } catch (error) {
-        if (error instanceof AxiosError && error.response) {
-            const errorMessage = error.response.data?.message || "Une erreur est survenue";
-            console.error(errorMessage);
-        } else {
-            console.error("Erreur inconnue");
-        }
+        toast.success(await translateMessage(error.response.data.message || "An error has occurred"));
         throw error;
     }
 };
@@ -37,20 +33,10 @@ export const fetchUsers = async (): Promise<UserResponseFetchUsers> => {
 export const createUser = async (params: UserCreateRequest): Promise<UserCreateResponse> => {
     try {
         const response = await axios.post<UserCreateResponse>(API_URL +'admin/users/create', params, { headers: getAuthHeaders() });
-        toast.success(response.data.message);
+        toast.success(await translateMessage(response.data.message));
         return response.data;
     }catch (error : any) {
-        console.log(error)
-        const errorData = error.response.data;
-        if (errorData.errors && Array.isArray(errorData.errors)) {
-            errorData.errors.forEach((err: any) => {
-                if (err.msg) {
-                    toast.error(err.msg);
-                }
-            });
-        } else {
-            toast.error(errorData.error||  error.response.data.error ||  error.response.data.message);
-        }
+        toast.success(await translateMessage(error.response.data.message || "An error has occurred"));
         throw error;
 
     }
@@ -60,15 +46,10 @@ export const createUser = async (params: UserCreateRequest): Promise<UserCreateR
 export const updateUserByAdmin = async (id: number, params: UserUpdaterRequest): Promise<UserUpdateResponse> => {
     try {
         const response = await axios.put<UserUpdateResponse>(`${API_URL}admin/users/update/${id}`, params, { headers: getAuthHeaders() });
-        toast.success(response.data.message);
+        toast.success(await translateMessage(response.data.message));
         return response.data;
     }catch (error) {
-        if (error instanceof AxiosError && error.response) {
-            const errorMessage = error.response.data?.message || "Une erreur est survenue";
-            toast.error(errorMessage);
-        } else {
-            toast.error("Erreur inconnue");
-        }
+        toast.success(await translateMessage(error.response.data.message || "An error has occurred"));
         throw error;
 
     }
@@ -76,17 +57,12 @@ export const updateUserByAdmin = async (id: number, params: UserUpdaterRequest):
 
 export const deleteUserFoAnAdmin  = async (id: number): Promise<any> => {
     try {
-        const status = "DELETED"
+        const status = "DELETED" //TODO
         const response = await axios.patch(`${API_URL}admin/users/${id}/update-status`, status,{ headers: getAuthHeaders() });
-        toast.success(response.data.message);
+        toast.success(await translateMessage(response.data.message));
         return response.data;
     } catch (error) {
-        if (error instanceof AxiosError && error.response) {
-            const errorMessage = error.response.data?.message || "Une erreur est survenue";
-            toast.error(errorMessage);
-        } else {
-            toast.error("Erreur inconnue");
-        }
+        toast.success(await translateMessage(error.response.data.message || "An error has occurred"));
         throw error;
     }
 };
@@ -95,15 +71,10 @@ export const deleteUserFoAnAdmin  = async (id: number): Promise<any> => {
 export const deleteDefinitiveUserFoAnAdmin = async (id: number): Promise<any> => {
     try {
         const response = await axios.delete(`${API_URL}admin/users/${id}/delete-definitive`, { headers: getAuthHeaders() });
-        toast.success(response.data.message);
+        toast.success(await translateMessage(response.data.message));
         return response.data;
     } catch (error) {
-        if (error instanceof AxiosError && error.response) {
-            const errorMessage = error.response.data?.message || "Une erreur est survenue";
-            toast.error(errorMessage);
-        } else {
-            toast.error("Erreur inconnue");
-        }
+        toast.success(await translateMessage(error.response.data.message || "An error has occurred"));
         throw error;
     }
 };
