@@ -403,10 +403,13 @@ export default function ContainerMap({ map }: ContainerMapProps) {
                             </div>
                         </div>
 
-                        {!search && <Search onSearchResultSelect={onSearchResultSelect} />}
+                        {!search && <Search onSearchResultSelect={onSearchResultSelect} initialValue={""} />}
                         {search && (
                             <>
-                                <RoutePlanner onRouteCalculated={onRouteCalculated} startAddress={startAddress} />
+                                <RoutePlanner
+                                    onRouteCalculated={onRouteCalculated}
+                                    startAddress={startAddress}
+                                />
                                 {isRouteActive && (
                                     <div className="mt-2 text-center">
                                         <button

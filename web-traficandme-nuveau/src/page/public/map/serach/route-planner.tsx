@@ -7,7 +7,7 @@ import Search from "./search-bar.tsx";
 import { useTranslation } from "react-i18next";
 import { LuRabbit, LuArrowLeft, LuSave, LuX } from "react-icons/lu";
 import { TbBarrierBlockOff, TbRoute2 } from "react-icons/tb";
-import { MdQrCode2, MdDirectionsCar, MdDirectionsWalk } from "react-icons/md";
+import {MdQrCode2, MdDirectionsCar, MdDirectionsWalk, MdOutlineGpsFixed} from "react-icons/md";
 import { FaBus } from "react-icons/fa"; // Importation de l'icône de bus
 import useRouteStore from "../../../../services/store/route-store.tsx";
 import Cookies from "js-cookie";
@@ -54,7 +54,7 @@ const getAddressFromCoordinates = async (lat: number, lon: number): Promise<stri
     }
 };
 
-const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated }) => {
+const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated, startAddress: initialStartAddress }) => {
     const [start, setStart] = useState<Coordinate>({ lat: 47.6640, lon: 2.8357 });
     const [end, setEnd] = useState<Coordinate>({ lat: 45.7640, lon: 4.835 });
     const { t } = useTranslation();
@@ -64,7 +64,8 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated }) => {
     const [selectedRouteId, setSelectedRouteId] = useState<string | null>(null);
     const [role, setRole] = useState<string | string[] | null>(null);
     const token = Cookies.get("authToken");
-    const [startAddress, setStartAddress] = useState<string>("");
+    // Utilisez initialStartAddress comme valeur initiale si disponible
+    const [startAddress, setStartAddress] = useState<string>(initialStartAddress || "");
     const [endAddress, setEndAddress] = useState<string>("");
     const [isSaving, setIsSaving] = useState<boolean>(false);
     const [showResults, setShowResults] = useState<boolean>(false);
@@ -74,6 +75,43 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated }) => {
     const [currentPosition, setCurrentPosition] = useState<number>(0);
     const simulationIntervalRef = useRef<number | null>(null);
     const apiKey: string = import.meta.env.VITE_TOMTOM_API_KEY;
+
+    // Ajoutez cet useEffect pour mettre à jour startAddress lorsque initialStartAddress change
+    useEffect(() => {
+        if (initialStartAddress) {
+            setStartAddress(initialStartAddress);
+
+            // Récupérer les coordonnées à partir de l'adresse
+            if (initialStartAddress && initialStartAddress !== "") {
+                getCoordinatesFromAddress(initialStartAddress)
+                    .then(coords => {
+                        if (coords) {
+                            setStart(coords);
+                        }
+                    })
+                    .catch(error => console.error("Erreur lors de la récupération des coordonnées:", error));
+            }
+        }
+    }, [initialStartAddress]);
+
+    // Ajoutez cette fonction pour convertir une adresse en coordonnées
+    const getCoordinatesFromAddress = async (address: string): Promise<Coordinate | null> => {
+        const url = `https://api.tomtom.com/search/2/geocode/${encodeURIComponent(address)}.json?key=${apiKey}`;
+
+        try {
+            const response = await fetch(url);
+            const data = await response.json();
+
+            if (data.results && data.results.length > 0) {
+                const position = data.results[0].position;
+                return { lat: position.lat, lon: position.lon };
+            }
+            return null;
+        } catch (error) {
+            console.error("Erreur lors de la récupération des coordonnées:", error);
+            return null;
+        }
+    };
 
     useEffect(() => {
         setRole(getUserRole());
@@ -86,16 +124,6 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated }) => {
         };
     }, [token]);
 
-    // Récupérer l'adresse de départ lorsque les coordonnées changent
-    useEffect(() => {
-        if (start && start.lat && start.lon) {
-            getAddressFromCoordinates(start.lat, start.lon)
-                .then(address => setStartAddress(address))
-                .catch(error => console.error("Erreur:", error));
-        }
-    }, [start]);
-
-    // Récupérer l'adresse de destination lorsque les coordonnées changent
     useEffect(() => {
         if (end && end.lat && end.lon) {
             getAddressFromCoordinates(end.lat, end.lon)
@@ -319,7 +347,6 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated }) => {
         }
     };
 
-    // Fonction pour fermer la modale
     const handleCloseQRModal = () => {
         setShowQRCode(false);
     };
@@ -331,28 +358,37 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated }) => {
         }
     };
 
+    function getUserPosition() {
+        if (start && start.lat && start.lon) {
+            getAddressFromCoordinates(start.lat, start.lon)
+                .then(address => setStartAddress(address))
+                .catch(error => console.error("Erreur:", error));
+        }
+    }
+
     const renderTransportModeSelector = () => (
         <div className="flex justify-center mb-4 p-2 rounded">
+
             <button
                 onClick={() => handleTransportModeChange("car")}
                 className={`mx-2 p-2 rounded ${transportMode === "car" ? "bg-blue-500 text-white" : "bg-white text-gray-700"}`}
                 title="Voiture"
             >
-                <MdDirectionsCar size={24} />
+                <MdDirectionsCar size={24}/>
             </button>
             <button
                 onClick={() => handleTransportModeChange("bus")}
                 className={`mx-2 p-2 rounded ${transportMode === "bus" ? "bg-blue-500 text-white" : "bg-white text-gray-700"}`}
                 title="Bus/Camion"
             >
-                <FaBus size={24} />
+                <FaBus size={24}/>
             </button>
             <button
                 onClick={() => handleTransportModeChange("walk")}
                 className={`mx-2 p-2 rounded ${transportMode === "walk" ? "bg-blue-500 text-white" : "bg-white text-gray-700"}`}
                 title="À pied"
             >
-                <MdDirectionsWalk size={24} />
+                <MdDirectionsWalk size={24}/>
             </button>
         </div>
     );
@@ -376,13 +412,21 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated }) => {
 
             {!showResults ? (
                 <>
-                    <div className="relative mb-4">
+                    <div className="relative mb-4 flex">
                         <Search
+                            initialValue={startAddress}
                             onSearchResultSelect={(position: Coordinate, address?: string) => {
                                 setStart(position);
                                 if (address) setStartAddress(address);
                             }}
                         />
+                        <div className="cursor-pointer">
+                            <MdOutlineGpsFixed
+                                className="hover:p-[1px] mt-12 ml-2"
+                                style={{fontSize: "20px"}}
+                                onClick={getUserPosition}
+                            />
+                        </div>
                     </div>
                     <Search
                         onSearchResultSelect={(position: Coordinate, address?: string) => {
@@ -393,7 +437,7 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated }) => {
 
                     <div className="flex justify-center">
                         <button
-                            style={{ backgroundColor: "#5DB3FF" }}
+                            style={{backgroundColor: "#5DB3FF"}}
                             className="rounded-sm m-2 flex px-2 py-2 text-sm font-semibold text-white shadow-xs hover:bg-gray-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-600"
                             onClick={handleCalculateRoutes}
                             disabled={isLoading}

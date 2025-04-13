@@ -24,4 +24,5 @@ export interface RouteSaveData {
 
 export interface RoutePlannerProps {
     onRouteCalculated: (route: string) => void;
+    startAddress: string;
 }
