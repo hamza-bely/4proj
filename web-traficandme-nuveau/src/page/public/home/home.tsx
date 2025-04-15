@@ -1,7 +1,6 @@
 'use client'
 
 import {useTranslation} from "react-i18next";
-import Contact from "../../../components/contact/contact.tsx";
 import Incentives from "../../../components/incentives/incentives.tsx";
 import ContentSection from "../../../components/content-section/content-section.tsx";
 import Stats from "../../../components/stats/stats.tsx";
@@ -81,7 +80,6 @@ export default function Header() {
             <Incentives/>
             <ContentSection/>
             <Stats/>
-            <Contact/>
             <Footer/>
         </div>
     );

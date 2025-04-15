@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import useUserStore from "../../../services/store/user-store";
 import Spinner from "../../../components/sniper/sniper.tsx";
+import {UserUpdaterRequest} from "../../../services/model/user.tsx";
 
 export default function UpdateUserAdmin({
                                             id,
@@ -9,13 +10,14 @@ export default function UpdateUserAdmin({
     id: number;
     setIsOpenUpdate: (open: boolean) => void;
 }) {
-    const { updateUser, users } = useUserStore();
-    const [userData, setUserData] = useState({
+    const { updateUserForAnAdmin, users } = useUserStore();
+    const [userData, setUserData] = useState<UserUpdaterRequest>({
         firstName: "",
         lastName: "",
         email: "",
         password: "",
         role: "ROLE_USER",
+        status : ""
     });
     const [isLoading, setIsLoading] = useState(false);
 
@@ -28,6 +30,7 @@ export default function UpdateUserAdmin({
                 email: selectedUser.email || "",
                 password: "",
                 role: selectedUser.role || "ROLE_USER",
+                status : selectedUser.status
             });
         }
     }, [id, users]);
@@ -47,8 +50,7 @@ export default function UpdateUserAdmin({
 
         try {
             const updatePayload = { ...userData };
-
-            await updateUser(id, updatePayload);
+            await updateUserForAnAdmin(id, updatePayload);
             setIsOpenUpdate(false);
         } catch (error) {
             console.error("Erreur lors de la mise à jour :", error);
@@ -119,8 +121,23 @@ export default function UpdateUserAdmin({
                         onChange={handleChange}
                         className="m-2 block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-gray-300 focus:outline-indigo-600"
                     >
-                        <option value="ROLE_USER">Utilisateur</option>
-                        <option value="ROLE_ADMIN">Admin</option>
+                        <option value="USER">Utilisateur</option>
+                        <option value="ADMIN">Admin</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label className="block text-gray-700 font-medium">Status</label>
+                    <select
+                        name="status"
+                        value={userData.status}
+                        onChange={handleChange}
+                        className="m-2 block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-gray-300 focus:outline-indigo-600"
+                    >
+                        <option value="ACTIVE">ACTIVE</option>
+                        <option value="INACTIVE">INACTIVE</option>
+                        <option value="SUSPENDED">SUSPENDED</option>
+                        <option value="DELETED">DELETED</option>
                     </select>
                 </div>
 
@@ -133,7 +150,7 @@ export default function UpdateUserAdmin({
                             : "bg-gray-950 text-white hover:bg-gray-800"
                     }`}
                 >
-                    {isLoading ? <Spinner /> : "Mettre à jour l'utilisateur"}
+                    {isLoading ? <Spinner/> : "Mettre à jour l'utilisateur"}
                 </button>
             </form>
         </div>

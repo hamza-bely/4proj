@@ -7,7 +7,7 @@ export default function ContentSection() {
 
     return (
         <div className="mx-auto mt-32 max-w-7xl px-6 sm:mt-40 lg:px-8">
-            <img className="h-158 w-full " src="images/home/img2.jpg"/>
+
 
             <div className="mx-auto max-w-2xl lg:mx-0">
                 <h2 className="text-4xl font-semibold tracking-tight text-pretty text-gray-900 sm:text-5xl">
@@ -34,6 +34,13 @@ export default function ContentSection() {
                 </div>
 
             </dl>
+            <div className="mt-32 sm:mt-40 xl:mx-auto xl:max-w-7xl xl:px-8">
+                <img
+                    alt={t('about.bannerAlt')}
+                    src="images/home/holidays.jpg"
+                    className="aspect-5/2 w-full object-cover xl:rounded-3xl"
+                />
+            </div>
         </div>
     );
 }

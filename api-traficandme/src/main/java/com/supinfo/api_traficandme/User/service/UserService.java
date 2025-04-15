@@ -1,16 +1,18 @@
 package com.supinfo.api_traficandme.User.service;
 
+import com.supinfo.api_traficandme.User.dto.StatusUser;
 import com.supinfo.api_traficandme.User.dto.UserMapper;
 import com.supinfo.api_traficandme.User.dto.UserRequest;
 import com.supinfo.api_traficandme.User.dto.UserResponse;
 import com.supinfo.api_traficandme.User.entity.UserInfo;
 import com.supinfo.api_traficandme.User.repository.UserRepository;
 import com.supinfo.api_traficandme.common.Role;
-import com.supinfo.api_traficandme.security.dto.AuthenticateResponse;
+import com.supinfo.api_traficandme.reports.entity.Report;
+import com.supinfo.api_traficandme.reports.repository.ReportRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import java.util.List;
-import java.util.Optional;
+
+import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -19,11 +21,13 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
+    private final ReportRepository reportRepository;
 
-    public UserService (UserRepository userRepository,UserMapper userMapper,PasswordEncoder passwordEncoder) {
+    public UserService (ReportRepository reportRepository,UserRepository userRepository,UserMapper userMapper,PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.userMapper= userMapper;
         this.passwordEncoder =passwordEncoder;
+        this.reportRepository = reportRepository;
     }
 
     public UserInfo findUser(String Username){
@@ -85,7 +89,10 @@ public class UserService {
                         user.getId(),
                         user.getFirstName() + " " + user.getLastName(),
                         user.getEmail(),
-                        user.getRoles().name()
+                        user.getRoles().name(),
+                        user.getStatus().name(),
+                        user.getCreateDate(),
+                        user.getUpdateDate()
         );
     }
 
@@ -127,13 +134,14 @@ public class UserService {
         user.setPassword(updatedPassword);
         user.setRoles(Role.valueOf(request.role().toUpperCase()));
 
-
+        if (request.status() != null) {
+            user.setStatus(StatusUser.valueOf(request.status().toUpperCase()));
+        }
 
         userRepository.save(user);
 
         return userMapper.toResponse(user);
     }
-
 
     public void mergeUser(UserInfo userToUpdate, UserRequest user){
         userToUpdate.setFirstName(user.firstName());
@@ -144,13 +152,40 @@ public class UserService {
         userRepository.save(userToUpdate);
     }
 
-    public boolean deleteUser(String email){
-        Optional<UserInfo> user = userRepository.findByEmail(email);
-        if(user.isPresent()){
-            userRepository.delete(user.get());
-            return true;
+    public UserInfo changeStatusUser(StatusUser newStatus,UserResponse userConnected) {
+
+        if (newStatus == null || !EnumSet.allOf(StatusUser.class).contains(newStatus)) {
+            throw new IllegalArgumentException("Status \"" + newStatus + "\" does not exist");
         }
-        return false;
+
+        UserInfo user = userRepository.findById(userConnected.id()).orElseThrow(() ->
+                new RuntimeException("User not found with id: " + userConnected.id()));
+
+        user.setStatus(newStatus);
+        user.setUpdateDate(new Date());
+
+        ///TODO FAIRE LA MEMEM CHOSE AVEC LE ROUTE CHANGE  LE EMAIL  AVEC "Anonymous User"
+        if (newStatus == StatusUser.DELETED) {
+            String randomSuffix = UUID.randomUUID().toString().substring(0, 8);
+
+            String originalUsername = user.getUsername();
+
+            user.setEmail("deleted_" + randomSuffix + "@example.com");
+            user.setFirstName("Anonymous");
+            user.setLastName("User");
+            user.setPassword(UUID.randomUUID().toString());
+
+
+            List<Report> userReports = reportRepository.findAll().stream()
+                    .filter(report -> report.getUser().equals(originalUsername))
+                    .collect(Collectors.toList());
+
+            for (Report report : userReports) {
+                report.setUser("Anonymous User");
+            }
+        }
+
+        return userRepository.save(user);
     }
 
     public UserInfo getOneUserByEmail(String email){

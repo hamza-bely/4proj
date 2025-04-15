@@ -30,7 +30,10 @@ public class UserMapper {
                 userInfo.getId(),
                 userInfo.getFirstName() +" "+ userInfo.getLastName(),
                 userInfo.getEmail(),
-                userInfo.getRoles().name()
+                userInfo.getRoles().name(),
+                userInfo.getStatus().name(),
+                userInfo.getCreateDate(),
+                userInfo.getUpdateDate()
         );
     }
 }

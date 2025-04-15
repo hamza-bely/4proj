@@ -1,6 +1,16 @@
-import {User, UserCreateRequest} from "../model/user.tsx";
-import {fetchUser, fetchUsers, createUser, updateUser} from "../service/user-service.tsx";
+import {User, UserCreateRequest, UserUpdaterRequest} from "../model/user.tsx";
+import {
+    fetchUser,
+    deleteUserForAnUser, updateUser
+} from "../service/user-service.tsx";
 import { create } from "zustand";
+import {
+    createUser,
+    deleteDefinitiveUserFoAnAdmin,
+    deleteUserFoAnAdmin,
+    fetchUsers,
+    updateUserByAdmin
+} from "../service/admin-serivce.tsx";
 
 interface UserState {
     users: User[];
@@ -8,8 +18,13 @@ interface UserState {
     fetchUsers: () => Promise<void>;
     fetchUser: () => Promise<void>;
     createUser : (params: UserCreateRequest) => Promise<void>;
-    updateUser : (id: number, params : any) => Promise<void>;
-    deleteUser: (id: number) => Promise<void>;
+    updateUser : (params : UserUpdaterRequest) => Promise<void>;
+    updateUserForAnAdmin : (id: number, params : UserUpdaterRequest) => Promise<void>;
+
+    deleteUserForAnUser: (id: number | undefined) => Promise<void>;
+    deleteUserForAnAdmin: (id: number) => Promise<void>;
+    deleteDefinitiveUserFoAnAdmin: (id: number) => Promise<void>;
+
 }
 
 const useUserStore = create<UserState>((set) => ({
@@ -17,21 +32,13 @@ const useUserStore = create<UserState>((set) => ({
     user: null ,
 
     fetchUsers: async () => {
-        try {
             const response = await fetchUsers();
             set({ users: response.data });
-        } catch (error) {
-            console.error(error);
-        }
     },
 
     fetchUser: async () => {
-        try {
             const response = await fetchUser();
-            set({ user : response.data });
-        } catch (error) {
-            console.error(error);
-        }
+            set({ user : response.data })
     },
 
     createUser: async (userData) => {
@@ -41,31 +48,39 @@ const useUserStore = create<UserState>((set) => ({
         }));
     },
 
-    updateUser: async ( id,params)  => {
-        try {
-            const response  = await updateUser(id,params);
-            set((state ) => ({
-                users: state.users.map((h) => (h.id === response.data.id ? response.data : h)),
-                user: response.data,
-            }));
-        } catch (error) {
-            console.error(error);
-        }
+    updateUser: async ( params)  => {
+        const response  = await updateUser(params);
+        set((state ) => ({
+            users: state.users.map((h) => (h.id === response.data.id ? response.data : h)),
+        }));
     },
 
-    deleteUser: async (id) => {
-        set({ loading: true });
-        try {
-            await deleteUser(id);
-            set((state) => ({
-                users: state.users.filter((h) => h.auth_service_user_id !== id),
-                user: state.user?.auth_service_user_id === id ? null : state.user,
+    updateUserForAnAdmin: async ( id,params)  => {
+            const response  = await updateUserByAdmin(id,params);
+            set((state ) => ({
+                users: state.users.map((h) => (h.id === response.data.id ? response.data : h)),
             }));
-        } catch (error) {
-            console.error("Erreur lors de la suppression:", error);
-        } finally {
-            set({ loading: false });
-        }
+    },
+
+    deleteUserForAnUser: async (id) => {
+            await deleteUserForAnUser();
+            set((state) => ({
+                users: state.users.filter((h) => h.id !== id),
+            }));
+    },
+
+    deleteUserForAnAdmin: async (id)  => {
+        const response  = await deleteUserFoAnAdmin(id);
+        set((state ) => ({
+            users: state.users.map((h) => (h.id === response.data.id ? response.data : h)),
+        }));
+    },
+
+    deleteDefinitiveUserFoAnAdmin: async (id) => {
+        await deleteDefinitiveUserFoAnAdmin(id);
+        set((state) => ({
+            users: state.users.filter((h) => h.id !== id),
+        }));
     },
 
 }));

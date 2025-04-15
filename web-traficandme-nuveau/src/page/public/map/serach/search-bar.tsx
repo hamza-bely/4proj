@@ -14,14 +14,22 @@ type SearchResult = {
 
 interface SearchProps {
   onSearchResultSelect: (position: { lat: number; lon: number }, address: string) => void;
+  initialValue: string;
 }
 
-const Search: React.FC<SearchProps> = ({ onSearchResultSelect }) => {
+const Search: React.FC<SearchProps> = ({ onSearchResultSelect,initialValue = ""  }) => {
   const { t } = useTranslation();
   const [query, setQuery] = useState<string>("");
   const [results, setResults] = useState<SearchResult[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isOpen, setIsOpen] = useState<boolean>(false);
+
+
+  useEffect(() => {
+    if (initialValue) {
+      setQuery(initialValue);
+    }
+  }, [initialValue]);
 
   useEffect(() => {
     if (query.trim()) {

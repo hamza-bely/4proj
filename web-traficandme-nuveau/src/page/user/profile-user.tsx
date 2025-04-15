@@ -1,18 +1,25 @@
 import { useEffect, useState } from "react";
-import { UserCircleIcon, TicketIcon } from "@heroicons/react/24/outline";
+import { UserCircleIcon } from "@heroicons/react/24/outline";
 import { useTranslation } from "react-i18next";
 import Spinner from "../../components/sniper/sniper.tsx";
 import useUserStore from "../../services/store/user-store.tsx";
+import {Dialog} from "../../assets/kit-ui/dialog.tsx";
+import ModalDeleteUser from "./modal-delete-user.tsx";
+import ReportsUser from "./reports-user.tsx";
+import {MdReportProblem} from "react-icons/md";
+import RoutesUser from "./routes-user.tsx";
+import {FaRoute} from "react-icons/fa";
 
 const secondaryNavigation = [
     { name: "General", href: "#", icon: UserCircleIcon },
-    { name: "Routes", href: "#", icon: TicketIcon },
+    { name: "Reports", href: "#", icon: MdReportProblem  },
+    { name: "Routes", href: "#", icon: FaRoute   },
 ];
 
-export default function Profile() {
+export default function ProfileUser() {
     const { t } = useTranslation();
-    const { user, updateUser, fetchUser } = useUserStore();
-
+    const { user, fetchUser } = useUserStore();
+    const [isOpen, setIsOpen] = useState(false);
     const [editMode, setEditMode] = useState(false);
     const [currentNavigation, setCurrentNavigation] = useState("General");
     const [formData, setFormData] = useState({
@@ -46,8 +53,7 @@ export default function Profile() {
 
     const handleSubmit = async () => {
         try {
-            const id = 1;
-            await updateUser(id, formData);
+            //await updateUser(formData); //TODO A FAIRE
             setEditMode(false);
         } catch (error) {
             console.error("Erreur lors de la mise à jour de l'utilisateur:", error);
@@ -100,12 +106,12 @@ export default function Profile() {
                                                 <dd className="text-gray-900">{user.username}</dd>
                                             </div>
                                             <div className="flex justify-between py-3">
-                                                <dt className="text-gray-500">{t("profile.email")}</dt>
+                                                <dt className="text-gray-500">{t("common.email")}</dt>
                                                 <dd className="text-gray-900">{user.email}</dd>
                                             </div>
                                             <div className="flex justify-between py-3">
                                                 <dt className="text-gray-500">{t("profile.date-create-profile")}</dt>
-                                                <dd className="text-gray-900">{new Date(user.created_at).toLocaleDateString()}</dd>
+                                                <dd className="text-gray-900">{new Date(user.createDate).toLocaleDateString()}</dd>
                                             </div>
                                         </dl>
                                     ) : (
@@ -121,7 +127,7 @@ export default function Profile() {
                                                 />
                                             </div>
                                             <div>
-                                                <label className="block text-sm font-medium text-gray-700">{t("profile.email")}</label>
+                                                <label className="block text-sm font-medium text-gray-700">{t("common.email")}</label>
                                                 <input
                                                     type="email"
                                                     name="email"
@@ -160,12 +166,23 @@ export default function Profile() {
                                                 </button>
                                             </>
                                         ) : (
-                                            <button
-                                                onClick={() => setEditMode(true)}
-                                                className="px-4 py-2 text-white bg-gray-950 rounded-md hover:bg-white hover:text-gray-950"
-                                            >
-                                                {t("profile.edit")}
-                                            </button>
+                                            <div>
+
+                                                <button
+                                                    onClick={() => setEditMode(true)}
+                                                    className="px-4 py-2 text-white bg-gray-950 rounded-md hover:bg-gray-800 hover:text-white"
+                                                >
+                                                    {t("profile.edit")}
+                                                </button>
+
+                                                <button
+                                                    onClick={() =>   setIsOpen(true)}
+                                                    className="px-4 ml-5 py-2 text-white bg-red-700 rounded-md hover:bg-red-600 hover:text-white"
+                                                >
+                                                    {t("profile.delete")}
+                                                </button>
+                                            </div>
+
                                         )}
                                     </div>
                                 </div>
@@ -175,13 +192,17 @@ export default function Profile() {
                         </div>
                     )}
 
-                    {currentNavigation === "Mes Tickets" && (
-                        <div>
+                    {currentNavigation === "Reports" && (
+                        <ReportsUser/>
+                    )}
 
-                         <p>todo</p>
-                        </div>
+                    {currentNavigation === "Routes" && (
+                        <RoutesUser/>
                     )}
                 </div>
+                <Dialog style={{ zIndex: 11, position: "fixed", top: 0, left: 0, right: 0, bottom: 0, display: "flex", justifyContent: "center", alignItems: "center" }} open={isOpen} onClose={() => setIsOpen(false)}>
+                    <ModalDeleteUser closeModal={() => setIsOpen(false)}  userId={user?.id} />
+                </Dialog>
             </main>
         </div>
     );

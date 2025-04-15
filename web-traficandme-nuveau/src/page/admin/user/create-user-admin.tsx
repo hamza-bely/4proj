@@ -6,9 +6,9 @@ export default function CreateUserAdmin({ setIsOpenCreate }: { setIsOpenCreate: 
     const { createUser } = useUserStore();
 
     const defaultUserData: UserCreateRequest = {
-        firstName: "",
-        lastName: "",
-        email: "",
+        firstName: "hamza",
+        lastName: "bely",
+        email: "hamzaciao80@gmail",
         password: "",
         role: "USER",
     };

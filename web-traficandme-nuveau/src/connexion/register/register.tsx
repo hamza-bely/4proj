@@ -86,7 +86,7 @@ export default function Register({ closeModal }: { closeModal: () => void }) {
                         </div>
                         <div>
                             <label htmlFor="email" className="block text-sm font-medium text-gray-900">
-                                {t('connection.email')}
+                                {t('common.email')}
                             </label>
                             <div className="mt-2">
                                 <input
@@ -129,7 +129,7 @@ export default function Register({ closeModal }: { closeModal: () => void }) {
                             >
                                 {isLoading ? (
                                     <div className="flex justify-center items-center">
-                                        <span className="ml-2">  {t('connection.loading')}</span>
+                                        <span className="ml-2">  {t('common.loading')}</span>
                                     </div>
                                 ) : (
                                     <p>

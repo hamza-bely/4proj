@@ -1,34 +1,155 @@
-import "./map.css"
+import "./css/map.css";
+import { useState, useRef, useEffect } from "react";
+import { LuSearch } from "react-icons/lu";
+import { TbRouteSquare } from "react-icons/tb";
+import { MdOutlineGpsFixed } from "react-icons/md";
+import tt, { Popup, Marker } from "@tomtom-international/web-sdk-maps";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import TrafficIndicator from "./components/traffic-indicator.tsx";
 import Search from "./serach/search-bar.tsx";
 import RoutePlanner from "./serach/route-planner.tsx";
-import  {useState} from "react";
-import { LuSearch } from "react-icons/lu";
-import {TbRouteSquare} from "react-icons/tb";
-import {MdOutlineGpsFixed} from "react-icons/md";
-import tt from "@tomtom-international/web-sdk-maps";
-
+import {createMarkerDOMElement} from "./serach/marker-icon.tsx";
 
 interface ContainerMapProps {
     map: tt.Map | null;
 }
 
-export default function  ContainerMap   ({ map }: ContainerMapProps )  {
+type Coordinate = [number, number];
+type TrafficInfo = {
+    incidents: number;
+    congestion: 'light' | 'moderate' | 'heavy' | 'none';
+    needsRerouting: boolean;
+};
 
-    const [search , setSearch]= useState<boolean>(false)
+export default function ContainerMap({ map }: ContainerMapProps) {
+    const [search, setSearch] = useState<boolean>(false);
+    const [isRouteActive, setIsRouteActive] = useState<boolean>(false);
+    const [startAddress, setStartAddress] = useState<string>("");
 
-    async function showRoute(routeData: string) {
+    const popups = useRef<Popup[]>([]);
+    const markers = useRef<Marker[]>([]);
+    const startPointRefresh = useRef<Coordinate | null>(null);
+    const endPointRefresh = useRef<Coordinate | null>(null);
+    const routeIntervalRef = useRef<number | null>(null);
+    const lastTrafficInfoRef = useRef<TrafficInfo | null>(null);
+
+    useEffect(() => {
+        return () => {
+            if (routeIntervalRef.current) {
+                clearInterval(routeIntervalRef.current);
+            }
+        };
+    }, []);
+
+    async function checkTrafficAndRecalculate(): Promise<void> {
+        if (!isRouteActive || !startPointRefresh.current || !endPointRefresh.current || !map) {
+            return;
+        }
+
+        try {
+            const trafficInfo = await checkTrafficConditions(startPointRefresh.current, endPointRefresh.current);
+
+            // Si les conditions ont changé et nécessitent un recalcul
+            if (trafficInfo.needsRerouting &&
+                (!lastTrafficInfoRef.current ||
+                    trafficInfo.congestion !== lastTrafficInfoRef.current.congestion ||
+                    trafficInfo.incidents !== lastTrafficInfoRef.current.incidents)) {
+
+                // Afficher une notification toast
+                const message = `${trafficInfo.incidents > 0 ? `${trafficInfo.incidents} incident(s) détecté(s). ` : ''}` +
+                    `${trafficInfo.congestion !== 'none' ? `Circulation ${getCongestionLabel(trafficInfo.congestion)}. ` : ''}` +
+                    'Recalcul de l\'itinéraire en cours...';
+
+                toast.info(message, {
+                    position: "top-right",
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                });
+
+                // Recalculer l'itinéraire
+                await updateRoute(startPointRefresh.current, endPointRefresh.current);
+            }
+
+            // Mettre à jour les dernières infos de trafic
+            lastTrafficInfoRef.current = trafficInfo;
+
+        } catch (error) {
+            console.error("Erreur lors de la vérification du trafic :", error);
+        }
+    }
+
+    function getCongestionLabel(congestion: string): string {
+        switch (congestion) {
+            case 'light': return 'légèrement perturbée';
+            case 'moderate': return 'modérément perturbée';
+            case 'heavy': return 'fortement perturbée';
+            default: return 'normale';
+        }
+    }
+
+    async function checkTrafficConditions(startPoint: Coordinate, endPoint: Coordinate): Promise<TrafficInfo> {
+        const apiKey = import.meta.env.VITE_TOMTOM_API_KEY;
+        const trafficUrl = `https://api.tomtom.com/traffic/services/4/flowSegmentData/absolute/10/json?key=${apiKey}&point=${startPoint[1]},${startPoint[0]}&unit=KMPH`;
+        const incidentsUrl = `https://api.tomtom.com/traffic/services/5/incidentDetails?key=${apiKey}&bbox=${Math.min(startPoint[0], endPoint[0])},${Math.min(startPoint[1], endPoint[1])},${Math.max(startPoint[0], endPoint[0])},${Math.max(startPoint[1], endPoint[1])}&fields={incidents{type,geometry,properties}}`;
+
+        try {
+            // Obtenir les informations de congestion
+            const flowResponse = await fetch(trafficUrl);
+            const flowData = await flowResponse.json();
+
+            // Obtenir les informations d'incidents
+            const incidentsResponse = await fetch(incidentsUrl);
+            const incidentsData = await incidentsResponse.json();
+
+            // Analyser le niveau de congestion
+            let congestion: 'light' | 'moderate' | 'heavy' | 'none' = 'none';
+            if (flowData.flowSegmentData) {
+                const currentSpeed = flowData.flowSegmentData.currentSpeed;
+                const freeFlowSpeed = flowData.flowSegmentData.freeFlowSpeed;
+
+                if (freeFlowSpeed > 0) {
+                    const ratio = currentSpeed / freeFlowSpeed;
+                    if (ratio < 0.5) congestion = 'heavy';
+                    else if (ratio < 0.7) congestion = 'moderate';
+                    else if (ratio < 0.9) congestion = 'light';
+                }
+            }
+
+            // Compter les incidents
+            const incidentsCount = incidentsData.incidents?.length || 0;
+
+            // Déterminer si un recalcul est nécessaire
+            const needsRerouting = congestion !== 'none' || incidentsCount > 0;
+
+            return {
+                incidents: incidentsCount,
+                congestion,
+                needsRerouting
+            };
+
+        } catch (error) {
+            console.error("Erreur lors de la vérification des conditions de circulation :", error);
+            return { incidents: 0, congestion: 'none', needsRerouting: false };
+        }
+    }
+
+    async function showRoute(routeData: string): Promise<void> {
         if (!map) return;
 
         try {
-            const routeCoordinates = JSON.parse(routeData); // Convertir la chaîne JSON en tableau
+            const routeCoordinates: Coordinate[] = JSON.parse(routeData);
 
-            // Supprimer l'ancienne route si elle existe
             if (map.getSource("route")) {
                 map.removeLayer("route-layer");
                 map.removeSource("route");
             }
 
-            // Ajouter une nouvelle source pour l'itinéraire
+            clearPopupsAndMarkers();
+
             map.addSource("route", {
                 type: "geojson",
                 data: {
@@ -40,7 +161,6 @@ export default function  ContainerMap   ({ map }: ContainerMapProps )  {
                 },
             });
 
-            // Ajouter un calque pour afficher l'itinéraire
             map.addLayer({
                 id: "route-layer",
                 type: "line",
@@ -50,123 +170,206 @@ export default function  ContainerMap   ({ map }: ContainerMapProps )  {
                     "line-cap": "round",
                 },
                 paint: {
-                    "line-color": "#5DB3FF", // Couleur de la ligne
-                    "line-width": 8, // Largeur de la ligne
+                    "line-color": "#5DB3FF",
+                    "line-width": 8,
                 },
             });
 
-            // Ajuster la carte pour afficher l'itinéraire
-            map.fitBounds(routeCoordinates.reduce((bbox, coord) => {
-                const [lon, lat] = coord;
-                return [
+            map.fitBounds(routeCoordinates.reduce(
+                (bbox, [lon, lat]) => [
                     Math.min(bbox[0], lon),
                     Math.min(bbox[1], lat),
                     Math.max(bbox[2], lon),
                     Math.max(bbox[3], lat),
-                ];
-            }, [Infinity, Infinity, -Infinity, -Infinity]), { padding: 50 });
+                ],
+                [Infinity, Infinity, -Infinity, -Infinity]
+            ) as [number, number, number, number], { padding: 50 });
 
-            // Ajouter les icônes de départ et d'arrivée
-            const startPoint = routeCoordinates[0]; // Point de départ
-            const endPoint = routeCoordinates[routeCoordinates.length - 1]; // Point d'arrivée
+            const startPoint = routeCoordinates[0];
+            const endPoint = routeCoordinates[routeCoordinates.length - 1];
 
-            // Ajouter un marqueur pour le point de départ
-            new tt.Marker({ element: createCustomIcon("Départ") })
+            startPointRefresh.current = startPoint;
+            endPointRefresh.current = endPoint;
+
+            const startMarker = new tt.Marker({
+                element: createMarkerDOMElement("Départ")
+            })
                 .setLngLat(startPoint)
                 .addTo(map);
+            markers.current.push(startMarker);
 
-            // Ajouter un marqueur pour le point d'arrivée
-            new tt.Marker({ element: createCustomIcon("Arrivée") })
+            const endMarker = new tt.Marker({
+                element: createMarkerDOMElement("Arrivée")
+            })
                 .setLngLat(endPoint)
                 .addTo(map);
+            markers.current.push(endMarker);
+
+            // Activer le suivi de route et le recalcul automatique
+            setIsRouteActive(true);
+
+            // Démarrer le minuteur pour le recalcul de l'itinéraire (toutes les 60 secondes = 60000 ms)
+            if (routeIntervalRef.current) {
+                clearInterval(routeIntervalRef.current);
+            }
+
+            routeIntervalRef.current = window.setInterval(() => {
+                checkTrafficAndRecalculate();
+            }, 60000); // 60000 ms = 1 minute
+
+            // Toast pour indiquer que l'itinéraire est actif avec suivi du trafic
+            toast.success("Itinéraire calculé. Surveillance du trafic activée.", {
+                position: "top-right",
+                autoClose: 3000,
+            });
 
         } catch (error) {
             console.error("Erreur lors de l'affichage de l'itinéraire :", error);
         }
     }
 
-// Fonction pour créer un marqueur personnalisé (avec texte, ou icône)
-    function createCustomIcon(type: string) {
-        const div = document.createElement("div");
-        div.style.backgroundColor = type === "Départ" ? "green" : "red"; // Couleur pour le départ (vert) et l'arrivée (rouge)
-        div.style.width = "20px";
-        div.style.height = "20px";
-        div.style.borderRadius = "50%";
-        div.style.display = "flex";
-        div.style.alignItems = "center";
-        div.style.justifyContent = "center";
-        div.style.color = "white";
-        div.style.fontSize = "12px";
-        div.style.fontWeight = "bold";
-        div.innerText = type === "Départ" ? "D" : "A";
-        return div;
+    function clearPopupsAndMarkers(): void {
+        popups.current.forEach(popup => popup.remove());
+        popups.current = [];
+
+        markers.current.forEach(marker => marker.remove());
+        markers.current = [];
     }
 
-    // Callback de l'itinéraire calculé (à partir de RoutePlanner)
-    const onRouteCalculated = (routePolyline: string) => {
-        showRoute(routePolyline);
-    };
+    async function updateRoute(startPoint: Coordinate, endPoint: Coordinate): Promise<void> {
+        const apiKey = import.meta.env.VITE_TOMTOM_API_KEY;
+        const url = `https://api.tomtom.com/routing/1/calculateRoute/${startPoint[1]},${startPoint[0]}:${endPoint[1]},${endPoint[0]}/json?key=${apiKey}&traffic=true`;
 
-    // Lorsque l'utilisateur sélectionne un résultat de recherche
-    const onSearchResultSelect = (position: { lat: number; lon: number }) => {
-        if (map) {
-            map.flyTo({ center: [position.lon, position.lat], zoom: 15 });
-            new tt.Marker().setLngLat([position.lon, position.lat]).addTo(map);
+        try {
+            const response = await fetch(url);
+            const data = await response.json();
+
+            if (data.routes?.[0]) {
+                const newRouteCoordinates = data.routes[0].legs.flatMap((leg: any) =>
+                    leg.points.map((point: any) => [point.longitude, point.latitude] as Coordinate)
+                );
+                await showRoute(JSON.stringify(newRouteCoordinates));
+            }
+        } catch (error) {
+            console.error("Erreur lors de la mise à jour de l'itinéraire :", error);
         }
     }
 
-    function getUserPosition() {
+    async function getAddressFromCoordinates(latitude: number, longitude: number): Promise<string> {
+        const apiKey = import.meta.env.VITE_TOMTOM_API_KEY;
+        const url = `https://api.tomtom.com/search/2/reverseGeocode/${latitude},${longitude}.json?key=${apiKey}&language=fr-FR`;
+
+        try {
+            const response = await fetch(url);
+            const data = await response.json();
+
+            if (data.addresses && data.addresses.length > 0) {
+                const address = data.addresses[0].address;
+                // Créer une adresse formatée complète
+                const formattedAddress = [
+                    address.streetNumber,
+                    address.streetName,
+                    address.municipalitySubdivision,
+                    address.municipality,
+                    address.postalCode,
+                    address.countrySubdivision
+                ].filter(Boolean).join(", ");
+
+                return formattedAddress;
+            }
+            return "Adresse inconnue";
+        } catch (error) {
+            console.error("Erreur lors de la récupération de l'adresse:", error);
+            return "Erreur lors de la récupération de l'adresse";
+        }
+    }
+
+    const onRouteCalculated = (routePolyline: string): void => {
+        showRoute(routePolyline);
+    };
+
+    const onSearchResultSelect = (position: { lat: number; lon: number }): void => {
+        if (map) {
+            map.flyTo({ center: [position.lon, position.lat], zoom: 15 });
+
+            const searchMarker = new tt.Marker({
+                element: createMarkerDOMElement("Recherche")
+            }).setLngLat([position.lon, position.lat]).addTo(map);
+
+            markers.current.push(searchMarker);
+        }
+    };
+
+    async function getUserPosition(): Promise<void> {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
-                (position) => {
+                async (position) => {
                     const { latitude, longitude } = position.coords;
-
                     if (map) {
-                        // Ajouter un marqueur à la position actuelle
-                        new tt.Marker()
-                            .setLngLat([longitude, latitude])
-                            .addTo(map);
+                        // Utilisation du nouveau composant pour le marqueur de position
+                        const userMarker = new tt.Marker({
+                            element: createMarkerDOMElement("Position")
+                        }).setLngLat([longitude, latitude]).addTo(map);
 
-                        // Centrer la carte sur la position de l'utilisateur
+                        markers.current.push(userMarker);
                         map.flyTo({ center: [longitude, latitude], zoom: 14 });
+
+                        // Récupérer l'adresse correspondante
+                        const address = await getAddressFromCoordinates(latitude, longitude);
+
+                        // Définir l'adresse comme point de départ
+                        setStartAddress(address);
+
+                        // Activer automatiquement l'onglet d'itinéraire
+                        setSearch(true);
+
+                        toast.info("Position récupérée: " + address, {
+                            position: "top-right",
+                            autoClose: 3000,
+                        });
                     }
                 },
                 (error) => {
                     console.error("Erreur de géolocalisation:", error);
-                    alert("Impossible de récupérer la position de l'utilisateur.");
+                    toast.error("Impossible de récupérer la position de l'utilisateur.", {
+                        position: "top-right",
+                        autoClose: 3000,
+                    });
                 },
-                { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 } // Amélioration de la précision
+                { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
             );
         } else {
-            alert("La géolocalisation n'est pas supportée par ce navigateur.");
-        }
-    }
-
-    function enableTrafficLayer() {
-        if (!map) return;
-
-        if (!map.getLayer("traffic")) {
-            map.addLayer({
-                id: "traffic",
-                type: "raster",
-                source: {
-                    type: "raster",
-                    tiles: [
-                        "https://api.tomtom.com/traffic/map/4/tile/flow/relative0/{z}/{x}/{y}.png?key=9zc7scbLhpcrEFouo0xJWt0jep9qNlnv"
-                    ],
-                    tileSize: 256
-                },
-                layout: {
-                    visibility: "visible"
-                }
+            toast.error("La géolocalisation n'est pas supportée par ce navigateur.", {
+                position: "top-right",
+                autoClose: 3000,
             });
         }
     }
 
+    function stopRouteTracking(): void {
+        if (map && map.getSource("route")) {
+            map.removeLayer("route-layer");
+            map.removeSource("route");
+        }
+
+        clearPopupsAndMarkers();
+
+        if (routeIntervalRef.current) {
+            clearInterval(routeIntervalRef.current);
+            routeIntervalRef.current = null;
+        }
+        setIsRouteActive(false);
+
+        toast.info("Surveillance du trafic désactivée.", {
+            position: "top-right",
+            autoClose: 3000,
+        });
+    }
 
     return (
         <div>
-            <div className="bg-white shadow-sm sm:rounded-lg  container-modal">
+            <ToastContainer />
+            <div className="bg-white shadow-sm sm:rounded-lg container-modal">
                 <div className="px-4 py-5 sm:p-6">
                     <div className="flex justify-center">
                         <img
@@ -178,43 +381,51 @@ export default function  ContainerMap   ({ map }: ContainerMapProps )  {
                         />
                     </div>
                     <div className="mt-5">
-                        <div className="flex" style={{alignItems: "center", justifyContent: "space-between"}}>
-                            <div  className=" cursor-pointer position-user hover:py-1">
+                        <div className="flex" style={{ alignItems: "center", justifyContent: "space-between" }}>
+                            <div className="cursor-pointer position-user hover:py-1">
                                 <MdOutlineGpsFixed
-                                    className=" hover:p-[1px]"
-                                    style={{fontSize: "20px"}}
-                                    onClick={getUserPosition}/>
+                                    className="hover:p-[1px]"
+                                    style={{ fontSize: "20px" }}
+                                    onClick={getUserPosition}
+                                />
                             </div>
-                            <div style={{alignItems: "center"}} className="flex justify-end item-ceter">
-
+                            <div className="flex justify-end items-center">
                                 <LuSearch
                                     onClick={() => setSearch(false)}
-                                    style={{fontSize: "20px"}}
-                                    className={`text-md m-2 cursor-pointer  hover:p-[1px]  ${search ? 'text-gray-500' : 'text-blue-500'}`}
+                                    style={{ fontSize: "20px" }}
+                                    className={`text-md m-2 cursor-pointer hover:p-[1px] ${search ? 'text-gray-500' : 'text-blue-500'}`}
                                 />
                                 <TbRouteSquare
                                     onClick={() => setSearch(true)}
-                                    style={{fontSize: "20px"}}
-                                    className={`text-md m-2 cursor-pointer  hover:p-[1px] ${search ? 'text-blue-500' : 'text-gray-500'}`}
+                                    style={{ fontSize: "20px" }}
+                                    className={`text-md m-2 cursor-pointer hover:p-[1px] ${search ? 'text-blue-500' : 'text-gray-500'}`}
                                 />
-
-                                <button
-                                    onClick={enableTrafficLayer}
-                                    className="bg-blue-500 text-white p-2 rounded shadow"
-                                >
-                                    Afficher le trafic
-                                </button>
-
                             </div>
                         </div>
 
-                        {!search && <Search onSearchResultSelect={onSearchResultSelect}/>}
-                        {search && <RoutePlanner onRouteCalculated={onRouteCalculated}/>}
+                        {!search && <Search onSearchResultSelect={onSearchResultSelect} initialValue={""} />}
+                        {search && (
+                            <>
+                                <RoutePlanner
+                                    onRouteCalculated={onRouteCalculated}
+                                    startAddress={startAddress}
+                                />
+                                {isRouteActive && (
+                                    <div className="mt-2 text-center">
+                                        <button
+                                            onClick={stopRouteTracking}
+                                            className="px-3 py-1 text-xs bg-red-500 text-white rounded-md hover:bg-red-600"
+                                        >
+                                            Arrêter le suivi du trafic
+                                        </button>
+                                    </div>
+                                )}
+                            </>
+                        )}
                     </div>
-
+                    <TrafficIndicator />
                 </div>
             </div>
         </div>
     );
-};
-
+}

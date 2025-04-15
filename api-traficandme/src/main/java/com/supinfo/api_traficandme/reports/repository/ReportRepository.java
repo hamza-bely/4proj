@@ -1,0 +1,7 @@
+package com.supinfo.api_traficandme.reports.repository;
+
+import com.supinfo.api_traficandme.reports.entity.Report;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface ReportRepository extends JpaRepository<Report, String> {
+}
