@@ -4,12 +4,17 @@ import {
     KeyboardAvoidingView, ScrollView, Platform, TouchableWithoutFeedback, Keyboard 
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { Link } from "expo-router";
+import { Link, router } from "expo-router";
 import { useColorScheme } from 'react-native';
+import { supabase } from '@supabase';
+
 
 export default function Login() {
     const colorScheme = useColorScheme();
     const [isDarkMode, setIsDarkMode] = useState(colorScheme === 'dark');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+
 
     useEffect(() => {
         const handleAppearanceChange = ({ colorScheme }: { colorScheme: any }) => {
@@ -22,6 +27,29 @@ export default function Login() {
             subscription.remove();
         };
     }, []);
+
+    const toLog = async () => {
+        // if (!email || !password) {
+        //     alert("Veuillez remplir tous les champs.");
+        //     return;
+        // }
+    
+        // const { data, error } = await supabase.auth.signInWithPassword({
+        //     email,
+        //     password,
+        // });
+    
+        // if (error) {
+        //     console.error(error);
+        //     alert("Email ou mot de passe incorrect.");
+        // } else {
+        //     alert("Connexion réussie !");
+        //     router.push('/home')
+        // }
+        router.push('/home')
+    };
+    
+    
 
     return (
         <KeyboardAvoidingView 
@@ -51,12 +79,18 @@ export default function Login() {
                                     style={[styles.input, isDarkMode ? styles.darkInput : styles.lightInput]} 
                                     placeholder="Email"
                                     keyboardType="email-address"
+                                    autoCapitalize="none"
+                                    value={email}
+                                    onChangeText={setEmail}
                                 />
                                 <Text style={[styles.label, isDarkMode ? styles.darkText : styles.lightText]}>Mot de passe</Text>
                                 <TextInput 
                                     style={[styles.input, isDarkMode ? styles.darkInput : styles.lightInput]} 
                                     placeholder="Mot de passe" 
-                                    secureTextEntry 
+                                    secureTextEntry
+                                    autoCapitalize="none"
+                                    value={password}
+                                    onChangeText={setPassword}
                                 />
                             </View>
                             <View style={styles.registerContainer}>
@@ -79,13 +113,10 @@ export default function Login() {
                         </View>
                     </ScrollView>
                     
-                    {/* Bouton toujours en bas */}
                     <View style={styles.footer}>
-                        <Link href="/start/login" asChild>
-                            <Pressable style={styles.buttonLog}>
-                                <Text style={styles.buttonText}>Se connecter</Text>
-                            </Pressable>
-                        </Link>
+                        <TouchableOpacity style={styles.buttonLog} onPress={toLog} >
+                            <Text style={styles.buttonText}>Se connecter</Text>
+                        </TouchableOpacity>
                     </View>
                 </View>
             </TouchableWithoutFeedback>

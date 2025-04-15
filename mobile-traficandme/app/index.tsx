@@ -4,7 +4,7 @@ import { useRouter } from 'expo-router';
 import { supabase } from "@/app/core/services/supabase";
 
 export default function IndexScreen() {
-    const router = useRouter(); // ✅ Utilisation correcte du router
+    const router = useRouter();
 
     useEffect(() => {
         const checkUser = async () => {
