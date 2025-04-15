@@ -1,10 +1,11 @@
-import React, { useEffect, useRef } from 'react';
-import { View, StyleSheet, Text, TouchableOpacity } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { View, StyleSheet, ActivityIndicator } from 'react-native';
 import { WebView } from 'react-native-webview';
 import * as Location from 'expo-location';
 
 export default function TomTomMap() {
   const webviewRef = useRef(null);
+  const [location, setLocation] = useState<{ latitude: number; longitude: number } | null>(null);
 
   useEffect(() => {
     (async () => {
@@ -13,16 +14,22 @@ export default function TomTomMap() {
         alert('Permission GPS refusée.');
         return;
       }
+
+      let location = await Location.getCurrentPositionAsync({});
+      setLocation({
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+      });
     })();
   }, []);
 
-  const centerOnUserLocation = async () => {
-    let location = await Location.getCurrentPositionAsync({});
-    const { latitude, longitude } = location.coords;
-    // Envoie les coordonnées à la WebView pour recenter
-    const script = `centerMapOn(${longitude}, ${latitude}); true;`;
-    webviewRef.current?.injectJavaScript(script);
-  };
+  if (!location) {
+    return (
+      <View style={styles.loader}>
+        <ActivityIndicator size="large" color="#0000ff" />
+      </View>
+    );
+  }
 
   const htmlContent = `
     <!DOCTYPE html>
@@ -31,7 +38,6 @@ export default function TomTomMap() {
       <meta charset="UTF-8" />
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       <script src="https://api.tomtom.com/maps-sdk-for-web/cdn/6.x/6.19.0/maps/maps-web.min.js"></script>
-      <script src="https://api.tomtom.com/maps-sdk-for-web/cdn/6.x/6.19.0/services/services-web.min.js"></script>
       <link rel="stylesheet" href="https://api.tomtom.com/maps-sdk-for-web/cdn/6.x/6.19.0/maps/maps.css" />
       <style>
         html, body, #map {
@@ -47,18 +53,22 @@ export default function TomTomMap() {
       <script>
         tt.setProductInfo('DelonApp', '1.0');
 
+        const userCoords = [${location.longitude}, ${location.latitude}];
+
         const map = tt.map({
           key: 'QBsKzG3zoRyZeec28eUDje0U8DeNoRSO'
           container: 'map',
-          center: [4.8357, 45.7640],
-          zoom: 15.5,
+          center: userCoords,
+          zoom: 17,
           pitch: 65,
-          bearing: 45,
+          bearing: 0,
           style: 'tomtom://vector/1/basic-main'
         });
 
         map.addControl(new tt.FullscreenControl());
         map.addControl(new tt.NavigationControl());
+
+        const marker = new tt.Marker().setLngLat(userCoords).addTo(map);
 
         map.on('load', () => {
           map.addLayer({
@@ -76,57 +86,28 @@ export default function TomTomMap() {
             }
           });
         });
-
-        function centerMapOn(lon, lat) {
-          map.flyTo({
-            center: [lon, lat],
-            zoom: 17,
-            speed: 1.2,
-            curve: 1.5,
-            pitch: 65,
-            bearing: 0
-          });
-        }
       </script>
     </body>
     </html>
   `;
 
   return (
-    <View style={{ flex: 1 }}>
-      <WebView
-        ref={webviewRef}
-        originWhitelist={['*']}
-        source={{ html: htmlContent }}
-        javaScriptEnabled
-        domStorageEnabled
-        mixedContentMode="always"
-        style={{ flex: 1 }}
-      />
-
-
-      <TouchableOpacity onPress={centerOnUserLocation} style={styles.gpsButton}>
-        <Text style={styles.gpsButtonText}>📍</Text>
-      </TouchableOpacity>
-    </View>
+    <WebView
+      ref={webviewRef}
+      originWhitelist={['*']}
+      source={{ html: htmlContent }}
+      javaScriptEnabled
+      domStorageEnabled
+      mixedContentMode="always"
+      style={{ flex: 1 }}
+    />
   );
 }
 
 const styles = StyleSheet.create({
-  gpsButton: {
-    position: 'absolute',
-    bottom: 30,
-    right: 20,
-    backgroundColor: '#fff',
-    padding: 12,
-    borderRadius: 50,
-    elevation: 5,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-  },
-  gpsButtonText: {
-    fontSize: 20,
+  loader: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });

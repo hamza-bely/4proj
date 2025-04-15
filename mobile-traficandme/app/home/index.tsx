@@ -9,7 +9,6 @@ export default function HomeScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={[styles.title, { color: textColor }]}>Carte de Lyon 🗺️</Text>
       <View style={styles.mapContainer}>
         <TomTomMap />
       </View>
