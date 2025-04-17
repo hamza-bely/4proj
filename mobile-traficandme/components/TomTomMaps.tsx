@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, StyleSheet, ActivityIndicator,Text } from 'react-native';
 import { WebView } from 'react-native-webview';
 import * as Location from 'expo-location';
 
@@ -56,13 +56,13 @@ export default function TomTomMap() {
         const userCoords = [${location.longitude}, ${location.latitude}];
 
         const map = tt.map({
-          key: 'QBsKzG3zoRyZeec28eUDje0U8DeNoRSO'
+          key: 'QBsKzG3zoRyZeec28eUDje0U8DeNoRSO',
           container: 'map',
           center: userCoords,
           zoom: 17,
           pitch: 65,
           bearing: 0,
-          style: 'tomtom://vector/1/basic-main'
+   
         });
 
         map.addControl(new tt.FullscreenControl());
@@ -92,15 +92,17 @@ export default function TomTomMap() {
   `;
 
   return (
-    <WebView
-      ref={webviewRef}
-      originWhitelist={['*']}
-      source={{ html: htmlContent }}
-      javaScriptEnabled
-      domStorageEnabled
-      mixedContentMode="always"
-      style={{ flex: 1 }}
-    />
+    <>
+      <WebView
+        ref={webviewRef}
+        originWhitelist={['*']}
+        source={{ html: htmlContent }}
+        javaScriptEnabled
+        domStorageEnabled
+        mixedContentMode="always"
+        style={{ flex: 1 }}
+      />
+    </>
   );
 }
 
