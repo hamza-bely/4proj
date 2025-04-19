@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import Routes from "../../../routes/routes.tsx";
+import { fetchSumOfMapStatistic } from '../../../services/service/admin-serivce.tsx';
+import { AdminSumStats } from '../../../services/model/user.tsx';
 
 // Types pour les données
 interface ApiUsageData {
@@ -20,12 +22,19 @@ interface ApiErrorData {
     count: number;
 }
 
+interface MapUsageData {
+    date: string;
+    routeSearches: number;
+    geocoding: number;
+    trafficInfo: number;
+}
 // Composant principal
 const TomTomApiDashboard: React.FC = () => {
     // États pour stocker les données
     const [usageData, setUsageData] = useState<ApiUsageData[]>([]);
     const [routeData, setRouteData] = useState<RouteData[]>([]);
     const [errorData, setErrorData] = useState<ApiErrorData[]>([]);
+    const [mapData, setMapData] = useState<AdminSumStats | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [timeRange, setTimeRange] = useState<string>('week');
 
@@ -71,6 +80,14 @@ const TomTomApiDashboard: React.FC = () => {
         }, 1000);
     }, [timeRange]);
 
+    // je fetch les totaux de la maps
+    useEffect(() => {
+        fetchSumOfMapStatistic()
+          .then(setMapData)
+          .catch(err => console.error("Erreur stats map", err));
+      }, []);
+
+
     // Gestionnaire de changement de plage de temps
     const handleTimeRangeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         setTimeRange(event.target.value);
@@ -115,16 +132,16 @@ const TomTomApiDashboard: React.FC = () => {
             {/* Cartes de statistiques */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
                 <div className="bg-white p-4 rounded-lg shadow">
-                    <h3 className="text-gray-500 text-sm">Recherches d'itinéraires</h3>
-                    <p className="text-2xl font-bold">{totalRouteSearches}</p>
+                    <h3 className="text-gray-500 text-sm">Nombres d'utilisateurs</h3>
+                    <p className="text-2xl font-bold">{mapData?.data.userTotal}</p>
                 </div>
                 <div className="bg-white p-4 rounded-lg shadow">
-                    <h3 className="text-gray-500 text-sm">Géocodage</h3>
-                    <p className="text-2xl font-bold">{totalGeocoding}</p>
+                    <h3 className="text-gray-500 text-sm">Recherches d'itinéraires</h3>
+                    <p className="text-2xl font-bold">{mapData?.data.routeSearches}</p>
                 </div>
                 <div className="bg-white p-4 rounded-lg shadow">
                     <h3 className="text-gray-500 text-sm">Info Trafic</h3>
-                    <p className="text-2xl font-bold">{totalTrafficInfo}</p>
+                    <p className="text-2xl font-bold">{mapData?.data.trafficInfo}</p>
                 </div>
                 <div className="bg-white p-4 rounded-lg shadow">
                     <h3 className="text-gray-500 text-sm">Erreurs</h3>
@@ -133,8 +150,12 @@ const TomTomApiDashboard: React.FC = () => {
             </div>
 
             {/* Graphiques */}
+            
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* Graphique d'utilisation quotidienne */}
+                {/*
+
+           ** a discuter  Graphique d'utilisation quotidienne **
+
                 <div className="bg-white p-4 rounded-lg shadow">
                     <h2 className="text-lg font-semibold mb-4">Utilisation Quotidienne</h2>
                     <ResponsiveContainer width="100%" height={300}>
@@ -150,6 +171,31 @@ const TomTomApiDashboard: React.FC = () => {
                         </LineChart>
                     </ResponsiveContainer>
                 </div>
+            */}
+                {/* Graphique des types de recherches d'itinéraires */}
+                <div className="bg-white p-4 rounded-lg shadow">
+                    <h2 className="text-lg font-semibold mb-4">Types de signalement sur l'Itinéraires</h2>
+                    <ResponsiveContainer width="100%" height={300}>
+                        <PieChart>
+                            <Pie
+                                data={routeData}
+                                cx="50%"
+                                cy="50%"
+                                labelLine={false}
+                                label={({ type, percent }) => `${type}: ${(percent * 100).toFixed(0)}%`}
+                                outerRadius={100}
+                                fill="#8884d8"
+                                dataKey="count"
+                            >
+                                {routeData.map((type , index) => (
+                                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                ))}
+                            </Pie>
+                            <Tooltip />
+                        </PieChart>
+                    </ResponsiveContainer>
+                </div>
+
 
                 {/* Graphique des types de recherches d'itinéraires */}
                 <div className="bg-white p-4 rounded-lg shadow">
@@ -161,12 +207,12 @@ const TomTomApiDashboard: React.FC = () => {
                                 cx="50%"
                                 cy="50%"
                                 labelLine={false}
-                                label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                                label={({ type, percent }) => `${type}: ${(percent * 100).toFixed(0)}%`}
                                 outerRadius={100}
                                 fill="#8884d8"
                                 dataKey="count"
                             >
-                                {routeData.map((entry , index) => (
+                                {routeData.map((type , index) => (
                                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                                 ))}
                             </Pie>

@@ -130,3 +130,13 @@ export interface UserUpdateResponse{
         updateDate: string
     }
 }
+
+export interface AdminSumStats {
+    message : string;
+    data:{
+        routeSearches: number;
+        userTotal: number;
+        trafficInfo: number;
+    }
+    
+  }
