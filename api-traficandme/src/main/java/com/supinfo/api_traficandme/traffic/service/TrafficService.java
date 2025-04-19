@@ -1,6 +1,7 @@
 package com.supinfo.api_traficandme.traffic.service;
 
 import com.supinfo.api_traficandme.User.dto.UserResponse;
+import com.supinfo.api_traficandme.statistiques.model.RouteData;
 import com.supinfo.api_traficandme.traffic.dto.StatusTraffic;
 import com.supinfo.api_traficandme.traffic.dto.TrafficRequest;
 import com.supinfo.api_traficandme.traffic.fetch.TrafficRepository;
@@ -108,6 +109,26 @@ public class TrafficService {
     public boolean isTrafficExists(String startLongitude, String startLatitude, String endLongitude, String endLatitude, String user) {
         return trafficRepository.existsByStartLongitudeAndStartLatitudeAndEndLongitudeAndEndLatitudeAndUser(
                 startLongitude, startLatitude, endLongitude, endLatitude, user);
+    }
+
+    public long getTotalTraffic() {
+        return trafficRepository.count();
+    }
+
+    public List<RouteData> getRouteData() {
+        List<Object[]> results = trafficRepository.countByMode();
+        List<RouteData> routeDataList = new ArrayList<>();
+
+        for (Object[] result : results) {
+            String mode = (String) result[0];
+            Long count = (Long) result[1];
+            RouteData routeData = new RouteData();
+            routeData.setMode(mode);
+            routeData.setCount(count);
+            routeDataList.add(routeData);
+        }
+
+        return routeDataList;
     }
 
 }

@@ -76,4 +76,8 @@ public class AdminService {
 
         return userCanceled;
     }
+
+    public long getTotalUsers() {
+        return userRepository.count();
+    }
 }
