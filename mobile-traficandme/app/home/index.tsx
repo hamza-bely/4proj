@@ -27,6 +27,18 @@ interface AddressSuggestion {
   };
 }
 
+interface RouteOption {
+  summary: {
+    travelTimeInSeconds: number;
+    lengthInMeters: number;
+  };
+  legs: [
+    {
+      points: string;
+    }
+  ];
+}
+
 export default function HomeScreen() {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
@@ -38,6 +50,8 @@ export default function HomeScreen() {
   const [selectedAddress, setSelectedAddress] = useState<AddressSuggestion | null>(null);
   const [speed, setSpeed] = useState<number | null>(null);
   const [travelTime, setTravelTime] = useState<number | null>(null);
+  const [routeOptions, setRouteOptions] = useState<RouteOption[]>([]);
+  const [selectedRoute, setSelectedRoute] = useState<RouteOption | null>(null);
 
   useEffect(() => {
     if (searchText.length > 2) {
@@ -58,7 +72,7 @@ export default function HomeScreen() {
       const subscription = Location.watchPositionAsync(
         {
           accuracy: Location.Accuracy.High,
-          timeInterval: 1000, // Mettre à jour toutes les secondes
+          timeInterval: 1000,
         },
         (location) => {
           setSpeed(location.coords.speed);
@@ -75,7 +89,7 @@ export default function HomeScreen() {
 
   useEffect(() => {
     if (destination) {
-      fetchTravelTime(destination);
+      fetchRouteOptions(destination);
     }
   }, [destination]);
 
@@ -89,16 +103,15 @@ export default function HomeScreen() {
     }
   };
 
-  const fetchTravelTime = async (destination: { latitude: number; longitude: number }) => {
+  const fetchRouteOptions = async (destination: { latitude: number; longitude: number }) => {
     try {
       const location = await Location.getCurrentPositionAsync({});
       const { latitude, longitude } = location.coords;
-      const response = await fetch(`https://api.tomtom.com/routing/1/calculateRoute/${latitude},${longitude}:${destination.latitude},${destination.longitude}/json?key=QBsKzG3zoRyZeec28eUDje0U8DeNoRSO`);
+      const response = await fetch(`https://api.tomtom.com/routing/1/calculateRoute/${latitude},${longitude}:${destination.latitude},${destination.longitude}/json?key=QBsKzG3zoRyZeec28eUDje0U8DeNoRSO&routeType=fastest&maxAlternatives=3`);
       const data = await response.json();
-      const travelTimeInSeconds = data.routes[0].summary.travelTimeInSeconds;
-      setTravelTime(travelTimeInSeconds / 60); // Convertir en minutes
+      setRouteOptions(data.routes);
     } catch (error) {
-      console.error('Erreur lors de la récupération du temps de trajet :', error);
+      console.error('Erreur lors de la récupération des itinéraires :', error);
     }
   };
 
@@ -110,11 +123,15 @@ export default function HomeScreen() {
     setDestination({ latitude: lat, longitude: lon });
   };
 
+  const handleSelectRoute = (route: RouteOption) => {
+    setSelectedRoute(route);
+  };
+
   return (
     <View style={styles.container}>
       <StatusBar style="light" translucent backgroundColor="transparent" />
 
-      <TomTomMap destination={destination} />
+      <TomTomMap destination={destination} routeOptions={routeOptions} selectedRoute={selectedRoute} />
 
       <LinearGradient
         colors={['rgba(0,0,0,0.6)', 'rgba(0,0,0,0.0)']}
@@ -154,19 +171,46 @@ export default function HomeScreen() {
             </View>
           </>
         ) : (
-          <View style={styles.routeInfoContainer}>
+          <>
+            {!selectedRoute ? (
+              <View style={styles.routeInfoContainer}>
+                {routeOptions.length > 0 && (
+                  <FlatList
+                    data={routeOptions}
+                    keyExtractor={(item, index) => index.toString()}
+                    renderItem={({ item }) => (
+                      <TouchableOpacity style={styles.routeOption} onPress={() => handleSelectRoute(item)}>
+                        <Text style={[styles.routeOptionText, { color: textColor }]}>
+                          Temps estimé : {(item.summary.travelTimeInSeconds / 60).toFixed(0)} min | Distance : {(item.summary.lengthInMeters / 1000).toFixed(1)} km
+                        </Text>
+                      </TouchableOpacity>
+                    )}
+                  />
+                )}
+              </View>
+            ) : (
+              <View style={styles.routeInfoContainer}>
+                <Text style={[styles.selectedRouteText, { color: textColor }]}>
+                  {((selectedRoute.summary.travelTimeInSeconds) / 60).toFixed(0)} min
+                </Text>
+                <TouchableOpacity style={styles.clearRouteButton} onPress={() => setSelectedRoute(null)}>
+                  <Text style={styles.clearRouteButtonText}>Changer d'itinéraire</Text>
+                </TouchableOpacity>
+              </View>
+            )}
             <View style={styles.routeInfoRowA}>
               <View style={styles.speed}>
                 <Text style={styles.speedText}>{(speed || 0)}</Text>
                 <Text style={styles.speedText}>km/h</Text>
               </View>
-              <Text style={[styles.routeInfoTime, { color: textColor }]}>{travelTime !== null ? `${travelTime.toFixed(0)} min` : ''}</Text>
+              <Text style={[styles.routeInfoTime, { color: textColor }]}>
+                {travelTime !== null ? `${travelTime.toFixed(0)} min` : ''}
+              </Text>
               <TouchableOpacity style={styles.clearRouteButton} onPress={() => setDestination(null)}>
                 <Text style={styles.clearRouteButtonText}>x</Text>
               </TouchableOpacity>
             </View>
-            {/* <Text style={[styles.routeInfoText, { color: textColor }]}>Itinéraire vers : {selectedAddress?.address.freeformAddress}</Text> */}
-          </View>
+          </>
         )}
       </KeyboardAvoidingView>
     </View>
@@ -232,6 +276,19 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#ddd',
   },
+  routeOption: {
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ddd',
+  },
+  routeOptionText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  selectedRouteText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
   myAddress: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -267,7 +324,7 @@ const styles = StyleSheet.create({
   routeInfoContainer: {
     padding: 10,
     alignItems: 'center',
-    justifyContent:'center',
+    justifyContent: 'center',
   },
   speed: {
     backgroundColor: '#ffbc2e',
@@ -297,13 +354,7 @@ const styles = StyleSheet.create({
     width: '100%',
     paddingHorizontal: 10,
   },
-  routeInfoText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 10,
-    textAlign: 'center',
-  },
-  routeInfoTime:{
+  routeInfoTime: {
     fontSize: 30,
     fontWeight: 'bold',
     textAlign: 'center',
