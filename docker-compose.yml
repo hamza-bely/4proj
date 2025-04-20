@@ -6,7 +6,7 @@ services:
   frontend:
     build: ./web-traficandme-nuveau
     ports:
-      - "3000:80"
+      - "5181:80"
     depends_on:
       - backend
 
