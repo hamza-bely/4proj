@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   KeyboardAvoidingView,
+  Keyboard,
   Platform,
   StyleSheet,
   TextInput,
@@ -9,6 +10,7 @@ import {
   Text,
   TouchableOpacity,
   FlatList,
+  Image
 } from 'react-native';
 import { Colors } from '@/constants/Colors';
 import TomTomMap from '@components/TomTomMaps';
@@ -28,6 +30,7 @@ interface AddressSuggestion {
 }
 
 interface RouteOption {
+  guidance: any;
   summary: {
     travelTimeInSeconds: number;
     lengthInMeters: number;
@@ -52,6 +55,11 @@ export default function HomeScreen() {
   const [travelTime, setTravelTime] = useState<number | null>(null);
   const [routeOptions, setRouteOptions] = useState<RouteOption[]>([]);
   const [selectedRoute, setSelectedRoute] = useState<RouteOption | null>(null);
+  const [instructions, setInstructions] = useState<string[]>([]);
+  const [currentInstruction, setCurrentInstruction] = useState<string | null>(null);
+  const [currentDistance, setCurrentDistance] = useState<number>(0);
+
+
 
   useEffect(() => {
     if (searchText.length > 2) {
@@ -93,6 +101,11 @@ export default function HomeScreen() {
     }
   }, [destination]);
 
+
+  
+
+  
+
   const fetchSuggestions = async (text: string) => {
     try {
       const response = await fetch(`https://api.tomtom.com/search/2/search/${encodeURIComponent(text)}.json?key=QBsKzG3zoRyZeec28eUDje0U8DeNoRSO&typeahead=true&limit=5`);
@@ -107,15 +120,22 @@ export default function HomeScreen() {
     try {
       const location = await Location.getCurrentPositionAsync({});
       const { latitude, longitude } = location.coords;
-      const response = await fetch(`https://api.tomtom.com/routing/1/calculateRoute/${latitude},${longitude}:${destination.latitude},${destination.longitude}/json?key=QBsKzG3zoRyZeec28eUDje0U8DeNoRSO&routeType=fastest&maxAlternatives=3`);
-      const data = await response.json();
+      const response = await fetch(
+        `https://api.tomtom.com/routing/1/calculateRoute/${latitude},${longitude}:${destination.latitude},${destination.longitude}/json?key=QBsKzG3zoRyZeec28eUDje0U8DeNoRSO&routeType=fastest&maxAlternatives=3&instructionsType=text&language=fr`
+      );
+            const data = await response.json();
       setRouteOptions(data.routes);
+      if (data.routes.length > 0) {
+        const instructionsArray = data.routes[0].guidance.instructions.map((instr: any) => instr.message);
+        setInstructions(instructionsArray);
+      }      
     } catch (error) {
       console.error('Erreur lors de la récupération des itinéraires :', error);
     }
   };
 
   const handleSelectAddress = (address: AddressSuggestion) => {
+    Keyboard.dismiss();
     setSearchText(address.address.freeformAddress);
     setSelectedAddress(address);
     setSuggestions([]);
@@ -125,7 +145,24 @@ export default function HomeScreen() {
 
   const handleSelectRoute = (route: RouteOption) => {
     setSelectedRoute(route);
+    if (route.legs && route.legs.length > 0) {
+      const routeInstructions = route.guidance?.instructions?.map((instr: any) => instr.message) || [];
+      setInstructions(routeInstructions);
+    }
   };
+  
+
+  const clearRoute = useCallback(() => {
+    setDestination(null);
+    setSelectedRoute(null);
+    setSearchText('');
+    setSuggestions([]);
+    setRouteOptions([]);
+    setSelectedAddress(null);
+    setInstructions([]);
+  }, []);
+  
+  
 
   return (
     <View style={styles.container}>
@@ -139,6 +176,31 @@ export default function HomeScreen() {
         end={{ x: 0, y: 1 }}
         style={styles.gradientOverlay}
       />
+
+      {selectedRoute && instructions.length > 0 && (
+        <View style={styles.roadInstructionContainer}>
+          {selectedAddress && (
+            <Text style={styles.titleDest}>{selectedAddress.address.freeformAddress}</Text>
+          )}
+
+          {currentInstruction && currentDistance > 0 && (
+            <>
+              <Text style={styles.instructionText}>{currentInstruction}</Text>
+
+              <Text style={styles.distanceText}>{currentDistance} mètres</Text>
+
+              <View style={styles.arrowContainer}>
+                {/* <Image
+                  source={currentInstruction?.includes('gauche') ? require('./left-arrow.png') : require('./right-arrow.png')}
+                  style={styles.arrowIcon}
+                /> */}
+              </View>
+            </>
+          )}
+        </View>
+      )}
+
+
 
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={[styles.tabNavigation, { backgroundColor: colorScheme === 'dark' ? '#1a1a1a' : '#f9f9f9' }]}>
         {!destination ? (
@@ -190,26 +252,29 @@ export default function HomeScreen() {
               </View>
             ) : (
               <View style={styles.routeInfoContainer}>
-                <Text style={[styles.selectedRouteText, { color: textColor }]}>
-                  {((selectedRoute.summary.travelTimeInSeconds) / 60).toFixed(0)} min
-                </Text>
-                <TouchableOpacity style={styles.clearRouteButton} onPress={() => setSelectedRoute(null)}>
+
+                <View style={styles.routeInfoRowA}>
+
+                  <View style={styles.speed}>
+                  <Text style={styles.speedText}>{Math.round(speed || 0)}</Text>
+                    <Text style={styles.speedText}>km/h</Text>
+                  </View>
+
+
+                  <Text style={[styles.selectedRouteText, { color: textColor }]}>
+                    {((selectedRoute.summary.travelTimeInSeconds) / 60).toFixed(0)} min
+                  </Text>
+
+                  <TouchableOpacity style={styles.clearRouteButton} onPress={clearRoute}>
+                    <Text style={styles.clearRouteButtonText}>x</Text>
+                  </TouchableOpacity>
+
+                </View> 
+                {/* <TouchableOpacity style={styles.clearRouteButton} onPress={() => setSelectedRoute(null)}>
                   <Text style={styles.clearRouteButtonText}>Changer d'itinéraire</Text>
-                </TouchableOpacity>
+                </TouchableOpacity> */}
               </View>
             )}
-            <View style={styles.routeInfoRowA}>
-              <View style={styles.speed}>
-                <Text style={styles.speedText}>{(speed || 0)}</Text>
-                <Text style={styles.speedText}>km/h</Text>
-              </View>
-              <Text style={[styles.routeInfoTime, { color: textColor }]}>
-                {travelTime !== null ? `${travelTime.toFixed(0)} min` : ''}
-              </Text>
-              <TouchableOpacity style={styles.clearRouteButton} onPress={() => setDestination(null)}>
-                <Text style={styles.clearRouteButtonText}>x</Text>
-              </TouchableOpacity>
-            </View>
           </>
         )}
       </KeyboardAvoidingView>
@@ -221,6 +286,50 @@ const styles = StyleSheet.create({
   container: {
     ...StyleSheet.absoluteFillObject,
     flex: 1,
+  },
+  roadInstructionContainer:{
+    position: 'absolute',
+    top: 0,
+    height: 180,
+    width: '100%',
+    zIndex: 10,
+    backgroundColor:'rgb(0, 0, 0)',
+    borderRadius:20,
+    paddingTop:75,
+
+  },
+  titleDest:{
+    fontWeight: 'bold',
+    color: '#fff',
+    fontSize: 15,
+    textAlign:'center'
+  },
+  instructionTitle: {
+    fontWeight: 'bold',
+    color: '#fff',
+    marginBottom: 5,
+  },
+  instructionText: {
+    color: '#fff',
+    fontSize: 14,
+    marginBottom: 3,
+  },
+  distanceText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    textAlign: 'center',
+  },
+  arrowContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  arrowIcon: {
+    width: 30,
+    height: 30,
+    resizeMode: 'contain',
   },
   gradientOverlay: {
     position: 'absolute',
@@ -286,8 +395,9 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   selectedRouteText: {
-    fontSize: 18,
+    fontSize: 30,
     fontWeight: 'bold',
+
   },
   myAddress: {
     flexDirection: 'row',
