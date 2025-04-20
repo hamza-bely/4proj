@@ -72,7 +72,6 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated, startAdd
     const [showQRCode, setShowQRCode] = useState<boolean>(false);
     const [qrCodeData, setQrCodeData] = useState<string>("");
     const [transportMode, setTransportMode] = useState<TransportMode>("car");
-    const [currentPosition, setCurrentPosition] = useState<number>(0);
     const simulationIntervalRef = useRef<number | null>(null);
     const apiKey: string = import.meta.env.VITE_TOMTOM_API_KEY;
 
@@ -136,18 +135,18 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated, startAdd
         if ( selectedRouteId) {
             const selectedRoute = routeOptions.find(route => route.id === selectedRouteId);
             if (selectedRoute && selectedRoute.coordinates && selectedRoute.coordinates.length > 0) {
-                const currentCoordIndex = Math.floor(currentPosition * (selectedRoute.coordinates.length - 1));
+                const currentCoordIndex = Math.floor(0 * (selectedRoute.coordinates.length - 1));
                 const currentCoord = selectedRoute.coordinates[currentCoordIndex];
                 const vehiclePosition = {
                     position: [currentCoord[0], currentCoord[1]],
                     type: transportMode,
-                    progress: currentPosition
+                    progress: 0
                 };
                 const event = new CustomEvent("vehiclePositionUpdate", { detail: vehiclePosition });
                 window.dispatchEvent(event);
             }
         }
-    }, [currentPosition, selectedRouteId, transportMode, routeOptions]);
+    }, [ selectedRouteId, transportMode, routeOptions]);
 
     const formatDuration = (seconds: number): string => {
         const hours = Math.floor(seconds / 3600);
@@ -201,7 +200,6 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated, startAdd
                     duration: route.summary.travelTimeInSeconds,
                     type: routeType,
                     avoidTolls: shouldAvoidTolls,
-                    travelMode
                 };
             }
             return null;

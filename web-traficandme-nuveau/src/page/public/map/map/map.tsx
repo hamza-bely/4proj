@@ -161,8 +161,11 @@ const Map: React.FC = () => {
         });
 
         mapInstance.fitBounds(bounds, {
-            padding: { top: 50, bottom: 50, left: 50, right: 50 }
+            padding: 50
         });
+
+
+
 
         // Add start and end markers
         const startPoint = routeCoordinates[0];

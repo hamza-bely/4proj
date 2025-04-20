@@ -12,12 +12,12 @@ type SearchResult = {
   address: string;
 };
 
-interface SearchProps {
+/*interface SearchProps {
   onSearchResultSelect: (position: { lat: number; lon: number }, address: string) => void;
   initialValue: string;
-}
+}*/
 
-const Search: React.FC<SearchProps> = ({ onSearchResultSelect,initialValue = ""  }) => {
+const Search: React.FC<any> = ({ onSearchResultSelect,initialValue = ""  }) => {
   const { t } = useTranslation();
   const [query, setQuery] = useState<string>("");
   const [results, setResults] = useState<SearchResult[]>([]);
