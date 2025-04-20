@@ -9,6 +9,11 @@ services:
       - "5181:80"
     depends_on:
       - backend
+    environment:
+      - VITE_API_URL=http://158.180.239.85:8080/api/
+      - VITE_TOMTOM_API_KEY=9zc7scbLhpcrEFouo0xJWt0jep9qNlnv
+      - VITE_LIBRETRANSLATE_API_KEY=ta_cle_api
+
 
   backend:
     build: ./api-traficandme
