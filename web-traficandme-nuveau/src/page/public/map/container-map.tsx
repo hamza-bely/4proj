@@ -158,6 +158,7 @@ export default function ContainerMap({ map }: ContainerMapProps) {
                         type: "LineString",
                         coordinates: routeCoordinates,
                     },
+                    properties: {},
                 },
             });
 
@@ -290,7 +291,11 @@ export default function ContainerMap({ map }: ContainerMapProps) {
 
     const onSearchResultSelect = (position: { lat: number; lon: number }): void => {
         if (map) {
-            map.flyTo({ center: [position.lon, position.lat], zoom: 15 });
+            map.flyTo({
+                center: [position.lon, position.lat],
+                zoom: 14
+            } as any);
+
 
             const searchMarker = new tt.Marker({
                 element: createMarkerDOMElement("Recherche")
@@ -312,7 +317,11 @@ export default function ContainerMap({ map }: ContainerMapProps) {
                         }).setLngLat([longitude, latitude]).addTo(map);
 
                         markers.current.push(userMarker);
-                        map.flyTo({ center: [longitude, latitude], zoom: 14 });
+                        map.flyTo({
+                            center: [longitude, latitude],
+                            zoom: 14
+                        } as any);
+
 
                         // Récupérer l'adresse correspondante
                         const address = await getAddressFromCoordinates(latitude, longitude);

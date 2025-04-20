@@ -11,11 +11,11 @@ import useReportStore from "../../../../services/store/report-store.tsx";
 import {toast} from "react-toastify";
 import {MarkerModel} from "../model/map.tsx";
 
-interface MarkersProps {
+/*interface MarkersProps {
     map: tt.Map | null;
-}
+}*/
 
-const Markers: React.FC<MarkersProps> = ({ map }) => {
+const Markers: React.FC<any> = ({ map }) => {
     const { t } = useTranslation();
     const { reports, fetchReports, createReport } = useReportStore();
     const token = Cookies.get("authToken");
@@ -77,7 +77,7 @@ const Markers: React.FC<MarkersProps> = ({ map }) => {
             </div>
             `;
             const marker = new tt.Marker({ element: markerElement })
-                .setLngLat(coordinates)
+                .setLngLat(coordinates as [number, number])
                 .addTo(map);
 
             marker.getElement().addEventListener("click", () => {

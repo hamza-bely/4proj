@@ -8,15 +8,13 @@ import com.supinfo.api_traficandme.reports.entity.Report;
 import com.supinfo.api_traficandme.reports.entity.ReportInteraction;
 import com.supinfo.api_traficandme.reports.repository.ReportInteractionRepository;
 import com.supinfo.api_traficandme.reports.repository.ReportRepository;
+import com.supinfo.api_traficandme.statistiques.model.ReportData;
 import lombok.Data;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Data
@@ -78,7 +76,7 @@ public class ReportService {
     }
 
     public Report likeReport(String reportId, String userEmail) {
-        Report report = reportRepository.findById(reportId)
+        Report report = reportRepository.findById(Integer.valueOf(reportId))
                 .orElseThrow(() -> new RuntimeException("Report not found with id: " + reportId));
 
         Optional<ReportInteraction> existing = reportInteractionRepository
@@ -112,7 +110,7 @@ public class ReportService {
     }
 
     public Report dislikeReport(String reportId, String userEmail) {
-        Report report = reportRepository.findById(reportId)
+        Report report = reportRepository.findById(Integer.valueOf(reportId))
                 .orElseThrow(() -> new RuntimeException("Report not found with id: " + reportId));
 
         Optional<ReportInteraction> existing = reportInteractionRepository
@@ -150,7 +148,7 @@ public class ReportService {
             throw new IllegalArgumentException("Status \"" + newStatus + "\" does not exist");
         }
 
-        Report report = reportRepository.findById(id).orElseThrow(() ->
+        Report report = reportRepository.findById(Integer.valueOf(id)).orElseThrow(() ->
                 new RuntimeException("Report not found with id: " + id));
 
 
@@ -169,7 +167,7 @@ public class ReportService {
             throw new IllegalArgumentException("Status \"" + newType + "\" does not exist");
         }
 
-        Report report = reportRepository.findById(id).orElseThrow(() ->
+        Report report = reportRepository.findById(Integer.valueOf(id)).orElseThrow(() ->
                 new RuntimeException("Report not found with id: " + id));
         report.setType(newType);
         report.setUpdateDate(new Date());
@@ -177,10 +175,28 @@ public class ReportService {
     }
 
     public void deleteReport(String id) {
-        Report report = reportRepository.findById(id)
+        Report report = reportRepository.findById(Integer.valueOf(id))
                 .orElseThrow(() -> new RuntimeException("Report not found with id: " + id));
 
         reportRepository.delete(report);
     }
 
+    public long getTotalReports() {
+        return reportRepository.count();
+    }
+
+    public List<ReportData> getReportData() {
+        List<Object[]> results = reportRepository.countByType();
+        List<ReportData> reportDataList = new ArrayList<>();
+
+        for (Object[] result : results) {
+            String type = (String) result[0];
+            Long count = (Long) result[1];
+            ReportData reportData = new ReportData();
+            reportData.setType(type);
+            reportData.setCount(count);
+            reportDataList.add(reportData);
+        }
+        return reportDataList;
+    }
 }

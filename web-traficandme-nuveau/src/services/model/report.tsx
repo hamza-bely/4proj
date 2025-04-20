@@ -48,3 +48,12 @@ export interface ReportCreateResponse {
     likeCount: number;
     dislikeCount: number;
 }
+
+export interface ReportData {
+    message: string;
+    data:{
+        type: string;
+        count: number;
+    }[];
+    
+}

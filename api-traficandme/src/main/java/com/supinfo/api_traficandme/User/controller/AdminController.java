@@ -6,6 +6,10 @@ import com.supinfo.api_traficandme.User.dto.UserResponse;
 import com.supinfo.api_traficandme.User.service.AdminService;
 import com.supinfo.api_traficandme.User.service.UserService;
 import com.supinfo.api_traficandme.security.dto.ApiResponse;
+import com.supinfo.api_traficandme.statistiques.model.AdminStatisticModel;
+import com.supinfo.api_traficandme.statistiques.model.ReportData;
+import com.supinfo.api_traficandme.statistiques.model.RouteData;
+import com.supinfo.api_traficandme.statistiques.service.StatisticService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -23,10 +27,11 @@ public class AdminController {
 
     private  final UserService userService;
     private  final AdminService adminService;
-
-    public AdminController(UserService userService,AdminService adminService, PasswordEncoder passwordEncoder){
+    private  final StatisticService statisticService;
+    public AdminController(UserService userService, AdminService adminService, PasswordEncoder passwordEncoder, StatisticService statisticService){
         this.adminService = adminService;
         this.userService = userService;
+        this.statisticService = statisticService;
     }
 
     @PostMapping("create")
@@ -86,6 +91,36 @@ public class AdminController {
         try {
             Boolean updated = adminService.deleteUserForAnAdmin(id);
             return ResponseEntity.ok(new ApiResponse<>("Status changed", updated));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(new ApiResponse<>(e.getMessage(), null));
+        }
+    }
+
+    @GetMapping("/total-map")
+    public ResponseEntity<ApiResponse<AdminStatisticModel>> getSummary() {
+        try {
+            AdminStatisticModel summary = statisticService.StatAdmin();
+            return ResponseEntity.ok(new ApiResponse<>("Summary of map using", summary));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(new ApiResponse<>(e.getMessage(), null));
+        }
+    }
+
+    @GetMapping("/Report-statistics")
+    public ResponseEntity<ApiResponse<List<ReportData>>> getReportStatistics() {
+        try {
+            List<ReportData> reportData = statisticService.getReportStatistics();
+            return ResponseEntity.ok(new ApiResponse<>("Report statistics", reportData));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(new ApiResponse<>(e.getMessage(), null));
+        }
+    }
+
+    @GetMapping("/Route-statistics")
+    public ResponseEntity<ApiResponse<List<RouteData>>> getRouteStatistics() {
+        try {
+            List<RouteData> routeData = statisticService.getRouteStatistics();
+            return ResponseEntity.ok(new ApiResponse<>("Route statistics", routeData));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(new ApiResponse<>(e.getMessage(), null));
         }

@@ -23,9 +23,12 @@ import java.util.List;
 @EnableWebSecurity
 public class SecurityConfiguration {
 
-    public SecurityConfiguration(AuthenticationProvider authenticationProvider,JwtAuthFilter jwtAuthFilter){
+    private final CorsProperties corsProperties;
+
+    public SecurityConfiguration(CorsProperties corsProperties, AuthenticationProvider authenticationProvider,JwtAuthFilter jwtAuthFilter){
         this.authenticationProvider = authenticationProvider;
         this.jwtAuthFilter = jwtAuthFilter;
+        this.corsProperties = corsProperties;
     }
 
     private final AuthenticationProvider authenticationProvider;
@@ -77,7 +80,7 @@ public class SecurityConfiguration {
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:5181") ); ///TODO ajouter le url de mobile
+        configuration.setAllowedOrigins(corsProperties.getAllowedOrigins()); ///TODO ajouter le url de mobile
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS","PATCH"));
         configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
         configuration.setAllowCredentials(true);

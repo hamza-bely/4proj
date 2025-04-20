@@ -53,7 +53,7 @@ export default function ProfileUser() {
 
     const handleSubmit = async () => {
         try {
-            //await updateUser(formData); //TODO A FAIRE
+            //await updateUser(formData);
             setEditMode(false);
         } catch (error) {
             console.error("Erreur lors de la mise à jour de l'utilisateur:", error);

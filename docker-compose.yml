@@ -1,0 +1,38 @@
+# docker-compose.yml
+
+version: "3.8"
+
+services:
+  frontend:
+    build: ./web-traficandme-nuveau
+    ports:
+      - "5181:80"
+    depends_on:
+      - backend
+
+  backend:
+    build: ./api-traficandme
+    ports:
+      - "8080:8080"
+    environment:
+      - CORS_ALLOWED_ORIGINS=http://158.180.239.85:5181,http://localhost:8081,http://mobile.app.url
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/traficandmedb
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=postgres
+    depends_on:
+      - db
+
+  db:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_DB: traficandmedb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+volumes:
+  db_data:
