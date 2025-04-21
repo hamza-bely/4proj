@@ -186,7 +186,7 @@ La documentation de l'API est disponible à l'adresse `http://localhost:3000/api
 
 ```bash
 cd api-traficandme
-npm run generate-docs
+
 ```
 
 ## Fonctionnalités Principales
@@ -211,16 +211,6 @@ npm test
 # Exécuter les tests pour un service spécifique
 cd <répertoire-du-service>
 npm test
-```
-
-### Style de Code
-
-```bash
-# Formater le code
-npm run format
-
-# Linter le code
-npm run lint
 ```
 
 ## Déploiement
