@@ -61,13 +61,13 @@ Cependant, l'application mobile est encore en phase initiale de développement e
 - **Hamza Belyahiaoui** - Développeur Full Stack / Chef de Projet
 - **Abdoul-waris Konate** - Développeur Back-End / Architecture des microservices
 - **Fadel Biaou** - Développeur Front-End / UX Designer
-- **Jean-philippe Delon** - Ingénieur DevOps / Spécialiste en sécurité
+- **Jean-philippe Delon** - Développeur Back-End / Spécialiste en sécurité et Mobile 
 
 ## Structure du Projet
 
 ```
 traficandme/
-├── api-traficandme/        # Service API Gateway
+├── api-traficandme/        # Service API 
 ├── web-traficandme/        # Application web pour utilisateurs et administrateurs
 ├── mobile-traficandme/     # Application mobile pour utilisateurs
 ```
@@ -76,9 +76,8 @@ traficandme/
 
 - Node.js (v22 ou supérieur)
 - npm (v10 ou supérieur)
-- MongoDB (v7 ou supérieur)
 - Docker et Docker Compose
-- API de cartographie (OpenStreetMap ou Google Maps)
+- API de cartographie Tomtom map
 
 ## Installation
 
