@@ -1,6 +1,6 @@
 package com.supinfo.api_traficandme.security.service;
 
-import com.supinfo.api_traficandme.User.repository.UserRepository;
+import com.supinfo.api_traficandme.user.repository.UserRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;

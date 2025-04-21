@@ -1,6 +1,5 @@
 package com.supinfo.api_traficandme.traffic.dto;
 
-import com.supinfo.api_traficandme.User.entity.UserInfo;
 import com.supinfo.api_traficandme.common.ModeCirculation;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;

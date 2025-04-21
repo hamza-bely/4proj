@@ -1,6 +1,6 @@
-package com.supinfo.api_traficandme.User.entity;
+package com.supinfo.api_traficandme.user.entity;
 
-import com.supinfo.api_traficandme.User.dto.StatusUser;
+import com.supinfo.api_traficandme.user.dto.StatusUser;
 import com.supinfo.api_traficandme.common.Role;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

@@ -1,12 +1,12 @@
-package com.supinfo.api_traficandme.User.controller;
+package com.supinfo.api_traficandme.user.controller;
 
-import com.supinfo.api_traficandme.User.dto.StatusUser;
-import com.supinfo.api_traficandme.User.dto.UserRequest;
-import com.supinfo.api_traficandme.User.dto.UserResponse;
-import com.supinfo.api_traficandme.User.service.AdminService;
-import com.supinfo.api_traficandme.User.service.UserService;
+import com.supinfo.api_traficandme.user.dto.StatusUser;
+import com.supinfo.api_traficandme.user.dto.UserRequest;
+import com.supinfo.api_traficandme.user.dto.UserResponse;
+import com.supinfo.api_traficandme.user.service.AdminService;
+import com.supinfo.api_traficandme.user.service.UserService;
 import com.supinfo.api_traficandme.security.dto.ApiResponse;
-import com.supinfo.api_traficandme.statistiques.model.AdminStatisticModel;
+import com.supinfo.api_traficandme.statistiques.model.SummaryStatistic;
 import com.supinfo.api_traficandme.statistiques.model.ReportData;
 import com.supinfo.api_traficandme.statistiques.model.RouteData;
 import com.supinfo.api_traficandme.statistiques.service.StatisticService;
@@ -97,16 +97,16 @@ public class AdminController {
     }
 
     @GetMapping("/total-map")
-    public ResponseEntity<ApiResponse<AdminStatisticModel>> getSummary() {
+    public ResponseEntity<ApiResponse<SummaryStatistic>> getSummary() {
         try {
-            AdminStatisticModel summary = statisticService.StatAdmin();
+            SummaryStatistic summary = statisticService.StatAdmin();
             return ResponseEntity.ok(new ApiResponse<>("Summary of map using", summary));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(new ApiResponse<>(e.getMessage(), null));
         }
     }
 
-    @GetMapping("/Report-statistics")
+    @GetMapping("/report-statistics")
     public ResponseEntity<ApiResponse<List<ReportData>>> getReportStatistics() {
         try {
             List<ReportData> reportData = statisticService.getReportStatistics();
@@ -116,7 +116,7 @@ public class AdminController {
         }
     }
 
-    @GetMapping("/Route-statistics")
+    @GetMapping("/route-statistics")
     public ResponseEntity<ApiResponse<List<RouteData>>> getRouteStatistics() {
         try {
             List<RouteData> routeData = statisticService.getRouteStatistics();

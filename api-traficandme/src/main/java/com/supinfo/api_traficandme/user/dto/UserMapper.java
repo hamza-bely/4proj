@@ -1,6 +1,6 @@
-package com.supinfo.api_traficandme.User.dto;
+package com.supinfo.api_traficandme.user.dto;
 
-import com.supinfo.api_traficandme.User.entity.UserInfo;
+import com.supinfo.api_traficandme.user.entity.UserInfo;
 import com.supinfo.api_traficandme.common.Role;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;

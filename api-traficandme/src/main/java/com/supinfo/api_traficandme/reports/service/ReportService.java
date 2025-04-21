@@ -1,6 +1,6 @@
 package com.supinfo.api_traficandme.reports.service;
 
-import com.supinfo.api_traficandme.User.dto.UserResponse;
+import com.supinfo.api_traficandme.user.dto.UserResponse;
 import com.supinfo.api_traficandme.reports.dto.CreateReportRequest;
 import com.supinfo.api_traficandme.reports.dto.StatusReport;
 import com.supinfo.api_traficandme.reports.dto.TypeReport;

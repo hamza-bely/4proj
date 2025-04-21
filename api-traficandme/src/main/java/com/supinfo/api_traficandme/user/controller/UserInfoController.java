@@ -1,9 +1,9 @@
-package com.supinfo.api_traficandme.User.controller;
+package com.supinfo.api_traficandme.user.controller;
 
-import com.supinfo.api_traficandme.User.dto.StatusUser;
-import com.supinfo.api_traficandme.User.dto.UserResponse;
-import com.supinfo.api_traficandme.User.entity.UserInfo;
-import com.supinfo.api_traficandme.User.service.UserService;
+import com.supinfo.api_traficandme.user.dto.StatusUser;
+import com.supinfo.api_traficandme.user.dto.UserResponse;
+import com.supinfo.api_traficandme.user.entity.UserInfo;
+import com.supinfo.api_traficandme.user.service.UserService;
 import com.supinfo.api_traficandme.security.dto.ApiResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

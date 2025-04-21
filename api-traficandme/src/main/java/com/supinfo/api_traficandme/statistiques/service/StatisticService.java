@@ -1,8 +1,9 @@
 package com.supinfo.api_traficandme.statistiques.service;
 
-import com.supinfo.api_traficandme.User.service.AdminService;
+import com.supinfo.api_traficandme.user.dto.StatusUser;
+import com.supinfo.api_traficandme.user.service.AdminService;
 import com.supinfo.api_traficandme.reports.service.ReportService;
-import com.supinfo.api_traficandme.statistiques.model.AdminStatisticModel;
+import com.supinfo.api_traficandme.statistiques.model.SummaryStatistic;
 import com.supinfo.api_traficandme.statistiques.model.ReportData;
 import com.supinfo.api_traficandme.statistiques.model.RouteData;
 import com.supinfo.api_traficandme.traffic.service.TrafficService;
@@ -23,18 +24,20 @@ public class StatisticService {
         this.reportService = reportService;
     }
 
-    public AdminStatisticModel StatAdmin(){
+    public SummaryStatistic StatAdmin(){
         long routeSearches = trafficService.getTotalTraffic();
-        long userTotal = adminService.getTotalUsers();
+        long activeUser = adminService.countUsersByStatus(StatusUser.ACTIVE);
         long trafficInfo = reportService.getTotalReports();
+        long deletedUser = adminService.countUsersByStatus(StatusUser.DELETED);
 
-        AdminStatisticModel adminStatisticModel = new AdminStatisticModel();
+        SummaryStatistic summaryStatisticModel = new SummaryStatistic();
 
-        adminStatisticModel.setRouteSearches(routeSearches);
-        adminStatisticModel.setUserTotal(userTotal);
-        adminStatisticModel.setTrafficInfo(trafficInfo);
+        summaryStatisticModel.setRouteSearches(routeSearches);
+        summaryStatisticModel.setUserTotal(activeUser);
+        summaryStatisticModel.setTrafficInfo(trafficInfo);
+        summaryStatisticModel.setDeletedUsers(deletedUser);
 
-        return adminStatisticModel;
+        return summaryStatisticModel;
     }
 
     public List<RouteData> getRouteStatistics() {
