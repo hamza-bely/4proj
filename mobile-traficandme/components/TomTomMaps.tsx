@@ -119,7 +119,7 @@ export default function TomTomMap({ destination, routeOptions, selectedRoute }: 
           key: 'QBsKzG3zoRyZeec28eUDje0U8DeNoRSO',
           container: 'map',
           center: userCoords,
-          zoom: 17,
+          zoom: 18,
           pitch: 100,
           dragRotate: true,
         });
@@ -182,7 +182,7 @@ export default function TomTomMap({ destination, routeOptions, selectedRoute }: 
             })
             .catch(err => {
               console.error("Erreur lors du calcul de l'itinéraire :", err);
-              alert("Erreur lors du calcul de l'itinéraire.");
+              //alert("Erreur lors du calcul de l'itinéraire.");
             });
         };
 

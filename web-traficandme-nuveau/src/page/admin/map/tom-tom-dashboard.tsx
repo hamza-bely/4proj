@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import Routes from "../../../routes/routes.tsx";
+import {  BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { fetchSumOfMapStatistic } from '../../../services/service/admin-serivce.tsx';
 import { AdminSumStats } from '../../../services/model/user.tsx';
 
-// Types pour les données
 interface ApiUsageData {
     date: string;
     routeSearches: number;
@@ -22,15 +20,8 @@ interface ApiErrorData {
     count: number;
 }
 
-interface MapUsageData {
-    date: string;
-    routeSearches: number;
-    geocoding: number;
-    trafficInfo: number;
-}
 // Composant principal
 const TomTomApiDashboard: React.FC = () => {
-    // États pour stocker les données
     const [usageData, setUsageData] = useState<ApiUsageData[]>([]);
     const [routeData, setRouteData] = useState<RouteData[]>([]);
     const [errorData, setErrorData] = useState<ApiErrorData[]>([]);
@@ -187,7 +178,7 @@ const TomTomApiDashboard: React.FC = () => {
                                 fill="#8884d8"
                                 dataKey="count"
                             >
-                                {routeData.map((type , index) => (
+                                {routeData.map((_type , index) => (
                                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                                 ))}
                             </Pie>
@@ -212,7 +203,7 @@ const TomTomApiDashboard: React.FC = () => {
                                 fill="#8884d8"
                                 dataKey="count"
                             >
-                                {routeData.map((type , index) => (
+                                {routeData.map((_type , index) => (
                                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                                 ))}
                             </Pie>
@@ -221,7 +212,6 @@ const TomTomApiDashboard: React.FC = () => {
                     </ResponsiveContainer>
                 </div>
 
-                {/* Graphique des erreurs API */}
                 <div className="bg-white p-4 rounded-lg shadow">
                     <h2 className="text-lg font-semibold mb-4">Types d'Erreurs API</h2>
                     <ResponsiveContainer width="100%" height={300}>

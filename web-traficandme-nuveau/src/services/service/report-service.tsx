@@ -19,7 +19,7 @@ export const fetchReports = async (): Promise<ReportFetchResponse> => {
         const response = await axios.get<ReportFetchResponse>(`${API_URL}reports/get-all`, { headers: getAuthHeaders() });
         return response.data;
     } catch (error: any) {
-        toast.success(await translateMessage(error.response.data.message || "An error has occurred"));
+        toast.error(await translateMessage(error.response.data.message || "An error has occurred"));
         throw error;
     }
 };
@@ -29,7 +29,7 @@ export const fetchReportsByUser = async (): Promise<ReportFetchResponse> => {
         const response = await axios.get<ReportFetchResponse>(`${API_URL}reports/get-all-by-user`, { headers: getAuthHeaders() });
         return response.data;
     } catch (error: any) {
-        toast.success(await translateMessage(error.response.data.message || "An error has occurred"));
+        toast.error(await translateMessage(error.response.data.message || "An error has occurred"));
         throw error;
     }
 };
@@ -43,7 +43,7 @@ export const createReport = async (data: any): Promise<Report> => {
         toast.success(await translateMessage(response.data.message));
         return response.data.data;
     } catch (error: any) {
-        toast.success(await translateMessage(error.response.data.message || "An error has occurred"));
+        toast.error(await translateMessage(error.response.data.message || "An error has occurred"));
         throw error;
     }
 };
@@ -57,7 +57,7 @@ export const deleteReport = async (id: number): Promise<ReportDeleteResponse> =>
         toast.success(await translateMessage(response.data.message));
         return response.data;
     } catch (error: any) {
-        toast.success(await translateMessage(error.response.data.message || "An error has occurred"));
+        toast.error(await translateMessage(error.response.data.message || "An error has occurred"));
         throw error;
     }
 };
@@ -70,7 +70,7 @@ export const likeReport = async (id: number): Promise<Report> => {
         toast.success(await translateMessage(response.data.message));
         return response.data.data;
     } catch (error: any) {
-        toast.success(await translateMessage(error.response.data.message || "An error has occurred"));
+        toast.error(await translateMessage(error.response.data.message || "An error has occurred"));
         throw error;
     }
 };
@@ -83,7 +83,7 @@ export const dislikeReport = async (id: number): Promise<Report> => {
         toast.success(await translateMessage(response.data.message));
         return response.data.data;
     } catch (error: any) {
-        toast.success(await translateMessage(error.response.data.message || "An error has occurred"));
+        toast.error(await translateMessage(error.response.data.message || "An error has occurred"));
         throw error;
     }
 };
@@ -96,7 +96,7 @@ export const changeReportStatus = async (id: number, status: string): Promise<Re
         toast.success(await translateMessage(response.data.message));
         return response.data.data;
     } catch (error: any) {
-        toast.success(await translateMessage(error.response.data.message || "An error has occurred"));
+        toast.error(await translateMessage(error.response.data.message || "An error has occurred"));
         throw error;
     }
 };
@@ -109,7 +109,7 @@ export const changeReportType = async (id: number, type: string): Promise<Report
         toast.success(await translateMessage(response.data.message));
         return response.data.data;
     } catch (error: any) {
-        toast.success(await translateMessage(error.response.data.message || "An error has occurred"));
+        toast.error(await translateMessage(error.response.data.message || "An error has occurred"));
         throw error;
     }
 };

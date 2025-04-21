@@ -51,7 +51,7 @@ export default function Login({ closeModal }: { closeModal: () => void }) {
                     <form onSubmit={handleSubmit} className="space-y-6">
                         <div>
                             <label htmlFor="email" className="block text-sm font-medium text-gray-900">
-                                {t('connection.email')}
+                                {t('common.email')}
                             </label>
                             <div className="mt-2">
                                 <input

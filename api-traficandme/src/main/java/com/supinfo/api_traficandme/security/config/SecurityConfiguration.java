@@ -16,6 +16,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import java.util.Collections;
 import java.util.List;
 
 
@@ -23,9 +24,12 @@ import java.util.List;
 @EnableWebSecurity
 public class SecurityConfiguration {
 
-    public SecurityConfiguration(AuthenticationProvider authenticationProvider,JwtAuthFilter jwtAuthFilter){
+    private final CorsProperties corsProperties;
+
+    public SecurityConfiguration(CorsProperties corsProperties, AuthenticationProvider authenticationProvider,JwtAuthFilter jwtAuthFilter){
         this.authenticationProvider = authenticationProvider;
         this.jwtAuthFilter = jwtAuthFilter;
+        this.corsProperties = corsProperties;
     }
 
     private final AuthenticationProvider authenticationProvider;
@@ -77,7 +81,7 @@ public class SecurityConfiguration {
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:5181") ); ///TODO ajouter le url de mobile
+        configuration.setAllowedOrigins(List.of("http://158.180.229.244:5181","http://localhost:5181","http://localhost:8081", "http://mobile.app.url"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS","PATCH"));
         configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
         configuration.setAllowCredentials(true);

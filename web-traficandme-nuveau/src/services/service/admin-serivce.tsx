@@ -26,7 +26,7 @@ export const fetchUsers = async (): Promise<UserResponseFetchUsers> => {
     try {
         const response = await axios.get<UserResponseFetchUsers>(`${API_URL}admin/users/list`, { headers: getAuthHeaders() });
         return response.data;
-    } catch (error) {
+    } catch (error : any) {
         toast.success(await translateMessage(error.response.data.message || "An error has occurred"));
         throw error;
     }
@@ -50,7 +50,7 @@ export const updateUserByAdmin = async (id: number, params: UserUpdaterRequest):
         const response = await axios.put<UserUpdateResponse>(`${API_URL}admin/users/update/${id}`, params, { headers: getAuthHeaders() });
         toast.success(await translateMessage(response.data.message));
         return response.data;
-    }catch (error) {
+    }catch (error: any) {
         toast.success(await translateMessage(error.response.data.message || "An error has occurred"));
         throw error;
 
@@ -63,7 +63,7 @@ export const deleteUserFoAnAdmin  = async (id: number): Promise<any> => {
         const response = await axios.patch(`${API_URL}admin/users/${id}/update-status`, status,{ headers: getAuthHeaders() });
         toast.success(await translateMessage(response.data.message));
         return response.data;
-    } catch (error) {
+    } catch (error: any) {
         toast.success(await translateMessage(error.response.data.message || "An error has occurred"));
         throw error;
     }
@@ -75,7 +75,7 @@ export const deleteDefinitiveUserFoAnAdmin = async (id: number): Promise<any> =>
         const response = await axios.delete(`${API_URL}admin/users/${id}/delete-definitive`, { headers: getAuthHeaders() });
         toast.success(await translateMessage(response.data.message));
         return response.data;
-    } catch (error) {
+    } catch (error: any) {
         toast.success(await translateMessage(error.response.data.message || "An error has occurred"));
         throw error;
     }
@@ -85,7 +85,7 @@ export const fetchSumOfMapStatistic = async (): Promise<AdminSumStats> => {
     try {
         const response = await axios.get<AdminSumStats>(`${API_URL}admin/users/total-map`, { headers: getAuthHeaders() });
         return response.data;
-    } catch (error) {
+    } catch (error: any) {
         toast.success(await translateMessage(error.response.data.message || "An error has occurred"));
         throw error;
     }
@@ -105,7 +105,7 @@ export const fetchRoutesByModeStatistics = async (): Promise<any> => {
     try {
         const response = await axios.get<any>(`${API_URL}admin/users/Route-statistics`, { headers: getAuthHeaders() });
         return response.data;
-    } catch (error) {
+    } catch (error: any) {
         toast.success(await translateMessage(error.response.data.message || "An error has occurred"));
         throw error;
     }

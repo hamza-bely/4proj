@@ -16,14 +16,14 @@ public class ApiTrafficAndMeApplication {
 	@Bean
 	public CommandLineRunner createDefaultUsers(UserService userService) {
 		return args -> {
-			if (userService.getOneUserByEmail("admin@example.com") == null) {
-				userService.createUser(new UserRequest(null,"Admin", "User", "admin@example.com", "AdminPass123!", "ADMIN","ACTIVE"));
-				System.out.println("Admin ajouté.");
+			if (userService.getOneUserByEmail("admin@traficandme.com") == null) {
+				userService.createUser(new UserRequest(null,"Admin", "User", "admin@traficandme.com", "AdminPass123!", "ADMIN","ACTIVE"));
+				System.out.println("Admin added.");
 			}
 
-			if (userService.getOneUserByEmail("john.doe@example.com") == null) {
-				userService.createUser(new UserRequest(null,"John", "Doe", "john.doe@example.com", "UserPass123!", "USER","ACTIVE"));
-				System.out.println("Utilisateur ajouté.");
+			if (userService.getOneUserByEmail("hamza.bely@traficandme.com") == null) {
+				userService.createUser(new UserRequest(null,"Hamza", "Bely", "hamza.bely@traficandme.com", "UserPass123!", "USER","ACTIVE"));
+				System.out.println("User added.");
 			}
 		};
 	}

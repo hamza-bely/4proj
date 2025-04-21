@@ -1,4 +1,4 @@
-import axios, {AxiosError} from "axios";
+import axios from "axios";
 import {toast} from "react-toastify";
 
 import {
@@ -25,7 +25,7 @@ export const register = async (params: UserRegisterRequest): Promise<UserRegiste
         toast.success(await translateMessage(response.data.message));
         return response.data;
     }catch (error : any) {
-        toast.success(await translateMessage(error.response.data.message || "An error has occurred"));
+        toast.error(await translateMessage(error.response.data.message || "An error has occurred"));
         throw error;
 
     }
@@ -38,7 +38,7 @@ export const login = async (params: UserLoginRequest): Promise<UserLoginResponse
         toast.success(await translateMessage(response.data.message));
         return response.data;
     } catch (error : any) {
-        toast.success(await translateMessage(error.response.data.message || "An error has occurred"));
+        toast.error(await translateMessage(error.response.data.message || "An error has occurred"));
         throw error;
     }
 };
@@ -47,8 +47,8 @@ export const fetchUser = async (): Promise<UserResponseFetchUser> => {
     try {
         const response = await axios.get<UserResponseFetchUser>(`${API_URL}users/me`, { headers: getAuthHeaders() });
         return response.data;
-    } catch (error) {
-        toast.success(await translateMessage(error.response.data.message || "An error has occurred"));
+    } catch (error: any) {
+        toast.error(await translateMessage(error.response.data.message || "An error has occurred"));
         throw error;
     }
 };
@@ -60,8 +60,8 @@ export const updateUser = async ( params: UserUpdaterRequest): Promise<UserUpdat
         const response = await axios.put<UserUpdateResponse>(`${API_URL}users/update`, params, { headers: getAuthHeaders() });
         toast.success(await translateMessage(response.data.message));
         return response.data;
-    }catch (error) {
-        toast.success(await translateMessage(error.response.data.message || "An error has occurred"));
+    }catch (error : any) {
+        toast.error(await translateMessage(error.response.data.message || "An error has occurred"));
         throw error;
 
     }
@@ -72,8 +72,8 @@ export const deleteUserForAnUser = async (): Promise<void> => {
         const status = "DELETED" //TODO A CHANGE
         const response = await axios.patch(`${API_URL}users/update-status`,status, { headers: getAuthHeaders() });
         toast.success(await translateMessage(response.data.message));
-    } catch (error) {
-        toast.success(await translateMessage(error.response.data.message || "An error has occurred"));
+    } catch (error : any) {
+        toast.error(await translateMessage(error.response.data.message || "An error has occurred"));
         throw error;
     }
 };
