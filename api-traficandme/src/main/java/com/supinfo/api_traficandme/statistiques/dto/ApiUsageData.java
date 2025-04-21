@@ -1,4 +1,4 @@
-package com.supinfo.api_traficandme.statistiques.model;
+package com.supinfo.api_traficandme.statistiques.dto;
 
 import lombok.Data;
 

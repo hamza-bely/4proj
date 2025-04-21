@@ -3,9 +3,9 @@ package com.supinfo.api_traficandme.statistiques.service;
 import com.supinfo.api_traficandme.user.dto.StatusUser;
 import com.supinfo.api_traficandme.user.service.AdminService;
 import com.supinfo.api_traficandme.reports.service.ReportService;
-import com.supinfo.api_traficandme.statistiques.model.SummaryStatistic;
-import com.supinfo.api_traficandme.statistiques.model.ReportData;
-import com.supinfo.api_traficandme.statistiques.model.RouteData;
+import com.supinfo.api_traficandme.statistiques.dto.SummaryStatistic;
+import com.supinfo.api_traficandme.statistiques.dto.ReportData;
+import com.supinfo.api_traficandme.statistiques.dto.RouteData;
 import com.supinfo.api_traficandme.traffic.service.TrafficService;
 import org.springframework.stereotype.Service;
 
