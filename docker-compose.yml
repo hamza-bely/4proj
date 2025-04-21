@@ -9,6 +9,8 @@ services:
       - "5181:80"
     depends_on:
       - backend
+    env_file:
+      - web-traficandme-nuveau/env.prod
 
   backend:
     build: ./api-traficandme
