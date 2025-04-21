@@ -1,4 +1,3 @@
-
 name: Pipline-Web
 
 on:
@@ -6,13 +5,13 @@ on:
     branches:
       - main
     paths:
-      - 'web-traficandme/**'
+      - '**'
   pull_request:
     branches:
       - main
       - develop
     paths:
-      - 'web-traficandme/**'
+      - '**'
   workflow_dispatch:
 
 jobs:
@@ -36,41 +35,41 @@ jobs:
         run: |
           cd web-traficandme
           npm run build --prod
+
   deploy:
-    needs : [build]
+    needs: [build]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+
       - name: Set up SSH
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H ${{ secrets.HOST }} >> ~/.ssh/known_hosts
-  
-      - name: Archive project files
-        run: tar -czf app.tar.gz ./web-traficandme
+
+      - name: Archive whole project
+        run: tar -czf project.tar.gz ./*
 
       - name: Copy archive to server
-        run: scp -i ~/.ssh/id_rsa  app.tar.gz ${{ secrets.USERNAME }}@${{ secrets.HOST }}:/home/${{ secrets.USERNAME }}/
+        run: scp -i ~/.ssh/id_rsa project.tar.gz ${{ secrets.USERNAME }}@${{ secrets.HOST }}:/home/${{ secrets.USERNAME }}/
 
       - name: Deploy with Docker Compose
         run: |
           ssh -i ~/.ssh/id_rsa ${{ secrets.USERNAME }}@${{ secrets.HOST }} << 'EOF'
             cd /home/${{ secrets.USERNAME }}
             
-             #  Installer Docker Compose 
             if ! command -v docker-compose &> /dev/null; then
               sudo apt update
               sudo apt install -y docker-compose
             fi
-            
-            rm -rf web-traficandme
-            tar -xzf app.tar.gz 
-            cd web-traficandme
-            docker-compose down
-            docker image rm web-traficandme_frontend
-            docker-compose up -d
-          EOF
 
+            rm -rf project
+            mkdir project
+            tar -xzf project.tar.gz -C project
+            cd project
+            docker-compose down
+            docker-compose up -d --build
+          EOF
