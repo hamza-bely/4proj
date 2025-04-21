@@ -119,7 +119,7 @@ export default function TomTomMap({ destination, routeOptions, selectedRoute }: 
           key: 'QBsKzG3zoRyZeec28eUDje0U8DeNoRSO',
           container: 'map',
           center: userCoords,
-          zoom: 19,
+          zoom: 18,
           pitch: 100,
           dragRotate: true,
         });

@@ -17,30 +17,11 @@ import TomTomMap from '@components/TomTomMaps';
 import { StatusBar } from 'expo-status-bar';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Location from 'expo-location';
+import  AddressSuggestion  from '@interfaces/AddressSuggestion';
+import  NavigationInstruction  from '@interfaces/NavigationInstruction';
+import  RouteOption  from '@interfaces/RouteOption';
+import  ClosestInstruction  from '@interfaces/ClosestInstruction';
 
-interface AddressSuggestion {
-  id: string;
-  address: {
-    freeformAddress: string;
-  };
-  position: {
-    lat: number;
-    lon: number;
-  };
-}
-
-interface RouteOption {
-  guidance: any;
-  summary: {
-    travelTimeInSeconds: number;
-    lengthInMeters: number;
-  };
-  legs: [
-    {
-      points: string;
-    }
-  ];
-}
 
 export default function HomeScreen() {
   const colorScheme = useColorScheme();
@@ -55,9 +36,10 @@ export default function HomeScreen() {
   const [travelTime, setTravelTime] = useState<number | null>(null);
   const [routeOptions, setRouteOptions] = useState<RouteOption[]>([]);
   const [selectedRoute, setSelectedRoute] = useState<RouteOption | null>(null);
-  const [instructions, setInstructions] = useState<string[]>([]);
   const [currentInstruction, setCurrentInstruction] = useState<string | null>(null);
   const [currentDistance, setCurrentDistance] = useState<number>(0);
+  const [currentManeuver, setCurrentManeuver] = useState<string>('STRAIGHT');
+  const [instructions, setInstructions] = useState<NavigationInstruction[]>([]);
 
 
 
@@ -103,6 +85,91 @@ export default function HomeScreen() {
 
 
   
+  useEffect(() => {
+    const watchPosition = async () => {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') return;
+  
+      const sub = await Location.watchPositionAsync(
+        {
+          accuracy: Location.Accuracy.High,
+          timeInterval: 2000,
+          distanceInterval: 5,
+        },
+        (location) => {
+          updateCurrentInstruction(location.coords);
+        }
+      );
+  
+      return () => sub.remove();
+    };
+  
+    watchPosition();
+  }, []);
+  
+  
+  const updateCurrentInstruction = (coords: Location.LocationObjectCoords) => {
+    if (!selectedRoute || !selectedRoute.guidance || !selectedRoute.guidance.instructions) return;
+  
+    const userLat = coords.latitude;
+    const userLon = coords.longitude;
+  
+
+    let closestInstruction: ClosestInstruction | null = null;
+    let minDistance = Number.MAX_SAFE_INTEGER;
+  
+    for (const instruction of selectedRoute.guidance.instructions) {
+      const { point, message } = instruction;
+      if (!point) continue;
+  
+      const distance = getDistanceFromLatLonInM(userLat, userLon, point.latitude, point.longitude);
+      if (distance < minDistance) {
+        minDistance = distance;
+        closestInstruction = { message, distance, maneuver: instruction.maneuver };
+      }
+    }
+  
+    if (closestInstruction) {
+      setCurrentInstruction(closestInstruction.message);
+      setCurrentDistance(Math.round(closestInstruction.distance));
+      setCurrentManeuver(closestInstruction.maneuver);
+    }
+    
+  };
+  
+  const getDistanceFromLatLonInM = (lat1: number, lon1: number, lat2: number, lon2: number) => {
+    const R = 6371e3; 
+    const φ1 = lat1 * Math.PI / 180;
+    const φ2 = lat2 * Math.PI / 180;
+    const Δφ = (lat2 - lat1) * Math.PI / 180;
+    const Δλ = (lon2 - lon1) * Math.PI / 180;
+  
+    const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+              Math.cos(φ1) * Math.cos(φ2) *
+              Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  
+    return R * c;
+  };
+
+  const getInstructionIcon = (instructionType: string) => {
+  switch (instructionType) {
+    case 'TURN_LEFT':
+      return require('@assets/images/turn-left.png');
+    case 'TURN_RIGHT':
+      return require('@assets/images/turn-right.png');
+    case 'STRAIGHT':
+      return require('@assets/images/straight.png');
+    case 'UTURN_LEFT':
+    case 'UTURN_RIGHT':
+      return require('@assets/images/u-turn.png');
+    case 'ROUNDABOUT_LEFT':
+    case 'ROUNDABOUT_RIGHT':
+      return require('@assets/images/roundabout.png');
+    default:
+      return require('@assets/images/straight.png');
+  }
+};
 
   
 
@@ -126,8 +193,13 @@ export default function HomeScreen() {
             const data = await response.json();
       setRouteOptions(data.routes);
       if (data.routes.length > 0) {
-        const instructionsArray = data.routes[0].guidance.instructions.map((instr: any) => instr.message);
+        const instructionsArray: NavigationInstruction[] = data.routes[0].guidance.instructions.map((instr: any) => ({
+          message: instr.message,
+          distance: instr.routeOffsetInMeters,
+          maneuver: instr.maneuver,
+        }));
         setInstructions(instructionsArray);
+        
       }      
     } catch (error) {
       console.error('Erreur lors de la récupération des itinéraires :', error);
@@ -146,8 +218,13 @@ export default function HomeScreen() {
   const handleSelectRoute = (route: RouteOption) => {
     setSelectedRoute(route);
     if (route.legs && route.legs.length > 0) {
-      const routeInstructions = route.guidance?.instructions?.map((instr: any) => instr.message) || [];
+      const routeInstructions: NavigationInstruction[] = route.guidance?.instructions?.map((instr: any) => ({
+        message: instr.message,
+        distance: instr.routeOffsetInMeters,
+        maneuver: instr.maneuver,
+      })) || [];
       setInstructions(routeInstructions);
+      
     }
   };
   
@@ -184,18 +261,19 @@ export default function HomeScreen() {
           )}
 
           {currentInstruction && currentDistance > 0 && (
-            <>
-              <Text style={styles.instructionText}>{currentInstruction}</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <Image
+                source={getInstructionIcon(currentManeuver)}
+                style={{ width: 40, height: 40, tintColor: '#00bfff', marginRight: 15 }}
+              />
 
-              <Text style={styles.distanceText}>{currentDistance} mètres</Text>
-
-              <View style={styles.arrowContainer}>
-                {/* <Image
-                  source={currentInstruction?.includes('gauche') ? require('./left-arrow.png') : require('./right-arrow.png')}
-                  style={styles.arrowIcon}
-                /> */}
-              </View>
-            </>
+            <View>
+              <Text style={{ color: '#00bfff', fontSize: 24, fontWeight: 'bold' }}>
+                {currentDistance} m
+              </Text>
+              <Text style={{ color: '#fff', fontSize: 18 }}>{currentInstruction}</Text>
+            </View>
+          </View>
           )}
         </View>
       )}
@@ -294,7 +372,7 @@ const styles = StyleSheet.create({
     width: '100%',
     zIndex: 10,
     backgroundColor:'rgb(0, 0, 0)',
-    borderRadius:20,
+    borderRadius:25,
     paddingTop:75,
 
   },

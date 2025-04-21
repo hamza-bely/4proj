@@ -8,7 +8,8 @@
       "@core/*": ["app/core/*"],
       "@assets/*":["assets/*"],
       "@supabase":["app/core/services/supabase.js"],
-      "@components/*":["components/*"]
+      "@components/*":["components/*"],
+      "@interfaces/*":["app/interfaces/*"],
       
     }
   },
