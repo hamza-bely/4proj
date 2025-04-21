@@ -268,7 +268,7 @@ export default function HomeScreen() {
               />
 
             <View>
-              <Text style={{ color: '#00bfff', fontSize: 24, fontWeight: 'bold' }}>
+              <Text style={{ color: '#fff', fontSize: 24, fontWeight: 'bold' }}>
                 {currentDistance} m
               </Text>
               <Text style={{ color: '#fff', fontSize: 18 }}>{currentInstruction}</Text>
