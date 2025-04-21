@@ -237,6 +237,9 @@ export default function HomeScreen() {
     setRouteOptions([]);
     setSelectedAddress(null);
     setInstructions([]);
+    setCurrentInstruction(null);
+    setCurrentDistance(Math.round(0));
+    setCurrentManeuver('');
   }, []);
   
   
@@ -261,10 +264,10 @@ export default function HomeScreen() {
           )}
 
           {currentInstruction && currentDistance > 0 && (
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <View style={styles.roadInstruction}>
               <Image
                 source={getInstructionIcon(currentManeuver)}
-                style={{ width: 40, height: 40, tintColor: '#00bfff', marginRight: 15 }}
+                style={{ width: (50), height: (50), tintColor: '#00bfff', marginRight: 15 }}
               />
 
             <View>
@@ -334,8 +337,8 @@ export default function HomeScreen() {
                 <View style={styles.routeInfoRowA}>
 
                   <View style={styles.speed}>
-                  <Text style={styles.speedText}>{Math.round(speed || 0)}</Text>
-                    <Text style={styles.speedText}>km/h</Text>
+                    <Text style={styles.speedTextNumber}>{Math.round(speed || 0)}</Text>
+                    <Text style={styles.speedTextLetter}>km/h</Text>
                   </View>
 
 
@@ -344,7 +347,7 @@ export default function HomeScreen() {
                   </Text>
 
                   <TouchableOpacity style={styles.clearRouteButton} onPress={clearRoute}>
-                    <Text style={styles.clearRouteButtonText}>x</Text>
+                    <Image source={require('@assets/images/close.png')} style={styles.closeBtn}/>
                   </TouchableOpacity>
 
                 </View> 
@@ -368,13 +371,17 @@ const styles = StyleSheet.create({
   roadInstructionContainer:{
     position: 'absolute',
     top: 0,
-    height: 180,
+    height: 160,
     width: '100%',
     zIndex: 10,
     backgroundColor:'rgb(0, 0, 0)',
     borderRadius:25,
     paddingTop:75,
 
+  },
+  roadInstruction:{
+    flexDirection:'row',
+    marginLeft:15,
   },
   titleDest:{
     fontWeight: 'bold',
@@ -516,9 +523,8 @@ const styles = StyleSheet.create({
   },
   speed: {
     backgroundColor: '#ffbc2e',
-    padding: 5,
-    width: 70,
-    height: 70,
+    width: 60,
+    height: 60,
     borderRadius: '100%',
     flexDirection: 'column',
     alignItems: 'center',
@@ -529,8 +535,13 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 1,
   },
-  speedText: {
-    fontSize: 18,
+  speedTextNumber: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#fff',
+  },
+  speedTextLetter: {
+    fontSize: 12,
     fontWeight: 'bold',
     color: '#fff',
   },
@@ -559,5 +570,9 @@ const styles = StyleSheet.create({
   clearRouteButtonText: {
     color: '#fff',
     fontWeight: 'bold',
+  },
+  closeBtn:{
+    height:20,
+    width:20,
   },
 });
