@@ -80,8 +80,8 @@ public class AuthService {
     }
 
     public AuthenticateResponse authenticate(AuthenticateRequest request) {
-        if (isNullOrEmpty(request.getEmail())) throw new IllegalArgumentException("Email is required.gatoire.");
-        if (isNullOrEmpty(request.getPassword())) throw new IllegalArgumentException("The mot de passe is obligatory.");
+        if (isNullOrEmpty(request.getEmail())) throw new IllegalArgumentException("Email is required");
+        if (isNullOrEmpty(request.getPassword())) throw new IllegalArgumentException("The password is required.");
 
         try {
             authenticationManager.authenticate(
@@ -91,7 +91,7 @@ public class AuthService {
                     )
             );
         } catch (BadCredentialsException e) {
-            throw new IllegalArgumentException("Email or many passes invalid.");
+            throw new IllegalArgumentException("Email or password invalid.");
         }
         UserInfo user = userRepository.findByEmail(request.getEmail()).orElseThrow();
         String jwtToken = jwtAuthService.generateToken(user);
