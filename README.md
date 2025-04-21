@@ -40,11 +40,7 @@
 ## Progress Summary
 
 Currently, most feature
-```
-
-
-
-
+``
 
 ## Project Team
 
@@ -58,13 +54,9 @@ Currently, most feature
 
 ```
 schoolinc/
-├── api-gateway/        # API Gateway service
-├── user-service/       # User management service
-├── course-service/     # Course management service
-├── class-service/      # Class management service
-├── grade-service/      # Grade management service
-├── frontend/          # React frontend application
-
+├── api-traficandme/        # API Gateway service
+├── web-traficandme/       # User management service
+├── mobile-traficandme/     # Course management service
 ```
 
 ## Prerequisites
