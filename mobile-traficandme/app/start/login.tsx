@@ -7,14 +7,14 @@ import { Ionicons } from '@expo/vector-icons';
 import { Link, router } from "expo-router";
 import { useColorScheme } from 'react-native';
 import { supabase } from '@supabase';
-
+import {loginUser} from '@services/apiService'
 
 export default function Login() {
     const colorScheme = useColorScheme();
     const [isDarkMode, setIsDarkMode] = useState(colorScheme === 'dark');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-
+    const [error, setError] = useState('');
 
     useEffect(() => {
         const handleAppearanceChange = ({ colorScheme }: { colorScheme: any }) => {
@@ -29,24 +29,15 @@ export default function Login() {
     }, []);
 
     const toLog = async () => {
-        // if (!email || !password) {
-        //     alert("Veuillez remplir tous les champs.");
-        //     return;
-        // }
-    
-        // const { data, error } = await supabase.auth.signInWithPassword({
-        //     email,
-        //     password,
-        // });
-    
-        // if (error) {
-        //     console.error(error);
-        //     alert("Email ou mot de passe incorrect.");
-        // } else {
-        //     alert("Connexion réussie !");
-        //     router.push('/home')
-        // }
-        router.push('/home')
+
+        try {
+            const user = await loginUser(email, password);
+
+            router.push('/home');
+        } catch (error) {
+            setError('Email ou mot de passe incorrect');
+        }
+
     };
     
     
@@ -92,6 +83,7 @@ export default function Login() {
                                     value={password}
                                     onChangeText={setPassword}
                                 />
+                                {error ? <Text style={styles.errorText}>{error}</Text> : null}
                             </View>
                             <View style={styles.registerContainer}>
                                 <Link href="/start/register" asChild>
@@ -159,6 +151,10 @@ const styles = StyleSheet.create({
     },
     darkText: {
         color: 'white',
+    },
+    errorText: {
+        color: 'red',
+        marginBottom: 20,
     },
     inputContainer: {
         width: '80%',

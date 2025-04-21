@@ -10,6 +10,7 @@
       "@supabase":["app/core/services/supabase.js"],
       "@components/*":["components/*"],
       "@interfaces/*":["app/interfaces/*"],
+      "@services/*":["app/core/services/*"],
       
     }
   },
