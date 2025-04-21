@@ -61,7 +61,7 @@ Cependant, l'application mobile est encore en phase initiale de développement e
 - **Hamza Belyahiaoui** - Développeur Full Stack / Chef de Projet
 - **Abdoul-waris Konate** - Développeur Back-End / Architecture des microservices
 - **Fadel Biaou** - Développeur Front-End / UX Designer
-- **Jean-philippe Delon** - Développeur Back-End / Spécialiste en sécurité et Mobile 
+- **Jean-philippe Delon** - Développeur Mobile / Spécialiste en Intelligence artificielle 
 
 ## Structure du Projet
 
@@ -77,7 +77,8 @@ traficandme/
 - Node.js (v22 ou supérieur)
 - npm (v10 ou supérieur)
 - Docker et Docker Compose
-- API de cartographie Tomtom map
+- java v17
+- API de cartographie "Tomtom map"
 
 ## Installation
 
@@ -95,35 +96,15 @@ Installer les dépendances pour chaque service:
 ```bash
 # Front-End 
 cd web-traficandme
-npm install
+./mvnw spring-boot:run
 
 # Mobile
 cd ../mobile-traficandme
 npm install
 
-# Back-End
+# API
 cd ../api-traficandme
 npm install
-```
-
-### 3. Configuration de l'Environnement
-
-Créer des fichiers `.env` dans chaque répertoire de service avec les variables suivantes:
-
-```env
-# api-traficandme/.env
-PORT=3000
-MONGODB_URI=mongodb://localhost:27017/traficandme
-JWT_SECRET=votre_secret_jwt
-MAPS_API_KEY=votre_cle_api_maps
-
-# web-traficandme/.env
-VITE_API_URL=http://localhost:3000/api
-VITE_MAPS_API_KEY=votre_cle_api_maps
-
-# mobile-traficandme/.env
-API_URL=http://localhost:3000/api
-MAPS_API_KEY=votre_cle_api_maps
 ```
 
 ### 4. Initialiser la Base de Données
@@ -131,9 +112,7 @@ MAPS_API_KEY=votre_cle_api_maps
 Initialiser la base de données avec les données initiales:
 
 ```bash
-# API Service
-cd api-traficandme
-npm run seed
+Processus automatique après le lancement du projet
 ```
 
 ### 5. Démarrer les Services
@@ -141,9 +120,9 @@ npm run seed
 Démarrer chaque service dans un terminal séparé:
 
 ```bash
-# Back-End
+# API
 cd api-traficandme
-npm run dev
+./mvnw spring-boot:run
 
 # Front-End
 cd web-traficandme
@@ -151,7 +130,7 @@ npm run dev
 
 # Mobile (développement)
 cd mobile-traficandme
-npm run start
+npx expo start
 ```
 
 ## Utilisation de l'Application
@@ -163,8 +142,8 @@ Pour utiliser l'application, suivez ces étapes:
 3. Démarrez tous les services dans des terminaux séparés en utilisant les commandes ci-dessus
 4. Accédez à l'application:
    - Front-End Web: http://localhost:5173
-   - Documentation API: http://localhost:3000/api-docs
-   - API: http://localhost:3000/api
+   - Documentation API: http://localhost:8080/swagger-ui/indeX.html
+   - API: http://localhost:8080/api
 
 ## Utilisateurs par Défaut
 
@@ -172,22 +151,17 @@ Le système est fourni avec des utilisateurs pré-configurés:
 
 ### Administrateur
 - Email: admin@traficandme.com
-- Mot de passe: admin123
+- Mot de passe: AdminPass123!
 - Rôle: ADMIN
 
 ### Utilisateur
-- Email: user@traficandme.com
-- Mot de passe: user123
+- Email: hamza.bely@traficandme.com
+- Mot de passe: UserPass123!
 - Rôle: USER
 
 ## Documentation de l'API
 
-La documentation de l'API est disponible à l'adresse `http://localhost:3000/api-docs`. Pour générer et servir la documentation:
-
-```bash
-cd api-traficandme
-
-```
+La documentation de l'API est disponible à l'adresse `http://localhost:8080/swagger-ui/indeX.html`. Pour générer et servir la documentation:
 
 ## Fonctionnalités Principales
 
@@ -200,10 +174,10 @@ cd api-traficandme
 - Prédiction des embouteillages
 - Partage d'itinéraires entre appareils
 
-## Développement
 
 ### Exécution des Tests
 
+//TODO ------
 ```bash
 # Exécuter les tests pour tous les services
 npm test
