@@ -7,6 +7,7 @@ import "../css/map.css";
 import { useLocation } from "react-router-dom";
 import { toast } from "react-toastify";
 import { Coordinate, RouteResponse } from "../model/map.tsx";
+import {translateMessage} from "../../../../assets/i18/translateMessage.tsx";
 
 // Constants extracted for better maintainability
 const TRAFFIC_REFRESH_INTERVAL = 90000000;
@@ -90,7 +91,7 @@ const Map: React.FC = () => {
                 const coordinates = points.map((p) => [p.longitude, p.latitude] as [number, number]);
                 displayRouteOnMap(coordinates, mapInstance);
             } else {
-                toast.error("Aucun itinéraire trouvé");
+                toast.error(await translateMessage("No routes found"));
             }
         } catch (error) {
             console.error("Erreur lors du calcul de l'itinéraire:", error);
