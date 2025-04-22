@@ -49,6 +49,18 @@ public class DateUtils {
 
         return sdf.format(date);
     }
+    public static Date formatDateWithPatternAsDate(Date date, String pattern) {
+        if (date == null) return null;
+
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat(pattern);
+            String formatted = sdf.format(date);         // formatte vers String
+            return sdf.parse(formatted);                // reparse vers Date
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
     public static String LocalDateFormatWithSpecificPattern(LocalDate date,String format) {
         if(date == null) return null;
         return date.format(DateTimeFormatter.ofPattern(format));

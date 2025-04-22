@@ -19,7 +19,7 @@ import java.util.Date;
 public class TrafficModel {
     @Id
     @GeneratedValue
-    private int Id;
+    private int id;
     private String startLongitude;
     private String startLatitude;
     private String endLongitude;
@@ -45,11 +45,11 @@ public class TrafficModel {
     private StatusTraffic status = StatusTraffic.ACTIVE;
 
     public int getId() {
-        return Id;
+        return id;
     }
 
     public void setId(int id) {
-        Id = id;
+        id = id;
     }
 
     public String getStartLongitude() {

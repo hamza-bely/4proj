@@ -1,5 +1,8 @@
 package com.supinfo.api_traficandme.user.controller;
 
+import com.supinfo.api_traficandme.common.PeriodStatus;
+import com.supinfo.api_traficandme.reports.dto.StatusReport;
+import com.supinfo.api_traficandme.statistiques.dto.ApiUsageData;
 import com.supinfo.api_traficandme.user.dto.StatusUser;
 import com.supinfo.api_traficandme.user.dto.UserRequest;
 import com.supinfo.api_traficandme.user.dto.UserResponse;
@@ -120,6 +123,16 @@ public class AdminController {
     public ResponseEntity<ApiResponse<List<RouteData>>> getRouteStatistics() {
         try {
             List<RouteData> routeData = statisticService.getRouteStatistics();
+            return ResponseEntity.ok(new ApiResponse<>("Route statistics", routeData));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(new ApiResponse<>(e.getMessage(), null));
+        }
+    }
+
+    @GetMapping("/search-statistics")
+    public ResponseEntity<ApiResponse<List<ApiUsageData>>> getStatisticsBySearchTime(@RequestBody PeriodStatus period) {
+        try {
+            List<ApiUsageData> routeData = statisticService.getApiUsageStatisticsPerTime(period);
             return ResponseEntity.ok(new ApiResponse<>("Route statistics", routeData));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(new ApiResponse<>(e.getMessage(), null));
