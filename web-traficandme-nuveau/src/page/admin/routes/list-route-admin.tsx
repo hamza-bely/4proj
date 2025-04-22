@@ -37,7 +37,7 @@ export default function ListRouteAdmin() {
             routeId: route.id.toString()
         });
 
-        navigate(`/map?${params.toString()}`);
+        navigate(`/map?${params}`);
     };
 
     const handleDelete = async (id: number) => {
