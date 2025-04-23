@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   KeyboardAvoidingView,
   Keyboard,
@@ -17,11 +17,10 @@ import TomTomMap from '@components/TomTomMaps';
 import { StatusBar } from 'expo-status-bar';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Location from 'expo-location';
-import  AddressSuggestion  from '@interfaces/AddressSuggestion';
-import  NavigationInstruction  from '@interfaces/NavigationInstruction';
-import  RouteOption  from '@interfaces/RouteOption';
-import  ClosestInstruction  from '@interfaces/ClosestInstruction';
-
+import AddressSuggestion from '@interfaces/AddressSuggestion';
+import NavigationInstruction from '@interfaces/NavigationInstruction';
+import RouteOption from '@interfaces/RouteOption';
+import ClosestInstruction from '@interfaces/ClosestInstruction';
 
 export default function HomeScreen() {
   const colorScheme = useColorScheme();
@@ -40,8 +39,6 @@ export default function HomeScreen() {
   const [currentDistance, setCurrentDistance] = useState<number>(0);
   const [currentManeuver, setCurrentManeuver] = useState<string>('STRAIGHT');
   const [instructions, setInstructions] = useState<NavigationInstruction[]>([]);
-
-
 
   useEffect(() => {
     if (searchText.length > 2) {
@@ -83,13 +80,11 @@ export default function HomeScreen() {
     }
   }, [destination]);
 
-
-  
   useEffect(() => {
     const watchPosition = async () => {
       const { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') return;
-  
+
       const sub = await Location.watchPositionAsync(
         {
           accuracy: Location.Accuracy.High,
@@ -100,44 +95,39 @@ export default function HomeScreen() {
           updateCurrentInstruction(location.coords);
         }
       );
-  
+
       return () => sub.remove();
     };
-  
+
     watchPosition();
   }, [selectedRoute]);
-  
 
-
-  
-  
-  
-  const updateCurrentInstruction = (coords: Location.LocationObjectCoords) => {
+  const updateCurrentInstruction = useCallback(async (coords: Location.LocationObjectCoords) => {
     if (!selectedRoute || !selectedRoute.guidance || !selectedRoute.guidance.instructions) {
       console.log('selectedRoute or guidance is null');
       return;
     }
-  
+
     const userLat = coords.latitude;
     const userLon = coords.longitude;
-  
+
     let closestInstruction: ClosestInstruction | null = null;
     let minDistance = Number.MAX_SAFE_INTEGER;
-  
+
     for (const instruction of selectedRoute.guidance.instructions) {
       const { point, message } = instruction;
       if (!point) {
         console.log('Instruction point is null');
         continue;
       }
-  
+
       const distance = getDistanceFromLatLonInM(userLat, userLon, point.latitude, point.longitude);
       if (distance < minDistance) {
         minDistance = distance;
         closestInstruction = { message, distance, maneuver: instruction.maneuver };
       }
     }
-  
+
     if (closestInstruction) {
       setCurrentInstruction(closestInstruction.message);
       setCurrentDistance(Math.round(closestInstruction.distance));
@@ -145,44 +135,69 @@ export default function HomeScreen() {
     } else {
       console.log('No closest instruction found');
     }
+
+    // Check if the user is off route and recalculate the route if necessary
+    if (minDistance > 50) { // Adjust the threshold as needed
+      await recalculateRoute(coords);
+    }
+  }, [selectedRoute]);
+
+  const recalculateRoute = async (coords: Location.LocationObjectCoords) => {
+    if (!destination) return;
+
+    try {
+      const response = await fetch(
+        `https://api.tomtom.com/routing/1/calculateRoute/${coords.latitude},${coords.longitude}:${destination.latitude},${destination.longitude}/json?key=QBsKzG3zoRyZeec28eUDje0U8DeNoRSO&routeType=fastest&maxAlternatives=3&instructionsType=text&language=fr`
+      );
+      const data = await response.json();
+      setRouteOptions(data.routes);
+      if (data.routes.length > 0) {
+        const instructionsArray: NavigationInstruction[] = data.routes[0].guidance.instructions.map((instr: any) => ({
+          message: instr.message,
+          distance: instr.routeOffsetInMeters,
+          maneuver: instr.maneuver,
+        }));
+        setInstructions(instructionsArray);
+        setSelectedRoute(data.routes[0]);
+      }
+    } catch (error) {
+      console.error('Erreur lors du recalcul de l\'itinéraire :', error);
+    }
   };
-  
-  
+
   const getDistanceFromLatLonInM = (lat1: number, lon1: number, lat2: number, lon2: number) => {
-    const R = 6371e3; 
+    const R = 6371e3;
     const φ1 = lat1 * Math.PI / 180;
     const φ2 = lat2 * Math.PI / 180;
     const Δφ = (lat2 - lat1) * Math.PI / 180;
     const Δλ = (lon2 - lon1) * Math.PI / 180;
-  
+
     const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
               Math.cos(φ1) * Math.cos(φ2) *
               Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  
+
     return R * c;
   };
 
   const getInstructionIcon = (instructionType: string) => {
-  switch (instructionType) {
-    case 'TURN_LEFT':
-      return require('@assets/images/turn-left.png');
-    case 'TURN_RIGHT':
-      return require('@assets/images/turn-right.png');
-    case 'STRAIGHT':
-      return require('@assets/images/straight.png');
-    case 'UTURN_LEFT':
-    case 'UTURN_RIGHT':
-      return require('@assets/images/u-turn.png');
-    case 'ROUNDABOUT_LEFT':
-    case 'ROUNDABOUT_RIGHT':
-      return require('@assets/images/roundabout.png');
-    default:
-      return require('@assets/images/straight.png');
-  }
-};
-
-  
+    switch (instructionType) {
+      case 'TURN_LEFT':
+        return require('@assets/images/turn-left.png');
+      case 'TURN_RIGHT':
+        return require('@assets/images/turn-right.png');
+      case 'STRAIGHT':
+        return require('@assets/images/straight.png');
+      case 'UTURN_LEFT':
+      case 'UTURN_RIGHT':
+        return require('@assets/images/u-turn.png');
+      case 'ROUNDABOUT_LEFT':
+      case 'ROUNDABOUT_RIGHT':
+        return require('@assets/images/roundabout.png');
+      default:
+        return require('@assets/images/straight.png');
+    }
+  };
 
   const fetchSuggestions = async (text: string) => {
     try {
@@ -201,7 +216,7 @@ export default function HomeScreen() {
       const response = await fetch(
         `https://api.tomtom.com/routing/1/calculateRoute/${latitude},${longitude}:${destination.latitude},${destination.longitude}/json?key=QBsKzG3zoRyZeec28eUDje0U8DeNoRSO&routeType=fastest&maxAlternatives=3&instructionsType=text&language=fr`
       );
-            const data = await response.json();
+      const data = await response.json();
       setRouteOptions(data.routes);
       if (data.routes.length > 0) {
         const instructionsArray: NavigationInstruction[] = data.routes[0].guidance.instructions.map((instr: any) => ({
@@ -210,8 +225,7 @@ export default function HomeScreen() {
           maneuver: instr.maneuver,
         }));
         setInstructions(instructionsArray);
-        
-      }      
+      }
     } catch (error) {
       console.error('Erreur lors de la récupération des itinéraires :', error);
     }
@@ -235,10 +249,8 @@ export default function HomeScreen() {
         maneuver: instr.maneuver,
       })) || [];
       setInstructions(routeInstructions);
-      
     }
   };
-  
 
   const clearRoute = useCallback(() => {
     setDestination(null);
@@ -252,14 +264,18 @@ export default function HomeScreen() {
     setCurrentDistance(0);
     setCurrentManeuver('');
   }, []);
-  
-  
+
+  const memoizedTomTomMap = useMemo(() => (
+    <TomTomMap destination={destination} routeOptions={routeOptions} selectedRoute={selectedRoute} />
+  ), [destination, routeOptions, selectedRoute]);
+
+  console.log('Rendering HomeScreen with:', { destination, routeOptions, selectedRoute });
 
   return (
     <View style={styles.container}>
       <StatusBar style="light" translucent backgroundColor="transparent" />
 
-      <TomTomMap destination={destination} routeOptions={routeOptions} selectedRoute={selectedRoute} />
+      {memoizedTomTomMap}
 
       <LinearGradient
         colors={['rgba(0,0,0,0.6)', 'rgba(0,0,0,0.0)']}
@@ -281,18 +297,16 @@ export default function HomeScreen() {
                 style={{ width: (50), height: (50), tintColor: '#00bfff', marginRight: 15 }}
               />
 
-            <View>
-              <Text style={{ color: '#fff', fontSize: 24, fontWeight: 'bold' }}>
-                {currentDistance} m
-              </Text>
-              <Text style={{ color: '#fff', fontSize: 18 }}>{currentInstruction}</Text>
+              <View>
+                <Text style={{ color: '#fff', fontSize: 24, fontWeight: 'bold' }}>
+                  {currentDistance} m
+                </Text>
+                <Text style={{ color: '#fff', fontSize: 18 }}>{currentInstruction}</Text>
+              </View>
             </View>
-          </View>
           )}
         </View>
       )}
-
-
 
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={[styles.tabNavigation, { backgroundColor: colorScheme === 'dark' ? '#1a1a1a' : '#f9f9f9' }]}>
         {!destination ? (
@@ -344,24 +358,18 @@ export default function HomeScreen() {
               </View>
             ) : (
               <View style={styles.routeInfoContainer}>
-
                 <View style={styles.routeInfoRowA}>
-
                   <View style={styles.speed}>
                     <Text style={styles.speedTextNumber}>{Math.round(speed || 0)}</Text>
                     <Text style={styles.speedTextLetter}>km/h</Text>
                   </View>
-
-
                   <Text style={[styles.selectedRouteText, { color: textColor }]}>
                     {((selectedRoute.summary.travelTimeInSeconds) / 60).toFixed(0)} min
                   </Text>
-
                   <TouchableOpacity style={styles.clearRouteButton} onPress={clearRoute}>
                     <Image source={require('@assets/images/close.png')} style={styles.closeBtn}/>
                   </TouchableOpacity>
-
-                </View> 
+                </View>
               </View>
             )}
           </>
@@ -385,7 +393,6 @@ const styles = StyleSheet.create({
     backgroundColor:'rgb(0, 0, 0)',
     borderRadius:25,
     paddingTop:75,
-
   },
   roadInstruction:{
     flexDirection:'row',
@@ -490,7 +497,6 @@ const styles = StyleSheet.create({
   selectedRouteText: {
     fontSize: 30,
     fontWeight: 'bold',
-
   },
   myAddress: {
     flexDirection: 'row',
