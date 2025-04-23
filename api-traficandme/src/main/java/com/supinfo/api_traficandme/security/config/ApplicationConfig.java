@@ -1,7 +1,6 @@
 package com.supinfo.api_traficandme.security.config;
 
-import com.supinfo.api_traficandme.User.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
+import com.supinfo.api_traficandme.user.repository.UserRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;

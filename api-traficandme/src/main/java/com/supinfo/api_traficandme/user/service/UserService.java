@@ -1,11 +1,11 @@
-package com.supinfo.api_traficandme.User.service;
+package com.supinfo.api_traficandme.user.service;
 
-import com.supinfo.api_traficandme.User.dto.StatusUser;
-import com.supinfo.api_traficandme.User.dto.UserMapper;
-import com.supinfo.api_traficandme.User.dto.UserRequest;
-import com.supinfo.api_traficandme.User.dto.UserResponse;
-import com.supinfo.api_traficandme.User.entity.UserInfo;
-import com.supinfo.api_traficandme.User.repository.UserRepository;
+import com.supinfo.api_traficandme.user.dto.StatusUser;
+import com.supinfo.api_traficandme.user.dto.UserMapper;
+import com.supinfo.api_traficandme.user.dto.UserRequest;
+import com.supinfo.api_traficandme.user.dto.UserResponse;
+import com.supinfo.api_traficandme.user.entity.UserInfo;
+import com.supinfo.api_traficandme.user.repository.UserRepository;
 import com.supinfo.api_traficandme.common.Role;
 import com.supinfo.api_traficandme.reports.entity.Report;
 import com.supinfo.api_traficandme.reports.repository.ReportRepository;

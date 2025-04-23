@@ -137,6 +137,7 @@ export interface AdminSumStats {
         routeSearches: number;
         userTotal: number;
         trafficInfo: number;
+        deletedUsers : number;
     }
     
   }

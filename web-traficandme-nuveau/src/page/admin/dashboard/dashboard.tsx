@@ -1,12 +1,29 @@
 import React, { useState, useEffect } from 'react';
-import {  BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { fetchSumOfMapStatistic } from '../../../services/service/admin-serivce.tsx';
+import {
+    BarChart,
+    Bar,
+    PieChart,
+    Pie,
+    Cell,
+    XAxis,
+    YAxis,
+    CartesianGrid,
+    Tooltip,
+    Legend,
+    ResponsiveContainer,
+    LineChart, Line
+} from 'recharts';
+import {
+    fetchApiStatisticsPerTime,
+    fetchReportsByTypeStatistics,
+    fetchRoutesByModeStatistics,
+    fetchSumOfMapStatistic
+} from '../../../services/service/admin-serivce.tsx';
 import { AdminSumStats } from '../../../services/model/user.tsx';
 
 interface ApiUsageData {
     date: string;
     routeSearches: number;
-    geocoding: number;
     trafficInfo: number;
 }
 
@@ -15,47 +32,29 @@ interface RouteData {
     count: number;
 }
 
+interface ReportData {
+    mode: string;
+    count: number;
+}
+
 interface ApiErrorData {
     errorType: string;
     count: number;
 }
 
-// Composant principal
-const TomTomApiDashboard: React.FC = () => {
+const Dashboard: React.FC = () => {
+    const [reportData, setReportData] = useState<ReportData[]>([]);
+    const [itineraryData, setItineraryData] = useState<RouteData[]>([]);
     const [usageData, setUsageData] = useState<ApiUsageData[]>([]);
-    const [routeData, setRouteData] = useState<RouteData[]>([]);
     const [errorData, setErrorData] = useState<ApiErrorData[]>([]);
     const [mapData, setMapData] = useState<AdminSumStats | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
-    const [timeRange, setTimeRange] = useState<string>('week');
+    const [timeRange, setTimeRange] = useState<string>('WEEK');
 
-    // Couleurs pour les graphiques
     const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
 
-    // Données fictives pour la démonstration
     useEffect(() => {
-        // Simuler un chargement de données
         setTimeout(() => {
-            // Données d'utilisation quotidienne
-            const mockUsageData: ApiUsageData[] = [
-                { date: '2025-04-01', routeSearches: 320, geocoding: 150, trafficInfo: 90 },
-                { date: '2025-04-02', routeSearches: 350, geocoding: 130, trafficInfo: 85 },
-                { date: '2025-04-03', routeSearches: 410, geocoding: 145, trafficInfo: 100 },
-                { date: '2025-04-04', routeSearches: 490, geocoding: 160, trafficInfo: 110 },
-                { date: '2025-04-05', routeSearches: 380, geocoding: 170, trafficInfo: 95 },
-                { date: '2025-04-06', routeSearches: 360, geocoding: 150, trafficInfo: 88 },
-            ];
-
-            // Types de recherches d'itinéraires
-            const mockRouteData: RouteData[] = [
-                { type: 'Le plus rapide', count: 1250 },
-                { type: 'Le plus court', count: 850 },
-                { type: 'Économique', count: 650 },
-                { type: 'Touristique', count: 320 },
-                { type: 'Sans péage', count: 580 },
-            ];
-
-            // Données d'erreurs
             const mockErrorData: ApiErrorData[] = [
                 { errorType: 'Timeout', count: 45 },
                 { errorType: 'Adresse non trouvée', count: 78 },
@@ -64,32 +63,65 @@ const TomTomApiDashboard: React.FC = () => {
                 { errorType: 'Autres', count: 20 },
             ];
 
-            setUsageData(mockUsageData);
-            setRouteData(mockRouteData);
             setErrorData(mockErrorData);
             setLoading(false);
         }, 1000);
     }, [timeRange]);
 
-    // je fetch les totaux de la maps
     useEffect(() => {
         fetchSumOfMapStatistic()
           .then(setMapData)
           .catch(err => console.error("Erreur stats map", err));
       }, []);
 
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const data = await fetchReportsByTypeStatistics();
+                setReportData(data.data)
+                console.log("data",data); // Example: Log the data
+            } catch (err) {
+                console.error("Erreur stats map", err);
+            }
+        };
 
-    // Gestionnaire de changement de plage de temps
+        fetchData();
+    }, []);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const data = await fetchRoutesByModeStatistics();
+                setItineraryData(data.data)
+                console.log("data",data); // Example: Log the data
+            } catch (err) {
+                console.error("Erreur stats map", err);
+            }
+        };
+
+        fetchData();
+    }, []);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const data = await fetchApiStatisticsPerTime(timeRange);
+                setUsageData(data.data)
+                console.log("data",data); // Example: Log the data
+            } catch (err) {
+                console.error("Erreur stats map", err);
+            }
+        };
+        if (timeRange) {
+            fetchData();
+        }
+    }, [timeRange]);
+
+    // Gestionnaire de changement de plage de temps fetchRoutesByStatisticsPerTime("WEEK")
     const handleTimeRangeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         setTimeRange(event.target.value);
         setLoading(true);
     };
-
-    // Calcul des statistiques totales
-    const totalRouteSearches = usageData.reduce((sum, item) => sum + item.routeSearches, 0);
-    const totalGeocoding = usageData.reduce((sum, item) => sum + item.geocoding, 0);
-    const totalTrafficInfo = usageData.reduce((sum, item) => sum + item.trafficInfo, 0);
-    const totalErrors = errorData.reduce((sum, item) => sum + item.count, 0);
 
     if (loading) {
         return <div className="flex justify-center items-center h-64">Chargement des données...</div>;
@@ -109,10 +141,10 @@ const TomTomApiDashboard: React.FC = () => {
                         value={timeRange}
                         onChange={handleTimeRangeChange}
                     >
-                        <option value="day">Aujourd'hui</option>
-                        <option value="week">Cette semaine</option>
-                        <option value="month">Ce mois</option>
-                        <option value="quarter">Ce trimestre</option>
+                        <option value="TODAY">Aujourd'hui</option>
+                        <option value="WEEK">Cette semaine</option>
+                        <option value="MONTH">Ce mois</option>
+                        <option value="QUARTER">Ce trimestre</option>
                     </select>
                 </div>
                 <div className="text-sm text-gray-500">
@@ -120,7 +152,6 @@ const TomTomApiDashboard: React.FC = () => {
                 </div>
             </div>
 
-            {/* Cartes de statistiques */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
                 <div className="bg-white p-4 rounded-lg shadow">
                     <h3 className="text-gray-500 text-sm">Nombres d'utilisateurs</h3>
@@ -136,16 +167,10 @@ const TomTomApiDashboard: React.FC = () => {
                 </div>
                 <div className="bg-white p-4 rounded-lg shadow">
                     <h3 className="text-gray-500 text-sm">Erreurs</h3>
-                    <p className="text-2xl font-bold text-red-500">{totalErrors}</p>
+                    <p className="text-2xl font-bold text-red-500">{mapData?.data.deletedUsers}</p>
                 </div>
             </div>
-
-            {/* Graphiques */}
-            
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/*
-
-           ** a discuter  Graphique d'utilisation quotidienne **
 
                 <div className="bg-white p-4 rounded-lg shadow">
                     <h2 className="text-lg font-semibold mb-4">Utilisation Quotidienne</h2>
@@ -157,28 +182,26 @@ const TomTomApiDashboard: React.FC = () => {
                             <Tooltip />
                             <Legend />
                             <Line type="monotone" dataKey="routeSearches" stroke="#0088FE" name="Recherches d'itinéraires" />
-                            <Line type="monotone" dataKey="geocoding" stroke="#00C49F" name="Géocodage" />
                             <Line type="monotone" dataKey="trafficInfo" stroke="#FFBB28" name="Info Trafic" />
                         </LineChart>
                     </ResponsiveContainer>
                 </div>
-            */}
-                {/* Graphique des types de recherches d'itinéraires */}
+
                 <div className="bg-white p-4 rounded-lg shadow">
-                    <h2 className="text-lg font-semibold mb-4">Types de signalement sur l'Itinéraires</h2>
+                    <h2 className="text-lg font-semibold mb-4">Types de Recherches sur l'Itinéraires</h2>
                     <ResponsiveContainer width="100%" height={300}>
                         <PieChart>
                             <Pie
-                                data={routeData}
+                                data={itineraryData}
                                 cx="50%"
                                 cy="50%"
                                 labelLine={false}
-                                label={({ type, percent }) => `${type}: ${(percent * 100).toFixed(0)}%`}
+                                label={({ mode, percent }) => `${mode}: ${(percent * 100).toFixed(0)}%`}
                                 outerRadius={100}
                                 fill="#8884d8"
                                 dataKey="count"
                             >
-                                {routeData.map((_type , index) => (
+                                {itineraryData.map((_mode , index) => (
                                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                                 ))}
                             </Pie>
@@ -188,13 +211,12 @@ const TomTomApiDashboard: React.FC = () => {
                 </div>
 
 
-                {/* Graphique des types de recherches d'itinéraires */}
                 <div className="bg-white p-4 rounded-lg shadow">
-                    <h2 className="text-lg font-semibold mb-4">Types de Recherches d'Itinéraires</h2>
+                    <h2 className="text-lg font-semibold mb-4">Types de Recherches Sinagnialment</h2>
                     <ResponsiveContainer width="100%" height={300}>
                         <PieChart>
                             <Pie
-                                data={routeData}
+                                data={reportData}
                                 cx="50%"
                                 cy="50%"
                                 labelLine={false}
@@ -203,7 +225,7 @@ const TomTomApiDashboard: React.FC = () => {
                                 fill="#8884d8"
                                 dataKey="count"
                             >
-                                {routeData.map((_type , index) => (
+                                {reportData.map((_type , index) => (
                                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                                 ))}
                             </Pie>
@@ -226,44 +248,10 @@ const TomTomApiDashboard: React.FC = () => {
                     </ResponsiveContainer>
                 </div>
 
-                {/* Tableau récapitulatif */}
-                <div className="bg-white p-4 rounded-lg shadow">
-                    <h2 className="text-lg font-semibold mb-4">Résumé des Performances</h2>
-                    <table className="min-w-full">
-                        <thead>
-                        <tr className="bg-gray-100">
-                            <th className="text-left p-2">Métrique</th>
-                            <th className="text-left p-2">Valeur</th>
-                            <th className="text-left p-2">Performance</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr className="border-b">
-                            <td className="p-2">Taux de réussite</td>
-                            <td className="p-2">{((totalRouteSearches + totalGeocoding + totalTrafficInfo - totalErrors) / (totalRouteSearches + totalGeocoding + totalTrafficInfo) * 100).toFixed(2)}%</td>
-                            <td className="p-2 text-green-500">Bon</td>
-                        </tr>
-                        <tr className="border-b">
-                            <td className="p-2">Temps de réponse moyen</td>
-                            <td className="p-2">320ms</td>
-                            <td className="p-2 text-green-500">Excellent</td>
-                        </tr>
-                        <tr className="border-b">
-                            <td className="p-2">Utilisation du quota</td>
-                            <td className="p-2">68%</td>
-                            <td className="p-2 text-yellow-500">Modéré</td>
-                        </tr>
-                        <tr>
-                            <td className="p-2">Coût par requête</td>
-                            <td className="p-2">0.0023€</td>
-                            <td className="p-2 text-green-500">Bon</td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
+
             </div>
         </div>
     );
 };
 
-export default TomTomApiDashboard;
+export default Dashboard;

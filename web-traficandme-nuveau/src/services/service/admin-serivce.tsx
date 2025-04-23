@@ -10,7 +10,6 @@ import {
     UserUpdaterRequest
 } from "../model/user.tsx";
 import {translateMessage} from "../../assets/i18/translateMessage.tsx";
-import { ReportData } from "../model/report.tsx";
 const API_URL = import.meta.env.VITE_API_URL;
 
 const getAuthHeaders = () => {
@@ -91,9 +90,9 @@ export const fetchSumOfMapStatistic = async (): Promise<AdminSumStats> => {
     }
 };
 
-export const fetchReportsByTypeStatistics = async (): Promise<ReportData> => {
+export const fetchReportsByTypeStatistics = async (): Promise<any> => {
     try {
-        const response = await axios.get<ReportData>(`${API_URL}admin/users/Report-statistics`, { headers: getAuthHeaders() });
+        const response = await axios.get<any>(`${API_URL}admin/users/report-statistics`, { headers: getAuthHeaders() });
         return response.data;
     } catch (error: any) {
         toast.success(await translateMessage(error.response.data.message || "An error has occurred"));
@@ -103,7 +102,17 @@ export const fetchReportsByTypeStatistics = async (): Promise<ReportData> => {
 
 export const fetchRoutesByModeStatistics = async (): Promise<any> => {
     try {
-        const response = await axios.get<any>(`${API_URL}admin/users/Route-statistics`, { headers: getAuthHeaders() });
+        const response = await axios.get<any>(`${API_URL}admin/users/route-statistics`, { headers: getAuthHeaders() });
+        return response.data;
+    } catch (error: any) {
+        toast.success(await translateMessage(error.response.data.message || "An error has occurred"));
+        throw error;
+    }
+};
+
+export const fetchApiStatisticsPerTime = async (period: string): Promise<any> => {
+    try {
+        const response = await axios.get<any>(`${API_URL}admin/users/search-statistics`, { headers: getAuthHeaders(),params: { period } });
         return response.data;
     } catch (error: any) {
         toast.success(await translateMessage(error.response.data.message || "An error has occurred"));

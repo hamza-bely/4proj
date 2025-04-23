@@ -1,6 +1,6 @@
 package com.supinfo.api_traficandme.security.dto;
 
-import com.supinfo.api_traficandme.User.dto.UserResponse;
+import com.supinfo.api_traficandme.user.dto.UserResponse;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;

@@ -1,11 +1,11 @@
 package com.supinfo.api_traficandme.security.service;
 
-import com.supinfo.api_traficandme.User.dto.UserResponse;
+import com.supinfo.api_traficandme.user.dto.UserResponse;
 import com.supinfo.api_traficandme.security.dto.AuthenticateRequest;
 import com.supinfo.api_traficandme.security.dto.AuthenticateResponse;
 import com.supinfo.api_traficandme.security.dto.RegisterRequest;
-import com.supinfo.api_traficandme.User.entity.UserInfo;
-import com.supinfo.api_traficandme.User.repository.UserRepository;
+import com.supinfo.api_traficandme.user.entity.UserInfo;
+import com.supinfo.api_traficandme.user.repository.UserRepository;
 import com.supinfo.api_traficandme.common.Role;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;

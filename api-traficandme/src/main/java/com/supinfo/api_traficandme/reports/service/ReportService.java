@@ -1,6 +1,6 @@
 package com.supinfo.api_traficandme.reports.service;
 
-import com.supinfo.api_traficandme.User.dto.UserResponse;
+import com.supinfo.api_traficandme.user.dto.UserResponse;
 import com.supinfo.api_traficandme.reports.dto.CreateReportRequest;
 import com.supinfo.api_traficandme.reports.dto.StatusReport;
 import com.supinfo.api_traficandme.reports.dto.TypeReport;
@@ -8,7 +8,7 @@ import com.supinfo.api_traficandme.reports.entity.Report;
 import com.supinfo.api_traficandme.reports.entity.ReportInteraction;
 import com.supinfo.api_traficandme.reports.repository.ReportInteractionRepository;
 import com.supinfo.api_traficandme.reports.repository.ReportRepository;
-import com.supinfo.api_traficandme.statistiques.model.ReportData;
+import com.supinfo.api_traficandme.statistiques.dto.ReportData;
 import lombok.Data;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;

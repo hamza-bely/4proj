@@ -5,7 +5,7 @@ import AuthGuardAdmin from "./auth-guard-admin.tsx";
 import ListUserAdmin from "../page/admin/user/list-user-admin.tsx";
 import AuthGuard from "./auth-guard.tsx";
 import ProfileUser from "../page/user/profile-user.tsx";
-import TomTomApiDashboard from "../page/admin/map/tom-tom-dashboard.tsx";
+import TomTomApiDashboard from "../page/admin/dashboard/dashboard.tsx";
 import ListReportAdmin from "../page/admin/report/list-report-admin.tsx";
 import ListRouteAdmin from "../page/admin/routes/list-route-admin.tsx";
 

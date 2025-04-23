@@ -1,7 +1,7 @@
 package com.supinfo.api_traficandme;
 
-import com.supinfo.api_traficandme.User.dto.UserRequest;
-import com.supinfo.api_traficandme.User.service.UserService;
+import com.supinfo.api_traficandme.user.dto.UserRequest;
+import com.supinfo.api_traficandme.user.service.UserService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

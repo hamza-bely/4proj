@@ -1,7 +1,7 @@
 package com.supinfo.api_traficandme.traffic.service;
 
-import com.supinfo.api_traficandme.User.dto.UserResponse;
-import com.supinfo.api_traficandme.statistiques.model.RouteData;
+import com.supinfo.api_traficandme.user.dto.UserResponse;
+import com.supinfo.api_traficandme.statistiques.dto.RouteData;
 import com.supinfo.api_traficandme.traffic.dto.StatusTraffic;
 import com.supinfo.api_traficandme.traffic.dto.TrafficRequest;
 import com.supinfo.api_traficandme.traffic.fetch.TrafficRepository;

@@ -7,8 +7,8 @@ import Search from "./search-bar.tsx";
 import { useTranslation } from "react-i18next";
 import { LuRabbit, LuArrowLeft, LuSave, LuX } from "react-icons/lu";
 import { TbBarrierBlockOff, TbRoute2 } from "react-icons/tb";
-import {MdQrCode2, MdDirectionsCar, MdDirectionsWalk, MdOutlineGpsFixed} from "react-icons/md";
-import { FaBus } from "react-icons/fa"; // Importation de l'icône de bus
+import {MdQrCode2, MdDirectionsCar, MdDirectionsWalk} from "react-icons/md";
+import { FaBus } from "react-icons/fa";
 import useRouteStore from "../../../../services/store/route-store.tsx";
 import Cookies from "js-cookie";
 import {getUserRole} from "../../../../services/service/token-service.tsx";
@@ -18,15 +18,8 @@ import {Coordinate, RouteResponse} from "../model/map.tsx";
 
 import { QRCodeSVG } from 'qrcode.react';
 
-// Type pour le moyen de transport - ajout de "bus"
 type TransportMode = "car" | "bike" | "walk" | "bus";
 
-/**
- * Récupère l'adresse à partir de coordonnées géographiques
- * @param {number} lat - Latitude
- * @param {number} lon - Longitude
- * @returns {Promise<string>} - L'adresse correspondante
- */
 const getAddressFromCoordinates = async (lat: number, lon: number): Promise<string> => {
     const apiKey: string = import.meta.env.VITE_TOMTOM_API_KEY;
     const url = `https://api.tomtom.com/search/2/reverseGeocode/${lat},${lon}.json?key=${apiKey}`;
@@ -64,8 +57,8 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated, startAdd
     const [selectedRouteId, setSelectedRouteId] = useState<string | null>(null);
     const [role, setRole] = useState<string | string[] | null>(null);
     const token = Cookies.get("authToken");
-    // Utilisez initialStartAddress comme valeur initiale si disponible
-    const [startAddress, setStartAddress] = useState<string>(initialStartAddress || "");
+
+    const [startAddress, setStartAddress] = useState<string>("");
     const [endAddress, setEndAddress] = useState<string>("");
     const [isSaving, setIsSaving] = useState<boolean>(false);
     const [showResults, setShowResults] = useState<boolean>(false);
@@ -356,14 +349,6 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated, startAdd
         }
     };
 
-    function getUserPosition() {
-        if (start && start.lat && start.lon) {
-            getAddressFromCoordinates(start.lat, start.lon)
-                .then(address => setStartAddress(address))
-                .catch(error => console.error("Erreur:", error));
-        }
-    }
-
     const renderTransportModeSelector = () => (
         <div className="flex justify-center mb-4 p-2 rounded">
 
@@ -418,13 +403,6 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated, startAdd
                                 if (address) setStartAddress(address);
                             }}
                         />
-                        <div className="cursor-pointer">
-                            <MdOutlineGpsFixed
-                                className="hover:p-[1px] mt-12 ml-2"
-                                style={{fontSize: "20px"}}
-                                onClick={getUserPosition}
-                            />
-                        </div>
                     </div>
                     <Search
                         onSearchResultSelect={(position: Coordinate, address?: string) => {

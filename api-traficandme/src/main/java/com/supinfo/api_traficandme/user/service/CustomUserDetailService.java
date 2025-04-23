@@ -1,6 +1,6 @@
-package com.supinfo.api_traficandme.User.service;
+package com.supinfo.api_traficandme.user.service;
 
-import com.supinfo.api_traficandme.User.entity.UserInfo;
+import com.supinfo.api_traficandme.user.entity.UserInfo;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;

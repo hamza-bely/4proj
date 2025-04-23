@@ -28,12 +28,12 @@ jobs:
       
       - name: Install dependencies
         run: |
-          cd web-traficandme
+          cd web-traficandme-nuveau
           npm install
       
       - name: Build Angular app
         run: |
-          cd web-traficandme
+          cd web-traficandme-nuveau
           npm run build --prod
 
   deploy:

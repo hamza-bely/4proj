@@ -1,7 +1,7 @@
 package com.supinfo.api_traficandme.reports.controller;
 
-import com.supinfo.api_traficandme.User.dto.UserResponse;
-import com.supinfo.api_traficandme.User.service.UserService;
+import com.supinfo.api_traficandme.user.dto.UserResponse;
+import com.supinfo.api_traficandme.user.service.UserService;
 import com.supinfo.api_traficandme.reports.dto.CreateReportRequest;
 import com.supinfo.api_traficandme.reports.dto.StatusReport;
 import com.supinfo.api_traficandme.reports.dto.TypeReport;

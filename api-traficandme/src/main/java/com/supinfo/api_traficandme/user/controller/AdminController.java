@@ -1,14 +1,16 @@
-package com.supinfo.api_traficandme.User.controller;
+package com.supinfo.api_traficandme.user.controller;
 
-import com.supinfo.api_traficandme.User.dto.StatusUser;
-import com.supinfo.api_traficandme.User.dto.UserRequest;
-import com.supinfo.api_traficandme.User.dto.UserResponse;
-import com.supinfo.api_traficandme.User.service.AdminService;
-import com.supinfo.api_traficandme.User.service.UserService;
+import com.supinfo.api_traficandme.common.PeriodStatus;
+import com.supinfo.api_traficandme.statistiques.dto.ApiUsageData;
+import com.supinfo.api_traficandme.user.dto.StatusUser;
+import com.supinfo.api_traficandme.user.dto.UserRequest;
+import com.supinfo.api_traficandme.user.dto.UserResponse;
+import com.supinfo.api_traficandme.user.service.AdminService;
+import com.supinfo.api_traficandme.user.service.UserService;
 import com.supinfo.api_traficandme.security.dto.ApiResponse;
-import com.supinfo.api_traficandme.statistiques.model.AdminStatisticModel;
-import com.supinfo.api_traficandme.statistiques.model.ReportData;
-import com.supinfo.api_traficandme.statistiques.model.RouteData;
+import com.supinfo.api_traficandme.statistiques.dto.SummaryStatistic;
+import com.supinfo.api_traficandme.statistiques.dto.ReportData;
+import com.supinfo.api_traficandme.statistiques.dto.RouteData;
 import com.supinfo.api_traficandme.statistiques.service.StatisticService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -28,7 +30,7 @@ public class AdminController {
     private  final UserService userService;
     private  final AdminService adminService;
     private  final StatisticService statisticService;
-    public AdminController(UserService userService, AdminService adminService, PasswordEncoder passwordEncoder, StatisticService statisticService){
+    public AdminController(UserService userService, AdminService adminService, StatisticService statisticService){
         this.adminService = adminService;
         this.userService = userService;
         this.statisticService = statisticService;
@@ -97,16 +99,16 @@ public class AdminController {
     }
 
     @GetMapping("/total-map")
-    public ResponseEntity<ApiResponse<AdminStatisticModel>> getSummary() {
+    public ResponseEntity<ApiResponse<SummaryStatistic>> getSummary() {
         try {
-            AdminStatisticModel summary = statisticService.StatAdmin();
+            SummaryStatistic summary = statisticService.StatAdmin();
             return ResponseEntity.ok(new ApiResponse<>("Summary of map using", summary));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(new ApiResponse<>(e.getMessage(), null));
         }
     }
 
-    @GetMapping("/Report-statistics")
+    @GetMapping("/report-statistics")
     public ResponseEntity<ApiResponse<List<ReportData>>> getReportStatistics() {
         try {
             List<ReportData> reportData = statisticService.getReportStatistics();
@@ -116,11 +118,21 @@ public class AdminController {
         }
     }
 
-    @GetMapping("/Route-statistics")
+    @GetMapping("/route-statistics")
     public ResponseEntity<ApiResponse<List<RouteData>>> getRouteStatistics() {
         try {
             List<RouteData> routeData = statisticService.getRouteStatistics();
             return ResponseEntity.ok(new ApiResponse<>("Route statistics", routeData));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(new ApiResponse<>(e.getMessage(), null));
+        }
+    }
+
+    @GetMapping("/search-statistics")
+    public ResponseEntity<ApiResponse<List<ApiUsageData>>> getStatisticsBySearchTime(@RequestParam PeriodStatus period) {
+        try {
+            List<ApiUsageData> routeData = statisticService.getApiUsageStatisticsPerTime(period);
+            return ResponseEntity.ok(new ApiResponse<>("Api usage statistics per: "+period+" ", routeData));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(new ApiResponse<>(e.getMessage(), null));
         }

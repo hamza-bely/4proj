@@ -1,13 +1,11 @@
 package com.supinfo.api_traficandme.traffic.controller;
 
-import com.supinfo.api_traficandme.User.dto.StatusUser;
-import com.supinfo.api_traficandme.User.dto.UserResponse;
-import com.supinfo.api_traficandme.User.service.UserService;
+import com.supinfo.api_traficandme.user.dto.UserResponse;
+import com.supinfo.api_traficandme.user.service.UserService;
 import com.supinfo.api_traficandme.security.dto.ApiResponse;
 import com.supinfo.api_traficandme.traffic.dto.TrafficRequest;
 import com.supinfo.api_traficandme.traffic.model.TrafficModel;
 import com.supinfo.api_traficandme.traffic.service.TrafficService;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
