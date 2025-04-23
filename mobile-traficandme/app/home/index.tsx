@@ -105,22 +105,31 @@ export default function HomeScreen() {
     };
   
     watchPosition();
-  }, []);
+  }, [selectedRoute]);
+  
+
+
+  
   
   
   const updateCurrentInstruction = (coords: Location.LocationObjectCoords) => {
-    if (!selectedRoute || !selectedRoute.guidance || !selectedRoute.guidance.instructions) return;
+    if (!selectedRoute || !selectedRoute.guidance || !selectedRoute.guidance.instructions) {
+      console.log('selectedRoute or guidance is null');
+      return;
+    }
   
     const userLat = coords.latitude;
     const userLon = coords.longitude;
   
-
     let closestInstruction: ClosestInstruction | null = null;
     let minDistance = Number.MAX_SAFE_INTEGER;
   
     for (const instruction of selectedRoute.guidance.instructions) {
       const { point, message } = instruction;
-      if (!point) continue;
+      if (!point) {
+        console.log('Instruction point is null');
+        continue;
+      }
   
       const distance = getDistanceFromLatLonInM(userLat, userLon, point.latitude, point.longitude);
       if (distance < minDistance) {
@@ -133,9 +142,11 @@ export default function HomeScreen() {
       setCurrentInstruction(closestInstruction.message);
       setCurrentDistance(Math.round(closestInstruction.distance));
       setCurrentManeuver(closestInstruction.maneuver);
+    } else {
+      console.log('No closest instruction found');
     }
-    
   };
+  
   
   const getDistanceFromLatLonInM = (lat1: number, lon1: number, lat2: number, lon2: number) => {
     const R = 6371e3; 
@@ -238,7 +249,7 @@ export default function HomeScreen() {
     setSelectedAddress(null);
     setInstructions([]);
     setCurrentInstruction(null);
-    setCurrentDistance(Math.round(0));
+    setCurrentDistance(0);
     setCurrentManeuver('');
   }, []);
   
@@ -351,9 +362,6 @@ export default function HomeScreen() {
                   </TouchableOpacity>
 
                 </View> 
-                {/* <TouchableOpacity style={styles.clearRouteButton} onPress={() => setSelectedRoute(null)}>
-                  <Text style={styles.clearRouteButtonText}>Changer d'itinéraire</Text>
-                </TouchableOpacity> */}
               </View>
             )}
           </>
