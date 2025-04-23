@@ -14,6 +14,7 @@ import {
     LineChart, Line
 } from 'recharts';
 import {
+    fetchApiStatisticsPerTime,
     fetchReportsByTypeStatistics,
     fetchRoutesByModeStatistics,
     fetchSumOfMapStatistic
@@ -23,12 +24,16 @@ import { AdminSumStats } from '../../../services/model/user.tsx';
 interface ApiUsageData {
     date: string;
     routeSearches: number;
-    geocoding: number;
     trafficInfo: number;
 }
 
 interface RouteData {
     type: string;
+    count: number;
+}
+
+interface ReportData {
+    mode: string;
     count: number;
 }
 
@@ -38,12 +43,13 @@ interface ApiErrorData {
 }
 
 const Dashboard: React.FC = () => {
-    const [reportData, setReportData] = useState<ApiUsageData[]>([]);
+    const [reportData, setReportData] = useState<ReportData[]>([]);
     const [itineraryData, setItineraryData] = useState<RouteData[]>([]);
+    const [usageData, setUsageData] = useState<ApiUsageData[]>([]);
     const [errorData, setErrorData] = useState<ApiErrorData[]>([]);
     const [mapData, setMapData] = useState<AdminSumStats | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
-    const [timeRange, setTimeRange] = useState<string>('week');
+    const [timeRange, setTimeRange] = useState<string>('WEEK');
 
     const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
 
@@ -96,8 +102,22 @@ const Dashboard: React.FC = () => {
         fetchData();
     }, []);
 
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const data = await fetchApiStatisticsPerTime(timeRange);
+                setUsageData(data.data)
+                console.log("data",data); // Example: Log the data
+            } catch (err) {
+                console.error("Erreur stats map", err);
+            }
+        };
+        if (timeRange) {
+            fetchData();
+        }
+    }, [timeRange]);
 
-    // Gestionnaire de changement de plage de temps
+    // Gestionnaire de changement de plage de temps fetchRoutesByStatisticsPerTime("WEEK")
     const handleTimeRangeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         setTimeRange(event.target.value);
         setLoading(true);
@@ -121,10 +141,10 @@ const Dashboard: React.FC = () => {
                         value={timeRange}
                         onChange={handleTimeRangeChange}
                     >
-                        <option value="day">Aujourd'hui</option>
-                        <option value="week">Cette semaine</option>
-                        <option value="month">Ce mois</option>
-                        <option value="quarter">Ce trimestre</option>
+                        <option value="TODAY">Aujourd'hui</option>
+                        <option value="WEEK">Cette semaine</option>
+                        <option value="MONTH">Ce mois</option>
+                        <option value="QUARTER">Ce trimestre</option>
                     </select>
                 </div>
                 <div className="text-sm text-gray-500">
@@ -155,14 +175,13 @@ const Dashboard: React.FC = () => {
                 <div className="bg-white p-4 rounded-lg shadow">
                     <h2 className="text-lg font-semibold mb-4">Utilisation Quotidienne</h2>
                     <ResponsiveContainer width="100%" height={300}>
-                        <LineChart data={reportData}>
+                        <LineChart data={usageData}>
                             <CartesianGrid strokeDasharray="3 3" />
                             <XAxis dataKey="date" />
                             <YAxis />
                             <Tooltip />
                             <Legend />
                             <Line type="monotone" dataKey="routeSearches" stroke="#0088FE" name="Recherches d'itinéraires" />
-                            <Line type="monotone" dataKey="geocoding" stroke="#00C49F" name="Géocodage" />
                             <Line type="monotone" dataKey="trafficInfo" stroke="#FFBB28" name="Info Trafic" />
                         </LineChart>
                     </ResponsiveContainer>

@@ -28,7 +28,7 @@ public class TrafficModel {
     private String address_end;
     @Enumerated(EnumType.STRING)
     private ModeCirculation mode;
-    @Column(name = "userName")
+    @Column(name = "user_name")
     private String user;
 
     @Temporal(TemporalType.TIMESTAMP)
@@ -48,8 +48,8 @@ public class TrafficModel {
         return id;
     }
 
-    public void setId(int id) {
-        id = id;
+    public void setId(int Id) {
+        this.id = Id;
     }
 
     public String getStartLongitude() {
