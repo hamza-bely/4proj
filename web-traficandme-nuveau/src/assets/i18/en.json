@@ -281,6 +281,23 @@
   },
   "report": {
     "new_report": "Ajouter un nouveau rapport"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "period": "Period",
+    "lastUpdate": "Last update",
+    "userCount": "Users",
+    "routeSearches": "Route searches",
+    "trafficInfo": "Traffic info",
+    "errorCount": "Errors",
+    "dailyUsage": "Daily usage",
+    "itinerarySearchTypes": "Itinerary search types",
+    "reportTypes": "Report types",
+    "apiErrorTypes": "API error types",
+    "today": "Today",
+    "week": "Week",
+    "month": "Month",
+    "quarter": "Quarter"
   }
 
 

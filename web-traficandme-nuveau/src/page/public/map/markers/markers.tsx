@@ -11,9 +11,6 @@ import useReportStore from "../../../../services/store/report-store.tsx";
 import {toast} from "react-toastify";
 import {MarkerModel} from "../model/map.tsx";
 
-/*interface MarkersProps {
-    map: tt.Map | null;
-}*/
 
 const Markers: React.FC<any> = ({ map }) => {
     const { t } = useTranslation();

@@ -273,6 +273,24 @@
   },
   "report": {
     "new_report": "Add a new report"
+  },
+
+  "dashboard": {
+    "title": "Tableau de bord",
+    "period": "Période",
+    "lastUpdate": "Dernière mise à jour",
+    "userCount": "Nombre d'utilisateur",
+    "routeSearches": "Recherches d'itinéraires",
+    "trafficInfo": "Info trafic",
+    "errorCount": "Erreurs",
+    "dailyUsage": "Utilisation quotidienne",
+    "itinerarySearchTypes": "Types de recherches d'itinéraires",
+    "reportTypes": "Types de rapports",
+    "apiErrorTypes": "Types d'erreurs API",
+    "today": "Aujourd'hui",
+    "week": "Semaine",
+    "month": "Mois",
+    "quarter": "Trimestre"
   }
 
 }

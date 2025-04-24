@@ -1,11 +1,11 @@
-package com.supinfo.api_traficandme.traffic.service;
+package com.supinfo.api_traficandme.itinerary.service;
 
 import com.supinfo.api_traficandme.user.dto.UserResponse;
 import com.supinfo.api_traficandme.statistiques.dto.RouteData;
-import com.supinfo.api_traficandme.traffic.dto.StatusTraffic;
-import com.supinfo.api_traficandme.traffic.dto.TrafficRequest;
-import com.supinfo.api_traficandme.traffic.fetch.TrafficRepository;
-import com.supinfo.api_traficandme.traffic.model.TrafficModel;
+import com.supinfo.api_traficandme.itinerary.dto.StatusTraffic;
+import com.supinfo.api_traficandme.itinerary.dto.TrafficRequest;
+import com.supinfo.api_traficandme.itinerary.repository.TrafficRepository;
+import com.supinfo.api_traficandme.itinerary.entity.Traffic;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -20,7 +20,7 @@ public class TrafficService {
         this.trafficRepository = trafficRepository;
     }
 
-    public TrafficModel createTraffic(TrafficRequest request, UserResponse connectedUser) throws Exception {
+    public Traffic createTraffic(TrafficRequest request, UserResponse connectedUser) throws Exception {
 
         if (request.getStartLongitude() == null || request.getStartLongitude().isBlank()) {
             throw new IllegalArgumentException("Start longitude is required.");
@@ -55,7 +55,7 @@ public class TrafficService {
             throw new Exception("Traffic record already exists for this route and user");
         }
 
-        TrafficModel stop = new TrafficModel();
+        Traffic stop = new Traffic();
         stop.setStartLongitude(request.getStartLongitude());
         stop.setStartLatitude(request.getStartLatitude());
         stop.setEndLongitude(request.getEndLongitude());
@@ -71,25 +71,25 @@ public class TrafficService {
         return trafficRepository.save(stop);
     }
 
-    public List<TrafficModel> getAllTraffic() {
+    public List<Traffic> getAllTraffic() {
         return trafficRepository.findAll();
     }
 
-    public List<TrafficModel> getAllTrafficByUser(UserResponse userConnected) {
+    public List<Traffic> getAllTrafficByUser(UserResponse userConnected) {
         return  trafficRepository.findAll().stream()
                 .filter(report -> report.getUser().equals(userConnected.email()))
                 .collect(Collectors.toList());
     }
 
-    public TrafficModel deleteTrafficForAnUser(Integer idTraffic) throws Exception {
+    public Traffic deleteTrafficForAnUser(Integer idTraffic) throws Exception {
 
-        Optional<TrafficModel> optionalTraffic = trafficRepository.findById(idTraffic);
+        Optional<Traffic> optionalTraffic = trafficRepository.findById(idTraffic);
 
         if (optionalTraffic.isEmpty()) {
             throw new Exception("No traffic found for this user.");
         }
 
-        TrafficModel traffic = optionalTraffic.get();
+        Traffic traffic = optionalTraffic.get();
         traffic.setStatus(StatusTraffic.DELETED);
         traffic.setUser("Anonymous");
         traffic.setUpdateDate(new Date());
@@ -98,7 +98,7 @@ public class TrafficService {
     }
 
     public Boolean deleteDefinitiveTrafficForAnAdmin(Integer id){
-        Optional<TrafficModel> traffic = trafficRepository.findById(id);
+        Optional<Traffic> traffic = trafficRepository.findById(id);
         if(traffic.isPresent()){
             trafficRepository.delete(traffic.get());
             return true;
