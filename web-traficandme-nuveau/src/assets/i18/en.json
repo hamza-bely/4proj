@@ -17,7 +17,8 @@
     "status" : "Status",
     "role" : "Role",
     "createDate" : "Create date",
-    "admin" : "Administration"
+    "admin" : "Administration",
+    "add": "Ajouter"
   },
 
   "reportStatus": {
@@ -30,7 +31,8 @@
     "accidents": "Accidents",
     "traffic": "Traffic",
     "roadsClosed": "Roads Closed",
-    "policeChecks": "Police Checks"
+    "policeChecks": "Police Checks",
+    "obstacles": "Obstacles"
   },
 
   "header": {
@@ -276,6 +278,9 @@
   "axios-report-error": {
     "user_undefined": "Utilisateur non défini",
     "generic": "Une erreur s'est produite"
+  },
+  "report": {
+    "new_report": "Ajouter un nouveau rapport"
   }
 
 

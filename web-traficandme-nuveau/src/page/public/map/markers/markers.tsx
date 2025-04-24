@@ -202,7 +202,7 @@ const Markers: React.FC<any> = ({ map }) => {
             {showAddReportModal && (
                 <div className="fixed inset-0   flex items-center justify-center z-50">
                     <div className="bg-white p-6 rounded-lg w-96 max-w-md">
-                        <h2 className="text-xl font-bold mb-4">{t("Ajouter un nouveau rapport")}</h2>
+                        <h2 className="text-xl font-bold mb-4">{t("report.new_report")}</h2>
 
                         <div className="mb-4">
                             <label className="block text-sm font-medium text-gray-700 mb-1">{t("Type")}</label>
@@ -211,11 +211,11 @@ const Markers: React.FC<any> = ({ map }) => {
                                 value={newReportData.type}
                                 onChange={(e) => setNewReportData({...newReportData, type: e.target.value})}
                             >
-                                <option value="ACCIDENTS">{t("Accidents")}</option>
-                                <option value="TRAFFIC">{t("Traffic")}</option>
-                                <option value="ROADS_CLOSED">{t("road-closed")}</option>
-                                <option value="POLICE_CHECKS">{t("police")}</option>
-                                <option value="OBSTACLES">{t("obstacles")}</option>
+                                <option value="ACCIDENTS">{t("reportTypes.accidents")}</option>
+                                <option value="TRAFFIC">{t("reportTypes.traffic")}</option>
+                                <option value="ROADS_CLOSED">{t("reportTypes.roadsClosed")}</option>
+                                <option value="POLICE_CHECKS">{t("reportTypes.policeChecks")}</option>
+                                <option value="OBSTACLES">{t("reportTypes.obstacles")}</option>
                             </select>
                         </div>
                         <div className="mb-4">
@@ -229,13 +229,13 @@ const Markers: React.FC<any> = ({ map }) => {
                                 className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400"
                                 onClick={() => setShowAddReportModal(false)}
                             >
-                                {t("Annuler")}
+                                {t("common.cancel")}
                             </button>
                             <button
                                 className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
                                 onClick={handleSubmitNewReport}
                             >
-                                {t("Ajouter")}
+                                {t("common.add")}
                             </button>
                         </div>
                     </div>

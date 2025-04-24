@@ -40,7 +40,7 @@ export const createRoute = async (params: any): Promise<any> => {
         toast.success(await translateMessage(response.data.message));
         return response.data;
     }catch (error : any) {
-        toast.success(await translateMessage(error.response.data.message || "An error has occurred"));
+        toast.error(await translateMessage(error.response.data.message || "An error has occurred"));
         throw error;
 
     }

@@ -18,7 +18,8 @@
     "status" : "Status",
     "role" : "Role",
     "createDate" : "Date de création",
-    "admin" : "Administrateur"
+    "admin" : "Administrateur",
+    "add": "Add"
   },
 
   "status" : {
@@ -269,8 +270,10 @@
   "axios-report-error": {
     "user_undefined": "User undefined",
     "generic": "An error occurred"
+  },
+  "report": {
+    "new_report": "Add a new report"
   }
-
 
 }
 
