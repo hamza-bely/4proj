@@ -25,9 +25,6 @@
         <mxCell id="nslCc2GsLbfLlcvG44iz-29" value="" style="image;aspect=fixed;html=1;points=[];align=center;fontSize=12;image=img/lib/azure2/other/VM_Application_Definition.svg;" parent="1" vertex="1">
           <mxGeometry x="50" y="250" width="59" height="54.49" as="geometry" />
         </mxCell>
-        <mxCell id="nslCc2GsLbfLlcvG44iz-31" value="[Frontend] → [API Gateway] → [API Backend] → [Keycloak]  &#xa;                                 ↑  &#xa;                             [PostgreSQL (Users + Métier)]" style="text;whiteSpace=wrap;" parent="1" vertex="1">
-          <mxGeometry x="210" y="460" width="360" height="70" as="geometry" />
-        </mxCell>
         <mxCell id="bNoQEROcNKXrwL61xhXn-6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="bNoQEROcNKXrwL61xhXn-2" target="nslCc2GsLbfLlcvG44iz-29">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
