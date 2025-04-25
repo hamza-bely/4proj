@@ -142,7 +142,6 @@ const Dashboard: React.FC = () => {
                 </div>
             </div>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* Utilisation API dans le temps */}
                 <div className="bg-white p-4 rounded-lg shadow">
                     <h2 className="text-lg font-semibold mb-4">{t('dashboard.dailyUsage')}</h2>
                     <ResponsiveContainer width="100%" height={300}>

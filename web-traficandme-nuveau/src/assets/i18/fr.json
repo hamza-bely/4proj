@@ -19,7 +19,8 @@
     "role" : "Role",
     "createDate" : "Date de création",
     "admin" : "Administrateur",
-    "add": "Add"
+    "add": "Add",
+    "error-global" : "Quelque chose s'est mal passé, réessayez plus tard"
   },
 
   "status" : {

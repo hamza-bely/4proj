@@ -24,4 +24,5 @@ export interface MarkerModel {
     latitude: number;
     longitude: number;
     status : string
+    address: string
 }

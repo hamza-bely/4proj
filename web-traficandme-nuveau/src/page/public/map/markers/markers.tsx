@@ -10,6 +10,7 @@ import { useTranslation } from "react-i18next";
 import useReportStore from "../../../../services/store/report-store.tsx";
 import {toast} from "react-toastify";
 import {MarkerModel} from "../model/map.tsx";
+import {getAddressFromCoordinates} from "../serach/methode.tsx";
 
 
 const Markers: React.FC<any> = ({ map }) => {
@@ -26,7 +27,8 @@ const Markers: React.FC<any> = ({ map }) => {
         type: "ACCIDENTS",
         latitude: 0,
         longitude: 0,
-        status : ""
+        status : "",
+        address : ""
     });
 
     const updateMarkersVisibility = (zoom: number) => {
@@ -128,8 +130,11 @@ const Markers: React.FC<any> = ({ map }) => {
     };
 
     const handleSubmitNewReport = async () => {
+        newReportData.address = await getAddressFromCoordinates(newReportData.latitude,newReportData.longitude,t)
+
         try {
             newReportData.status = userRole === "ROLE_ADMIN" ?  "AVAILABLE" : "PENDING"
+            console.log(newReportData )
             await createReport(newReportData);
             setShowAddReportModal(false);
             await fetchReports();

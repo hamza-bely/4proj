@@ -118,7 +118,16 @@ export default function ReportsUser() {
                                     {formatDate(report.createDate)}
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    {report.latitude.toFixed(6)}, {report.longitude.toFixed(6)}
+                                    {report.address ?
+                                        <div>
+                                            {report.address}
+                                        </div>
+                                        :
+                                        <div>
+                                            {report.latitude.toFixed(6)}  {report.longitude.toFixed(6)}
+                                        </div>
+
+                                    }
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                     <button

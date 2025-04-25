@@ -17,35 +17,11 @@ import {RouteOption, RoutePlannerProps, RouteSaveData} from "../model/route-plan
 import {Coordinate, RouteResponse} from "../model/map.tsx";
 
 import { QRCodeSVG } from 'qrcode.react';
+import {getAddressFromCoordinates} from "./methode.tsx";
 
 type TransportMode = "car" | "bike" | "walk" | "bus";
 
-const getAddressFromCoordinates = async (lat: number, lon: number): Promise<string> => {
-    const apiKey: string = import.meta.env.VITE_TOMTOM_API_KEY;
-    const url = `https://api.tomtom.com/search/2/reverseGeocode/${lat},${lon}.json?key=${apiKey}`;
 
-    try {
-        const response = await fetch(url);
-        const data = await response.json();
-
-        if (data.addresses && data.addresses.length > 0) {
-            const address = data.addresses[0].address;
-            const formattedAddress = [
-                address.streetNumber,
-                address.streetName,
-                address.municipality,
-                address.postalCode,
-                address.countrySubdivision
-            ].filter(Boolean).join(', ');
-
-            return formattedAddress;
-        }
-        return "Adresse non trouvée";
-    } catch (error) {
-        console.error("Erreur lors de la récupération de l'adresse:", error);
-        return "Erreur lors de la récupération de l'adresse";
-    }
-};
 
 const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated, startAddress: initialStartAddress }) => {
     const [start, setStart] = useState<Coordinate>({ lat: 47.6640, lon: 2.8357 });
@@ -68,12 +44,10 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated, startAdd
     const simulationIntervalRef = useRef<number | null>(null);
     const apiKey: string = import.meta.env.VITE_TOMTOM_API_KEY;
 
-    // Ajoutez cet useEffect pour mettre à jour startAddress lorsque initialStartAddress change
     useEffect(() => {
         if (initialStartAddress) {
             setStartAddress(initialStartAddress);
 
-            // Récupérer les coordonnées à partir de l'adresse
             if (initialStartAddress && initialStartAddress !== "") {
                 getCoordinatesFromAddress(initialStartAddress)
                     .then(coords => {
@@ -81,12 +55,11 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated, startAdd
                             setStart(coords);
                         }
                     })
-                    .catch(error => console.error("Erreur lors de la récupération des coordonnées:", error));
+                    .catch(error => console.error(t("error-global"), error));
             }
         }
     }, [initialStartAddress]);
 
-    // Ajoutez cette fonction pour convertir une adresse en coordonnées
     const getCoordinatesFromAddress = async (address: string): Promise<Coordinate | null> => {
         const url = `https://api.tomtom.com/search/2/geocode/${encodeURIComponent(address)}.json?key=${apiKey}`;
 
@@ -100,7 +73,7 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated, startAdd
             }
             return null;
         } catch (error) {
-            console.error("Erreur lors de la récupération des coordonnées:", error);
+            toast.error(t("error-global"));
             return null;
         }
     };
@@ -118,9 +91,9 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated, startAdd
 
     useEffect(() => {
         if (end && end.lat && end.lon) {
-            getAddressFromCoordinates(end.lat, end.lon)
+            getAddressFromCoordinates(end.lat, end.lon,t)
                 .then(address => setEndAddress(address))
-                .catch(error => console.error("Erreur:", error));
+                .catch(error => console.error(t("error-global"), error));
         }
     }, [end]);
 
@@ -197,7 +170,7 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated, startAdd
             }
             return null;
         } catch (error) {
-            console.error(`Erreur lors du calcul de l'itinéraire ${routeType}:`, error);
+            console.error(t("error-global"), error);
             return null;
         }
     };
@@ -240,7 +213,7 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated, startAdd
                 setShowResults(true);
             }
         } catch (error) {
-            console.error("Erreur lors du calcul des itinéraires :", error);
+            console.error(t("error-global"), error);
         } finally {
             setIsLoading(false);
         }

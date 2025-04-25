@@ -18,7 +18,8 @@
     "role" : "Role",
     "createDate" : "Create date",
     "admin" : "Administration",
-    "add": "Ajouter"
+    "add": "Ajouter",
+    "error-global" : "Something went wrong try again later"
   },
 
   "reportStatus": {

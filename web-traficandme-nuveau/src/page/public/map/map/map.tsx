@@ -9,7 +9,6 @@ import { toast } from "react-toastify";
 import { Coordinate, RouteResponse } from "../model/map.tsx";
 import {translateMessage} from "../../../../assets/i18/translateMessage.tsx";
 
-// Constants extracted for better maintainability
 const TRAFFIC_REFRESH_INTERVAL = 90000000;
 const MARKERS_REFRESH_INTERVAL = 300000;
 const DEFAULT_CENTER: [number, number] = [2.3522, 48.8566];
@@ -26,10 +25,8 @@ const Map: React.FC = () => {
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
 
-    // API key memo to prevent unnecessary recomputation
     const apiKey = import.meta.env.VITE_TOMTOM_API_KEY;
 
-    // Extract URL parameters
     const urlLat = searchParams.get('lat');
     const urlLng = searchParams.get('lng');
     const startLat = searchParams.get('startLat');
@@ -39,12 +36,10 @@ const Map: React.FC = () => {
     const mode = searchParams.get('mode');
     const peage = searchParams.get('peage') === 'true';
 
-    // Enable traffic layer as a memoized function
     const enableTrafficLayer = useCallback((mapInstance: tt.Map) => {
         if (!mapInstance) return;
 
         if (mapInstance.getSource("traffic-source")) {
-            // Remove existing layer to avoid duplicates
             mapInstance.removeLayer("traffic-layer");
             mapInstance.removeSource("traffic-source");
         }
@@ -67,7 +62,6 @@ const Map: React.FC = () => {
         });
     }, [apiKey]);
 
-    // Calculate and display route as a memoized function
     const calculateRouteFromParams = useCallback(async (
         startCoord: Coordinate,
         endCoord: Coordinate,

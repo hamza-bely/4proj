@@ -10,6 +10,8 @@ import TrafficIndicator from "./components/traffic-indicator.tsx";
 import Search from "./serach/search-bar.tsx";
 import RoutePlanner from "./serach/route-planner.tsx";
 import {createMarkerDOMElement} from "./serach/marker-icon.tsx";
+import {getAddressFromCoordinates} from "./serach/methode.tsx";
+import {useTranslation} from "react-i18next";
 
 interface ContainerMapProps {
     map: tt.Map | null;
@@ -26,6 +28,7 @@ export default function ContainerMap({ map }: ContainerMapProps) {
     const [search, setSearch] = useState<boolean>(false);
     const [isRouteActive, setIsRouteActive] = useState<boolean>(false);
     const [startAddress, setStartAddress] = useState<string>("");
+    const { t } = useTranslation();
 
     const popups = useRef<Popup[]>([]);
     const markers = useRef<Marker[]>([]);
@@ -256,34 +259,6 @@ export default function ContainerMap({ map }: ContainerMapProps) {
         }
     }
 
-    async function getAddressFromCoordinates(latitude: number, longitude: number): Promise<string> {
-        const apiKey = import.meta.env.VITE_TOMTOM_API_KEY;
-        const url = `https://api.tomtom.com/search/2/reverseGeocode/${latitude},${longitude}.json?key=${apiKey}&language=fr-FR`;
-
-        try {
-            const response = await fetch(url);
-            const data = await response.json();
-
-            if (data.addresses && data.addresses.length > 0) {
-                const address = data.addresses[0].address;
-                // Créer une adresse formatée complète
-                const formattedAddress = [
-                    address.streetNumber,
-                    address.streetName,
-                    address.municipalitySubdivision,
-                    address.municipality,
-                    address.postalCode,
-                    address.countrySubdivision
-                ].filter(Boolean).join(", ");
-
-                return formattedAddress;
-            }
-            return "Adresse inconnue";
-        } catch (error) {
-            console.error("Erreur lors de la récupération de l'adresse:", error);
-            return "Erreur lors de la récupération de l'adresse";
-        }
-    }
 
     const onRouteCalculated = (routePolyline: string): void => {
         showRoute(routePolyline);
@@ -311,7 +286,6 @@ export default function ContainerMap({ map }: ContainerMapProps) {
                 async (position) => {
                     const { latitude, longitude } = position.coords;
                     if (map) {
-                        // Utilisation du nouveau composant pour le marqueur de position
                         const userMarker = new tt.Marker({
                             element: createMarkerDOMElement("Position")
                         }).setLngLat([longitude, latitude]).addTo(map);
@@ -323,13 +297,10 @@ export default function ContainerMap({ map }: ContainerMapProps) {
                         } as any);
 
 
-                        // Récupérer l'adresse correspondante
-                        const address = await getAddressFromCoordinates(latitude, longitude);
+                        const address = await getAddressFromCoordinates(latitude, longitude,t);
 
-                        // Définir l'adresse comme point de départ
                         setStartAddress(address);
 
-                        // Activer automatiquement l'onglet d'itinéraire
                         setSearch(true);
 
                         toast.info("Position récupérée: " + address, {
