@@ -10,14 +10,12 @@ import com.supinfo.api_traficandme.reports.service.ReportService;
 import com.supinfo.api_traficandme.statistiques.dto.SummaryStatistic;
 import com.supinfo.api_traficandme.statistiques.dto.ReportData;
 import com.supinfo.api_traficandme.statistiques.dto.RouteData;
-import com.supinfo.api_traficandme.traffic.service.TrafficService;
+import com.supinfo.api_traficandme.itinerary.service.TrafficService;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
-import static com.supinfo.api_traficandme.common.PeriodStatus.WEEK;
 
 @Service
 public class StatisticService {

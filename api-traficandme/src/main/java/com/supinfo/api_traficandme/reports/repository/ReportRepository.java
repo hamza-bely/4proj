@@ -9,7 +9,6 @@ import java.util.List;
 
 @Repository
 public interface ReportRepository extends JpaRepository<Report, Integer> {
-
     @Query(value = "SELECT type, COUNT(*) AS count" +
             " FROM report GROUP BY type",
             nativeQuery = true)

@@ -52,6 +52,7 @@ public class ReportService {
         report.setCreateDate(new Date());
         report.setUpdateDate(new Date());
         report.setLikeCount(0);
+        report.setAddress(request.getAddress());
         report.setDislikeCount(0);
 
         return reportRepository.save(report);
