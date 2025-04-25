@@ -1,6 +1,5 @@
 .position-search{
     position: absolute;
-    /* top: 300px; */
     margin-top: 80px;
     z-index: 1000;
     background-color: white;
@@ -10,7 +9,6 @@
 
 .container-modal{
     position: absolute;
-    /* top: 500px; */
     z-index: 1000;
     margin-top: 20px;
     width: 400px;

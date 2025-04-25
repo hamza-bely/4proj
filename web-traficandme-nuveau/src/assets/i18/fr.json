@@ -292,6 +292,19 @@
     "week": "Semaine",
     "month": "Mois",
     "quarter": "Trimestre"
+  },
+  "createUser": {
+    "title": "Ajouter un utilisateur",
+    "firstName": "Prénom",
+    "lastName": "Nom",
+    "email": "Email",
+    "password": "Mot de passe",
+    "role": "Rôle",
+    "user": "Utilisateur",
+    "admin": "Administrateur",
+    "moderator": "Modérateur",
+    "submit": "Ajouter l'utilisateur",
+    "loading": "Chargement..."
   }
 
 }

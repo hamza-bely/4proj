@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import "../css/map.css";
 
 const TrafficIndicator: React.FC = () => {
-    const { t } = useTranslation(); // Hook pour les traductions
+    const { t } = useTranslation();
 
     return (
         <div className="">

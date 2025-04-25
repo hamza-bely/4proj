@@ -19,7 +19,8 @@
     "createDate" : "Create date",
     "admin" : "Administration",
     "add": "Ajouter",
-    "error-global" : "Something went wrong try again later"
+    "error-global" : "Something went wrong try again later",
+    "email" : "Email"
   },
 
   "reportStatus": {
@@ -299,8 +300,18 @@
     "week": "Week",
     "month": "Month",
     "quarter": "Quarter"
+  },
+  "createUser": {
+    "title": "Add a user",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "email": "Email",
+    "password": "Password",
+    "role": "Role",
+    "user": "User",
+    "admin": "Administrator",
+    "moderator": "Moderator",
+    "submit": "Add User",
+    "loading": "Loading..."
   }
-
-
-
 }

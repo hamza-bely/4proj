@@ -1,13 +1,11 @@
 import { useState } from "react";
 import { Bars3Icon, XMarkIcon, ChevronDownIcon } from "@heroicons/react/24/outline";
-import { ChartPieIcon } from "@heroicons/react/16/solid";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import Cookies from "js-cookie";
 import useUserStore from "../../services/store/user-store.tsx";
 import Languages from "../languages/languages.tsx";
-import { FaUserShield } from "react-icons/fa";
-import { MdReportProblem } from "react-icons/md";
+import {routesAdmin, routesModerator} from "./navigation.tsx";
 
 interface MobileHeaderProps {
     navigationLinks: { name: string; href: string }[];
@@ -15,12 +13,6 @@ interface MobileHeaderProps {
     openLogin: () => void;
     openRegister: () => void;
 }
-
-const solutions = [
-    { name: 'Dashboard', href: 'admin/dashboard', icon: ChartPieIcon },
-    { name: 'utilisateurs', href: '/admin/management-users', icon: FaUserShield },
-    { name: 'Report', href: '/admin/management-report', icon: MdReportProblem },
-];
 
 export default function MobileHeader({ navigationLinks, role, openLogin, openRegister }: MobileHeaderProps) {
     const { t } = useTranslation();
@@ -137,8 +129,6 @@ export default function MobileHeader({ navigationLinks, role, openLogin, openReg
                                         {item.name}
                                     </Link>
                                 ))}
-
-                                {/* Admin menu */}
                                 {role === "ROLE_ADMIN" && (
                                     <div className="mt-2">
                                         <button
@@ -154,7 +144,39 @@ export default function MobileHeader({ navigationLinks, role, openLogin, openReg
 
                                         {adminMenuOpen && (
                                             <div className="ml-4 space-y-1 mt-2 border-l-2 border-gray-100 pl-2">
-                                                {solutions.map((item) => (
+                                                {routesAdmin.map((item) => (
+                                                    <Link
+                                                        key={item.name}
+                                                        to={item.href}
+                                                        onClick={toggleMobileMenu}
+                                                        className="flex items-center space-x-3 rounded-md px-3 py-2 text-base font-medium text-gray-900 hover:bg-gray-50"
+                                                    >
+                                                        <span className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-md bg-gray-100 text-gray-600">
+                                                            <item.icon className="size-4" aria-hidden="true" />
+                                                        </span>
+                                                        <span>{item.name}</span>
+                                                    </Link>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+                                {role === "ROLE_MODERATOR" && (
+                                    <div className="mt-2">
+                                        <button
+                                            onClick={toggleAdminMenu}
+                                            className="flex w-full items-center justify-between rounded-md px-3 py-2 text-base font-medium text-gray-900 hover:bg-gray-50"
+                                        >
+                                            {t('admin')}
+                                            <ChevronDownIcon
+                                                className={`size-5 text-gray-500 transition-transform ${adminMenuOpen ? 'rotate-180' : ''}`}
+                                                aria-hidden="true"
+                                            />
+                                        </button>
+
+                                        {adminMenuOpen && (
+                                            <div className="ml-4 space-y-1 mt-2 border-l-2 border-gray-100 pl-2">
+                                                {routesModerator.map((item) => (
                                                     <Link
                                                         key={item.name}
                                                         to={item.href}

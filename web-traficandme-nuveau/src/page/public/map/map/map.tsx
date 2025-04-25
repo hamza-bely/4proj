@@ -225,7 +225,6 @@ const Map: React.FC = () => {
             // Enable traffic layer
             enableTrafficLayer(mapInstance);
 
-            // Calculate route if params are present
             if (startLat && startLon && endLat && endLon) {
                 calculateRouteFromParams(
                     { lat: parseFloat(startLat), lon: parseFloat(startLon) },
@@ -236,21 +235,18 @@ const Map: React.FC = () => {
                 );
             }
 
-            // Set up markers refresh interval
             const incidentInterval = setInterval(() => {
                 markersRef.current.forEach(marker => marker.remove());
                 markersRef.current = [];
             }, MARKERS_REFRESH_INTERVAL);
             intervalRefs.current.push(incidentInterval);
 
-            // Set up traffic layer refresh interval
             const trafficInterval = setInterval(() => {
                 enableTrafficLayer(mapInstance);
             }, TRAFFIC_REFRESH_INTERVAL);
             intervalRefs.current.push(trafficInterval);
         });
 
-        // Cleanup function
         return () => {
             if (mapInstance) mapInstance.remove();
             intervalRefs.current.forEach(interval => clearInterval(interval));

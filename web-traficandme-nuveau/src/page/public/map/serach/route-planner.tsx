@@ -5,7 +5,7 @@ import "../css/map.css";
 import { toast } from "react-toastify";
 import Search from "./search-bar.tsx";
 import { useTranslation } from "react-i18next";
-import { LuRabbit, LuArrowLeft, LuSave, LuX } from "react-icons/lu";
+import { LuRabbit, LuArrowLeft, LuSave, LuX, LuChevronDown, LuChevronUp } from "react-icons/lu";
 import { TbBarrierBlockOff, TbRoute2 } from "react-icons/tb";
 import {MdQrCode2, MdDirectionsCar, MdDirectionsWalk} from "react-icons/md";
 import { FaBus } from "react-icons/fa";
@@ -21,7 +21,12 @@ import {getAddressFromCoordinates} from "./methode.tsx";
 
 type TransportMode = "car" | "bike" | "walk" | "bus";
 
-
+// Instructions interface for route directions
+interface Instruction {
+    message: string;
+    distance: number;
+    duration: number;
+}
 
 const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated, startAddress: initialStartAddress }) => {
     const [start, setStart] = useState<Coordinate>({ lat: 47.6640, lon: 2.8357 });
@@ -33,6 +38,8 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated, startAdd
     const [selectedRouteId, setSelectedRouteId] = useState<string | null>(null);
     const [role, setRole] = useState<string | string[] | null>(null);
     const token = Cookies.get("authToken");
+
+    const [showInstructions, setShowInstructions] = useState<boolean>(false);
 
     const [startAddress, setStartAddress] = useState<string>("");
     const [endAddress, setEndAddress] = useState<string>("");
@@ -144,7 +151,8 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated, startAdd
         const shouldAvoidTolls = avoidTolls && transportMode !== "walk";
         const avoid = shouldAvoidTolls ? "&avoid=tollRoads" : "";
 
-        const url = `https://api.tomtom.com/routing/1/calculateRoute/${start.lat},${start.lon}:${end.lat},${end.lon}/json?key=${apiKey}&routeType=${routeType}${avoid}&travelMode=${travelMode}`;
+        // Add instructionsType=text to get text instructions
+        const url = `https://api.tomtom.com/routing/1/calculateRoute/${start.lat},${start.lon}:${end.lat},${end.lon}/json?key=${apiKey}&routeType=${routeType}${avoid}&travelMode=${travelMode}&instructionsType=text`;
 
         try {
             const response = await fetch(url);
@@ -154,6 +162,19 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated, startAdd
                 const route = data.routes[0];
                 const points = route.legs[0].points;
                 const coordinates = points.map((p) => [p.longitude, p.latitude] as [number, number]);
+
+                // Extract instructions from the route
+                const instructions: Instruction[] = [];
+
+                if (route.guidance && route.guidance.instructions) {
+                    route.guidance.instructions.forEach(instruction => {
+                        instructions.push({
+                            message: instruction.message || "",
+                            distance: instruction.routeOffsetInMeters || 0,
+                            duration: instruction.travelTimeInSeconds || 0
+                        });
+                    });
+                }
 
                 const id = `${routeType}-${shouldAvoidTolls ? 'no-tolls' : 'with-tolls'}-${travelMode}-${Date.now()}`;
                 const name = `${routeType === 'fastest' ? t('map.fastest') : t('map.shortest')}${shouldAvoidTolls ? ` (${t('map.no-tolls')})` : ''}`;
@@ -166,6 +187,7 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated, startAdd
                     duration: route.summary.travelTimeInSeconds,
                     type: routeType,
                     avoidTolls: shouldAvoidTolls,
+                    instructions: instructions
                 };
             }
             return null;
@@ -186,6 +208,7 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated, startAdd
         setIsLoading(true);
         setRouteOptions([]);
         setSelectedRouteId(null);
+        setShowInstructions(false);
 
         try {
             let routePromises = [];
@@ -224,11 +247,14 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated, startAdd
         if (selectedRoute) {
             setSelectedRouteId(routeId);
             onRouteCalculated(JSON.stringify(selectedRoute.coordinates));
+            // Close instructions when selecting a new route
+            setShowInstructions(false);
         }
     };
 
     const handleBackToSearch = () => {
         setShowResults(false);
+        setShowInstructions(false);
     };
 
     const handleSaveRoute = async () => {
@@ -322,9 +348,12 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated, startAdd
         }
     };
 
+    const toggleInstructions = () => {
+        setShowInstructions(!showInstructions);
+    };
+
     const renderTransportModeSelector = () => (
         <div className="flex justify-center mb-4 p-2 rounded">
-
             <button
                 onClick={() => handleTransportModeChange("car")}
                 className={`mx-2 p-2 rounded ${transportMode === "car" ? "bg-blue-500 text-white" : "bg-white text-gray-700"}`}
@@ -349,6 +378,52 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated, startAdd
         </div>
     );
 
+    const renderDrivingInstructions = () => {
+        if (!selectedRouteId) return null;
+        const selectedRoute = routeOptions.find(route => route.id === selectedRouteId);
+        if (!selectedRoute || !selectedRoute.instructions || selectedRoute.instructions.length === 0) {
+            return <div className="text-center text-gray-500 py-2">Aucune instruction disponible</div>;
+        }
+
+        return (
+            <div className="mt-4 border-t pt-4">
+                <div
+                    className="flex justify-between items-center cursor-pointer font-medium text-blue-600"
+                    onClick={toggleInstructions}
+                >
+                    <span>Instructions de conduite</span>
+                    {showInstructions ?
+                        <LuChevronUp className="text-lg" /> :
+                        <LuChevronDown className="text-lg" />
+                    }
+                </div>
+
+                {showInstructions && (
+                    <div className="mt-2 max-h-64 overflow-y-auto">
+                        <ol className="list-decimal list-inside text-sm space-y-2 pl-2">
+                            {selectedRoute.instructions.map((instruction, index) => (
+                                <li key={index} className="border-b pb-2">
+                                    <span className="font-medium">{instruction.message}</span>
+                                    <div className="text-xs text-gray-500 mt-1">
+                                        {instruction.distance > 0 && (
+                                            <span className="mr-2">{formatDistance(instruction.distance)}</span>
+                                        )}
+                                        {instruction.duration > 0 && (
+                                            <span>{formatDuration(instruction.duration)}</span>
+                                        )}
+                                    </div>
+                                </li>
+                            ))}
+                        </ol>
+                    </div>
+                )}
+            </div>
+        );
+    };
+
+    // Determine whether to show the route options or not
+    const shouldShowRouteOptions = showResults && !showInstructions;
+
     return (
         <div className="relative">
             <h2 className="flex items-center">
@@ -361,7 +436,9 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated, startAdd
                         <LuArrowLeft className="text-xl" />
                     </button>
                 )}
-                {showResults ? t("map.available-routes") : t("map.route-planner")}
+                {showResults ?
+                    (showInstructions ? "Instructions de conduite" : t("map.available-routes"))
+                    : t("map.route-planner")}
             </h2>
 
             {!showResults && renderTransportModeSelector()}
@@ -397,36 +474,96 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated, startAdd
                 </>
             ) : (
                 <div className="route-options">
-                    <div className="space-y-2">
-                        {routeOptions.map((route) => (
-                            <div
-                                key={route.id}
-                                className={`route-item p-3 border rounded cursor-pointer hover:bg-gray-100 ${selectedRouteId === route.id ? 'bg-blue-50 border-blue-300' : ''}`}
-                                onClick={() => handleRouteSelect(route.id)}
-                            >
-                                <div className="flex items-center justify-between">
-                                    <div className="flex items-center">
-                                        {route.type === "fastest" ? (
-                                            <LuRabbit className="text-xl mr-2" />
-                                        ) : (
-                                            <TbRoute2 className="text-xl mr-2" />
+                    {/* Show route options only when instructions are not displayed */}
+                    {!showInstructions && (
+                        <div className="space-y-2">
+                            {routeOptions.map((route) => (
+                                <div
+                                    key={route.id}
+                                    className={`route-item p-3 border rounded cursor-pointer hover:bg-gray-100 ${selectedRouteId === route.id ? 'bg-blue-50 border-blue-300' : ''}`}
+                                    onClick={() => handleRouteSelect(route.id)}
+                                >
+                                    <div className="flex items-center justify-between">
+                                        <div className="flex items-center">
+                                            {route.type === "fastest" ? (
+                                                <LuRabbit className="text-xl mr-2" />
+                                            ) : (
+                                                <TbRoute2 className="text-xl mr-2" />
+                                            )}
+                                            <span className="font-medium">{route.name}</span>
+                                        </div>
+                                        {route.avoidTolls && (
+                                            <TbBarrierBlockOff className="text-lg ml-2" />
                                         )}
-                                        <span className="font-medium">{route.name}</span>
                                     </div>
-                                    {route.avoidTolls && (
-                                        <TbBarrierBlockOff className="text-lg ml-2" />
-                                    )}
+                                    <div className="text-sm text-gray-600 mt-1">
+                                        <span>{formatDistance(route.distance)}</span>
+                                        <span className="mx-2">•</span>
+                                        <span>{formatDuration(route.duration)}</span>
+                                    </div>
                                 </div>
-                                <div className="text-sm text-gray-600 mt-1">
-                                    <span>{formatDistance(route.distance)}</span>
-                                    <span className="mx-2">•</span>
-                                    <span>{formatDuration(route.duration)}</span>
+                            ))}
+                        </div>
+                    )}
+
+                    {/* Always render the driving instructions toggle if a route is selected */}
+                    {selectedRouteId && !showInstructions && renderDrivingInstructions()}
+
+                    {/* When instructions are showing, display the full instructions list */}
+                    {showInstructions && selectedRouteId && (
+                        <div className="mt-2">
+                            <div className="flex justify-between items-center mb-4">
+                                <button
+                                    onClick={toggleInstructions}
+                                    className="flex items-center text-blue-600 hover:text-blue-800"
+                                >
+                                    <LuArrowLeft className="mr-1" /> Retour aux itinéraires
+                                </button>
+
+                                <div className="text-sm text-gray-600">
+                                    {(() => {
+                                        const selectedRoute = routeOptions.find(route => route.id === selectedRouteId);
+                                        if (selectedRoute) {
+                                            return (
+                                                <>
+                                                    <span>{formatDistance(selectedRoute.distance)}</span>
+                                                    <span className="mx-1">•</span>
+                                                    <span>{formatDuration(selectedRoute.duration)}</span>
+                                                </>
+                                            );
+                                        }
+                                        return null;
+                                    })()}
                                 </div>
                             </div>
-                        ))}
-                    </div>
 
-                    {role && <div className="flex justify-center mt-4 space-x-2">
+                            <div className="bg-white rounded-lg border p-4 max-h-96 overflow-y-auto">
+                                <ol className="list-decimal list-inside text-sm space-y-3 pl-2">
+                                    {(() => {
+                                        const selectedRoute = routeOptions.find(route => route.id === selectedRouteId);
+                                        if (selectedRoute && selectedRoute.instructions) {
+                                            return selectedRoute.instructions.map((instruction, index) => (
+                                                <li key={index} className="border-b pb-3">
+                                                    <span className="font-medium">{instruction.message}</span>
+                                                    <div className="text-xs text-gray-500 mt-1">
+                                                        {instruction.distance > 0 && (
+                                                            <span className="mr-2">{formatDistance(instruction.distance)}</span>
+                                                        )}
+                                                        {instruction.duration > 0 && (
+                                                            <span>{formatDuration(instruction.duration)}</span>
+                                                        )}
+                                                    </div>
+                                                </li>
+                                            ));
+                                        }
+                                        return <li>Aucune instruction disponible</li>;
+                                    })()}
+                                </ol>
+                            </div>
+                        </div>
+                    )}
+
+                    {role && !showInstructions && <div className="flex justify-center mt-4 space-x-2">
                         <button
                             onClick={handleSaveRoute}
                             disabled={isSaving || !selectedRouteId}
@@ -487,7 +624,7 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated, startAdd
                                 onClick={handleCloseQRModal}
                                 className="rounded-sm px-4 py-2 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700"
                             >
-                                Fermer
+                                {t('common.close')}
                             </button>
                         </div>
                     </div>

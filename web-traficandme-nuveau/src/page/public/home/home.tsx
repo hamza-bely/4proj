@@ -1,5 +1,4 @@
 'use client'
-
 import {useTranslation} from "react-i18next";
 import Incentives from "../../../components/incentives/incentives.tsx";
 import ContentSection from "../../../components/content-section/content-section.tsx";
@@ -7,7 +6,7 @@ import Stats from "../../../components/stats/stats.tsx";
 import Footer from "../../../components/footer/footer.tsx";
 
 export default function Header() {
-    const { t } = useTranslation();  // useTranslation hook to get the translation function
+    const { t } = useTranslation();
 
     return (
         <div className="bg-white">

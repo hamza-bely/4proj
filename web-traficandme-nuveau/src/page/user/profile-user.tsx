@@ -7,7 +7,7 @@ import {Dialog} from "../../assets/kit-ui/dialog.tsx";
 import ModalDeleteUser from "./modal-delete-user.tsx";
 import ReportsUser from "./reports-user.tsx";
 import {MdReportProblem} from "react-icons/md";
-import RoutesUser from "./routes-user.tsx";
+import ItineraryUser from "./itinerary-user.tsx";
 import {FaRoute} from "react-icons/fa";
 
 const secondaryNavigation = [
@@ -197,7 +197,7 @@ export default function ProfileUser() {
                     )}
 
                     {currentNavigation === "Routes" && (
-                        <RoutesUser/>
+                        <ItineraryUser/>
                     )}
                 </div>
                 <Dialog style={{ zIndex: 11, position: "fixed", top: 0, left: 0, right: 0, bottom: 0, display: "flex", justifyContent: "center", alignItems: "center" }} open={isOpen} onClose={() => setIsOpen(false)}>

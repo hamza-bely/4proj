@@ -3,8 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { fetchReportsByUser } from "../../services/service/report-service.tsx";
 import Spinner from "../../components/sniper/sniper.tsx";
 import { useNavigate } from 'react-router-dom';
-import {Report} from '../../services/model/report.tsx'
-
+import { Report } from '../../services/model/report.tsx';
+import { LuMap } from "react-icons/lu";
 
 export default function ReportsUser() {
     const { t } = useTranslation();
@@ -58,93 +58,140 @@ export default function ReportsUser() {
         return statusMappings[status as keyof typeof statusMappings] || status;
     };
 
+    // Mobile view card component
+    const ReportCard = ({ report }: { report: Report }) => (
+        <div className="bg-white shadow rounded-lg mb-4 p-4 border border-gray-200">
+            <div className="flex justify-between items-start mb-3">
+                <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                    {getReportTypeLabel(report.type)}
+                </span>
+                <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                    report.status === 'PENDING' ? 'bg-yellow-100 text-yellow-800' :
+                        report.status === 'APPROVED' ? 'bg-green-100 text-green-800' :
+                            report.status === 'REJECTED' ? 'bg-red-100 text-red-800' :
+                                'bg-gray-100 text-gray-800'
+                }`}>
+                    {getStatusLabel(report.status)}
+                </span>
+            </div>
+
+            <div className="mb-3 text-sm text-gray-600">
+                {formatDate(report.createDate)}
+            </div>
+
+            <div className="mb-3">
+                <div className="text-xs font-medium text-gray-500 uppercase mb-1">{t('reports.location')}</div>
+                <div className="text-sm text-gray-700">
+                    {report.address || `${report.latitude.toFixed(6)} ${report.longitude.toFixed(6)}`}
+                </div>
+            </div>
+
+            <div className="flex justify-end">
+                <button
+                    className="text-indigo-600 hover:text-indigo-900 flex items-center text-sm"
+                    onClick={() => handleViewOnMap(report.latitude, report.longitude)}
+                >
+                    <LuMap className="h-4 w-4 mr-1"/>
+                    {t('reports.view-on-map')}
+                </button>
+            </div>
+        </div>
+    );
+
     if (loading) {
         return (
-            <div className="bg-white p-6 sm:rounded-lg">
+            <div className="bg-white p-4 sm:p-6 sm:rounded-lg">
                 <Spinner/>
             </div>
         );
     }
 
+    const filteredReports = reports.filter((report) => report.status !== "CANCELED");
+
     return (
-        <div className="bg-white p-6 sm:rounded-lg">
+        <div className="bg-white p-4 sm:p-6 sm:rounded-lg">
             <h2 className="text-xl font-semibold mb-4">{t('reports.myReports')}</h2>
 
-            {reports.length === 0 ? (
+            {filteredReports.length === 0 ? (
                 <p className="text-gray-500">{t('reports.noReports')}</p>
             ) : (
-                <div className="overflow-x-auto">
-                    <table className="min-w-full divide-y divide-gray-200">
-                        <thead className="bg-gray-50">
-                        <tr>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                {t('reports.type')}
-                            </th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                {t('reports.status')}
-                            </th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                {t('reports.date')}
-                            </th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                {t('reports.location')}
-                            </th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                {t('common.actions')}
-                            </th>
-                        </tr>
-                        </thead>
-                        <tbody className="bg-white divide-y divide-gray-200">
-                        {reports
-                            .filter((report) => report.status !== "CANCELED")
-                            .map((report) => (
-                            <tr key={report.id}>
-                                <td className="px-6 py-4 whitespace-nowrap">
-                                    <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
-                                        {getReportTypeLabel(report.type)}
-                                    </span>
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap">
-                                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                                        report.status === 'PENDING' ? 'bg-yellow-100 text-yellow-800' :
-                                            report.status === 'APPROVED' ? 'bg-green-100 text-green-800' :
-                                                report.status === 'REJECTED' ? 'bg-red-100 text-red-800' :
-                                                    'bg-gray-100 text-gray-800'
-                                    }`}>
-                                        {getStatusLabel(report.status)}
-                                    </span>
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    {formatDate(report.createDate)}
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    {report.address ?
-                                        <div>
-                                            {report.address}
-                                        </div>
-                                        :
-                                        <div>
-                                            {report.latitude.toFixed(6)}  {report.longitude.toFixed(6)}
-                                        </div>
-
-                                    }
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                    <button
-                                        className="text-indigo-600 hover:text-indigo-900 flex items-center"
-                                        onClick={() => handleViewOnMap(report.latitude, report.longitude)}
-                                    >
-                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
-                                        </svg>
-                                        {t('reports.view-on-map')}
-                                    </button>
-                                </td>
-                            </tr>
+                <>
+                    {/* Mobile view - Cards */}
+                    <div className="md:hidden">
+                        {filteredReports.map((report) => (
+                            <ReportCard key={report.id} report={report} />
                         ))}
-                        </tbody>
-                    </table>
-                </div>
+                    </div>
+
+                    {/* Tablet and Desktop view - Table */}
+                    <div className="hidden md:block overflow-x-auto">
+                        <table className="min-w-full divide-y divide-gray-200">
+                            <thead className="bg-gray-50">
+                            <tr>
+                                <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    {t('reports.type')}
+                                </th>
+                                <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    {t('reports.status')}
+                                </th>
+                                <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    {t('reports.date')}
+                                </th>
+                                <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    {t('reports.location')}
+                                </th>
+                                <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    {t('common.actions')}
+                                </th>
+                            </tr>
+                            </thead>
+                            <tbody className="bg-white divide-y divide-gray-200">
+                            {filteredReports.map((report) => (
+                                <tr key={report.id}>
+                                    <td className="px-3 py-4 whitespace-nowrap">
+                                            <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                                                {getReportTypeLabel(report.type)}
+                                            </span>
+                                    </td>
+                                    <td className="px-3 py-4 whitespace-nowrap">
+                                            <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                                                report.status === 'PENDING' ? 'bg-yellow-100 text-yellow-800' :
+                                                    report.status === 'APPROVED' ? 'bg-green-100 text-green-800' :
+                                                        report.status === 'REJECTED' ? 'bg-red-100 text-red-800' :
+                                                            'bg-gray-100 text-gray-800'
+                                            }`}>
+                                                {getStatusLabel(report.status)}
+                                            </span>
+                                    </td>
+                                    <td className="px-3 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        {formatDate(report.createDate)}
+                                    </td>
+                                    <td className="px-3 py-4 text-sm text-gray-500 break-words">
+                                        {report.address ?
+                                            <div>
+                                                {report.address}
+                                            </div>
+                                            :
+                                            <div>
+                                                {report.latitude.toFixed(6)} {report.longitude.toFixed(6)}
+                                            </div>
+                                        }
+                                    </td>
+                                    <td className="px-3 py-4 whitespace-nowrap text-sm font-medium">
+                                        <button
+                                            className="text-indigo-600 hover:text-indigo-900 flex items-center"
+                                            onClick={() => handleViewOnMap(report.latitude, report.longitude)}
+                                        >
+                                            <LuMap className="h-5 w-5 mr-1"/>
+                                            {t('reports.view-on-map')}
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </>
             )}
         </div>
     );
