@@ -8,5 +8,6 @@ public record UserRequest(
         String password,
         String role,
         String status
+
 ) {
 }
