@@ -1,4 +1,4 @@
-package com.supinfo.api_traficandme.traffic.dto;
+package com.supinfo.api_traficandme.itinerary.dto;
 
 import com.supinfo.api_traficandme.common.ModeCirculation;
 import jakarta.validation.constraints.NotNull;

@@ -1,56 +1,41 @@
-<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36 OPR/117.0.0.0" version="25.0.1">
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36" version="26.2.14">
   <diagram name="Page-1" id="M4y0jXKTTHNmajSopDJP">
-    <mxGraphModel dx="1672" dy="746" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+    <mxGraphModel dx="1426" dy="785" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
-        <mxCell id="nslCc2GsLbfLlcvG44iz-10" value="" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=default;verticalAlign=top;aspect=fixed;imageAspect=0;image=https://cdn-icons-png.flaticon.com/512/1493/1493169.png;" vertex="1" parent="1">
-          <mxGeometry x="430" y="218" width="62" height="62" as="geometry" />
+        <mxCell id="nslCc2GsLbfLlcvG44iz-10" value="" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=default;verticalAlign=top;aspect=fixed;imageAspect=0;image=https://cdn-icons-png.flaticon.com/512/1493/1493169.png;" parent="1" vertex="1">
+          <mxGeometry x="330" y="298" width="62" height="62" as="geometry" />
         </mxCell>
-        <mxCell id="nslCc2GsLbfLlcvG44iz-32" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="nslCc2GsLbfLlcvG44iz-11" target="nslCc2GsLbfLlcvG44iz-10">
+        <mxCell id="nslCc2GsLbfLlcvG44iz-25" value="" style="image;aspect=fixed;html=1;points=[];align=center;fontSize=12;image=img/lib/azure2/other/Arc_PostgreSQL.svg;" parent="1" vertex="1">
+          <mxGeometry x="590" y="250" width="65.08" height="68" as="geometry" />
+        </mxCell>
+        <mxCell id="nslCc2GsLbfLlcvG44iz-27" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=-0.046;entryY=0.471;entryDx=0;entryDy=0;entryPerimeter=0;" parent="1" source="nslCc2GsLbfLlcvG44iz-10" target="nslCc2GsLbfLlcvG44iz-25" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="nslCc2GsLbfLlcvG44iz-11" value="" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=default;verticalAlign=top;aspect=fixed;imageAspect=0;image=https://miro.medium.com/v2/resize:fit:1400/0*bKfOagkmq0M2KR3-.png;" vertex="1" parent="1">
-          <mxGeometry x="320" y="40" width="70" height="70" as="geometry" />
-        </mxCell>
-        <mxCell id="nslCc2GsLbfLlcvG44iz-17" value="" style="image;aspect=fixed;html=1;points=[];align=center;fontSize=12;image=img/lib/azure2/other/Arc_PostgreSQL.svg;" vertex="1" parent="1">
-          <mxGeometry x="610" y="40" width="65.08" height="68" as="geometry" />
-        </mxCell>
-        <mxCell id="nslCc2GsLbfLlcvG44iz-21" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="nslCc2GsLbfLlcvG44iz-18">
-          <mxGeometry relative="1" as="geometry">
-            <mxPoint x="430" y="250" as="targetPoint" />
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="nslCc2GsLbfLlcvG44iz-18" value="" style="image;aspect=fixed;html=1;points=[];align=center;fontSize=12;image=img/lib/azure2/other/Defender_Distributer_Control_System.svg;rotation=90;" vertex="1" parent="1">
-          <mxGeometry x="240" y="242" width="58" height="58" as="geometry" />
-        </mxCell>
-        <mxCell id="nslCc2GsLbfLlcvG44iz-22" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.515;entryY=1.015;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="nslCc2GsLbfLlcvG44iz-29" target="nslCc2GsLbfLlcvG44iz-18">
-          <mxGeometry relative="1" as="geometry">
-            <mxPoint x="110" y="205" as="sourcePoint" />
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="nslCc2GsLbfLlcvG44iz-23" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.529;entryY=1.029;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="nslCc2GsLbfLlcvG44iz-28" target="nslCc2GsLbfLlcvG44iz-18">
-          <mxGeometry relative="1" as="geometry">
-            <mxPoint x="122.88000000000011" y="329" as="sourcePoint" />
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="nslCc2GsLbfLlcvG44iz-25" value="" style="image;aspect=fixed;html=1;points=[];align=center;fontSize=12;image=img/lib/azure2/other/Arc_PostgreSQL.svg;" vertex="1" parent="1">
-          <mxGeometry x="620" y="174" width="65.08" height="68" as="geometry" />
-        </mxCell>
-        <mxCell id="nslCc2GsLbfLlcvG44iz-26" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.061;entryY=0.603;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="nslCc2GsLbfLlcvG44iz-11" target="nslCc2GsLbfLlcvG44iz-17">
+        <mxCell id="bNoQEROcNKXrwL61xhXn-5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="nslCc2GsLbfLlcvG44iz-28" target="nslCc2GsLbfLlcvG44iz-10">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="nslCc2GsLbfLlcvG44iz-27" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=-0.046;entryY=0.471;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="nslCc2GsLbfLlcvG44iz-10" target="nslCc2GsLbfLlcvG44iz-25">
+        <mxCell id="nslCc2GsLbfLlcvG44iz-28" value="" style="image;aspect=fixed;html=1;points=[];align=center;fontSize=12;image=img/lib/azure2/general/Mobile_Engagement.svg;" parent="1" vertex="1">
+          <mxGeometry x="150" y="360" width="35" height="58.63" as="geometry" />
+        </mxCell>
+        <mxCell id="bNoQEROcNKXrwL61xhXn-9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.75;entryDx=0;entryDy=0;" edge="1" parent="1" source="nslCc2GsLbfLlcvG44iz-29" target="nslCc2GsLbfLlcvG44iz-10">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="nslCc2GsLbfLlcvG44iz-28" value="" style="image;aspect=fixed;html=1;points=[];align=center;fontSize=12;image=img/lib/azure2/general/Mobile_Engagement.svg;" vertex="1" parent="1">
-          <mxGeometry x="70" y="306.38" width="35" height="58.63" as="geometry" />
+        <mxCell id="nslCc2GsLbfLlcvG44iz-29" value="" style="image;aspect=fixed;html=1;points=[];align=center;fontSize=12;image=img/lib/azure2/other/VM_Application_Definition.svg;" parent="1" vertex="1">
+          <mxGeometry x="50" y="250" width="59" height="54.49" as="geometry" />
         </mxCell>
-        <mxCell id="nslCc2GsLbfLlcvG44iz-29" value="" style="image;aspect=fixed;html=1;points=[];align=center;fontSize=12;image=img/lib/azure2/other/VM_Application_Definition.svg;" vertex="1" parent="1">
-          <mxGeometry x="60" y="188.31" width="59" height="54.49" as="geometry" />
+        <mxCell id="bNoQEROcNKXrwL61xhXn-6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="bNoQEROcNKXrwL61xhXn-2" target="nslCc2GsLbfLlcvG44iz-29">
+          <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="nslCc2GsLbfLlcvG44iz-31" value="[Frontend] → [API Gateway] → [API Backend] → [Keycloak]  &#xa;                                 ↑  &#xa;                             [PostgreSQL (Users + Métier)]" style="text;whiteSpace=wrap;" vertex="1" parent="1">
-          <mxGeometry x="210" y="460" width="360" height="70" as="geometry" />
+        <mxCell id="bNoQEROcNKXrwL61xhXn-7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="bNoQEROcNKXrwL61xhXn-2" target="nslCc2GsLbfLlcvG44iz-10">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="bNoQEROcNKXrwL61xhXn-8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="bNoQEROcNKXrwL61xhXn-2" target="nslCc2GsLbfLlcvG44iz-28">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="bNoQEROcNKXrwL61xhXn-2" value="" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=default;verticalAlign=top;aspect=fixed;imageAspect=0;image=https://i.ytimg.com/vi/Mhxt3cZwcSA/maxresdefault.jpg;" vertex="1" parent="1">
+          <mxGeometry x="334" y="90" width="112" height="63" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>

@@ -8,6 +8,7 @@ public class CreateReportRequest {
     private double latitude;
     private double longitude;
     private StatusReport status;
+    private String address;
 
     public TypeReport getType() {
         return type;
@@ -39,5 +40,13 @@ public class CreateReportRequest {
 
     public void setStatus(StatusReport status) {
         this.status = status;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 }

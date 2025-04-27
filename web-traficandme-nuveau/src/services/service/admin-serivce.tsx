@@ -26,7 +26,7 @@ export const fetchUsers = async (): Promise<UserResponseFetchUsers> => {
         const response = await axios.get<UserResponseFetchUsers>(`${API_URL}admin/users/list`, { headers: getAuthHeaders() });
         return response.data;
     } catch (error : any) {
-        toast.success(await translateMessage(error.response.data.message || "An error has occurred"));
+        toast.error(await translateMessage(error.response.data.message || "An error has occurred"));
         throw error;
     }
 };
@@ -37,7 +37,7 @@ export const createUser = async (params: UserCreateRequest): Promise<UserCreateR
         toast.success(await translateMessage(response.data.message));
         return response.data;
     }catch (error : any) {
-        toast.success(await translateMessage(error.response.data.message || "An error has occurred"));
+        toast.error(await translateMessage(error.response.data.message || "An error has occurred"));
         throw error;
 
     }
@@ -50,7 +50,7 @@ export const updateUserByAdmin = async (id: number, params: UserUpdaterRequest):
         toast.success(await translateMessage(response.data.message));
         return response.data;
     }catch (error: any) {
-        toast.success(await translateMessage(error.response.data.message || "An error has occurred"));
+        toast.error(await translateMessage(error.response.data.message || "An error has occurred"));
         throw error;
 
     }
@@ -63,7 +63,7 @@ export const deleteUserFoAnAdmin  = async (id: number): Promise<any> => {
         toast.success(await translateMessage(response.data.message));
         return response.data;
     } catch (error: any) {
-        toast.success(await translateMessage(error.response.data.message || "An error has occurred"));
+        toast.error(await translateMessage(error.response.data.message || "An error has occurred"));
         throw error;
     }
 };
@@ -75,7 +75,7 @@ export const deleteDefinitiveUserFoAnAdmin = async (id: number): Promise<any> =>
         toast.success(await translateMessage(response.data.message));
         return response.data;
     } catch (error: any) {
-        toast.success(await translateMessage(error.response.data.message || "An error has occurred"));
+        toast.error(await translateMessage(error.response.data.message || "An error has occurred"));
         throw error;
     }
 };
@@ -85,7 +85,7 @@ export const fetchSumOfMapStatistic = async (): Promise<AdminSumStats> => {
         const response = await axios.get<AdminSumStats>(`${API_URL}admin/users/total-map`, { headers: getAuthHeaders() });
         return response.data;
     } catch (error: any) {
-        toast.success(await translateMessage(error.response.data.message || "An error has occurred"));
+        toast.error(await translateMessage(error.response.data.message || "An error has occurred"));
         throw error;
     }
 };
@@ -95,7 +95,7 @@ export const fetchReportsByTypeStatistics = async (): Promise<any> => {
         const response = await axios.get<any>(`${API_URL}admin/users/report-statistics`, { headers: getAuthHeaders() });
         return response.data;
     } catch (error: any) {
-        toast.success(await translateMessage(error.response.data.message || "An error has occurred"));
+        toast.error(await translateMessage(error.response.data.message || "An error has occurred"));
         throw error;
     }
 };
@@ -105,7 +105,7 @@ export const fetchRoutesByModeStatistics = async (): Promise<any> => {
         const response = await axios.get<any>(`${API_URL}admin/users/route-statistics`, { headers: getAuthHeaders() });
         return response.data;
     } catch (error: any) {
-        toast.success(await translateMessage(error.response.data.message || "An error has occurred"));
+        toast.error(await translateMessage(error.response.data.message || "An error has occurred"));
         throw error;
     }
 };
@@ -115,7 +115,7 @@ export const fetchApiStatisticsPerTime = async (period: string): Promise<any> =>
         const response = await axios.get<any>(`${API_URL}admin/users/search-statistics`, { headers: getAuthHeaders(),params: { period } });
         return response.data;
     } catch (error: any) {
-        toast.success(await translateMessage(error.response.data.message || "An error has occurred"));
+        toast.error(await translateMessage(error.response.data.message || "An error has occurred"));
         throw error;
     }
 };

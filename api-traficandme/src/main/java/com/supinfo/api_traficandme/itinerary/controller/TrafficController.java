@@ -1,11 +1,11 @@
-package com.supinfo.api_traficandme.traffic.controller;
+package com.supinfo.api_traficandme.itinerary.controller;
 
 import com.supinfo.api_traficandme.user.dto.UserResponse;
 import com.supinfo.api_traficandme.user.service.UserService;
 import com.supinfo.api_traficandme.security.dto.ApiResponse;
-import com.supinfo.api_traficandme.traffic.dto.TrafficRequest;
-import com.supinfo.api_traficandme.traffic.model.TrafficModel;
-import com.supinfo.api_traficandme.traffic.service.TrafficService;
+import com.supinfo.api_traficandme.itinerary.dto.TrafficRequest;
+import com.supinfo.api_traficandme.itinerary.entity.Traffic;
+import com.supinfo.api_traficandme.itinerary.service.TrafficService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -27,7 +27,7 @@ public class TrafficController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<ApiResponse<TrafficModel>> create(@RequestBody TrafficRequest request) {
+    public ResponseEntity<ApiResponse<Traffic>> create(@RequestBody TrafficRequest request) {
         try {
             Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             UserResponse connectedUser = userService.getUserByEmail(((UserDetails) principal).getUsername());
@@ -35,7 +35,7 @@ public class TrafficController {
                 throw new IllegalArgumentException("User not found");
             }
 
-            TrafficModel traffic = trafficService.createTraffic(request, connectedUser);
+            Traffic traffic = trafficService.createTraffic(request, connectedUser);
             return ResponseEntity.ok(new ApiResponse<>("TrafficData fetched successfully", traffic));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(new ApiResponse<>(e.getMessage(), null));
@@ -43,9 +43,9 @@ public class TrafficController {
     }
 
     @GetMapping("/get-all")
-    public ResponseEntity<ApiResponse<List<TrafficModel>>> getAll() {
+    public ResponseEntity<ApiResponse<List<Traffic>>> getAll() {
         try {
-            List<TrafficModel> trafficList = trafficService.getAllTraffic();
+            List<Traffic> trafficList = trafficService.getAllTraffic();
             return ResponseEntity.ok(new ApiResponse<>("TrafficData fetched successfully", trafficList));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(new ApiResponse<>(e.getMessage(), null));
@@ -53,14 +53,14 @@ public class TrafficController {
     }
 
     @GetMapping("/user")
-    public ResponseEntity<ApiResponse<List<TrafficModel>>> getAllByUser() {
+    public ResponseEntity<ApiResponse<List<Traffic>>> getAllByUser() {
         try {
             Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             UserResponse userConnected = userService.getUserByEmail(((UserDetails) principal).getUsername());
             if(userConnected.username() == null){
                 throw new IllegalArgumentException("User undefined");
             }
-            List<TrafficModel> userTrafficList = trafficService.getAllTrafficByUser(userConnected);
+            List<Traffic> userTrafficList = trafficService.getAllTrafficByUser(userConnected);
             return ResponseEntity.ok(new ApiResponse<>("Traffic by user was successfully fetched",userTrafficList ));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(new ApiResponse<>(e.getMessage(), null));
@@ -68,9 +68,9 @@ public class TrafficController {
     }
 
     @DeleteMapping("{id}/delete-for-an-user")
-    public ResponseEntity<ApiResponse<TrafficModel>> deleteForAnUSer(@PathVariable Integer id) {
+    public ResponseEntity<ApiResponse<Traffic>> deleteForAnUSer(@PathVariable Integer id) {
         try {
-            TrafficModel traffic = trafficService.deleteTrafficForAnUser(id);
+            Traffic traffic = trafficService.deleteTrafficForAnUser(id);
             return ResponseEntity.ok(new ApiResponse<>("Traffic deleted successfully", traffic));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(new ApiResponse<>(e.getMessage(), null));

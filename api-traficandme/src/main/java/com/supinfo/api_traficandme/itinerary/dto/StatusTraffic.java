@@ -1,4 +1,4 @@
-package com.supinfo.api_traficandme.traffic.dto;
+package com.supinfo.api_traficandme.itinerary.dto;
 
 public enum StatusTraffic {
         ACTIVE,

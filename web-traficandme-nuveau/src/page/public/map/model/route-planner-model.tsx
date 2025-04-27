@@ -1,14 +1,7 @@
+import React from "react";
 
 
-export interface RouteOption {
-    id: string;
-    name: string;
-    coordinates: Array<[number, number]>;
-    distance: number;
-    duration: number;
-    type: "fastest" | "shortest" | "eco";
-    avoidTolls: boolean;
-}
+
 
 export interface RouteSaveData {
     startLongitude: string;
@@ -25,4 +18,19 @@ export interface RouteSaveData {
 export interface RoutePlannerProps {
     onRouteCalculated: (route: string) => void;
     startAddress: string;
+}
+
+export interface RouteOption {
+    id: string;
+    name: string;
+    type: string;
+    avoidTolls: boolean;
+    distance: number;
+    duration: number;
+    coordinates: Array<[number, number]>;
+    instructions?: Array<{
+        message: React.ReactNode;
+        distance: number;
+        duration: number;
+    }>;
 }

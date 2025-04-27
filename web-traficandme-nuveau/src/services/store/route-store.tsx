@@ -5,7 +5,7 @@ import {
     deleteRouteForAnUser,
     fetchRoutes,
     fetchRoutesByUser
-} from "../service/routes-service.tsx";
+} from "../service/itinerary-service.tsx";
 interface RouteState {
     routes: Route[];
     route: Route | null;

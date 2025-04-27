@@ -1,7 +1,7 @@
-package com.supinfo.api_traficandme.traffic.model;
+package com.supinfo.api_traficandme.itinerary.entity;
 
 import com.supinfo.api_traficandme.common.ModeCirculation;
-import com.supinfo.api_traficandme.traffic.dto.StatusTraffic;
+import com.supinfo.api_traficandme.itinerary.dto.StatusTraffic;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,7 +16,7 @@ import java.util.Date;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class TrafficModel {
+public class Traffic {
     @Id
     @GeneratedValue
     private int id;

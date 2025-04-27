@@ -10,6 +10,7 @@ export interface Report {
     status: string,
     likeCount: number;
     dislikeCount: number;
+    address : string
 }
 
 
@@ -55,5 +56,4 @@ export interface ReportData {
         type: string;
         count: number;
     }[];
-    
 }

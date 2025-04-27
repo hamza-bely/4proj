@@ -40,7 +40,8 @@ export interface UserResponseFetchUser {
     message : string;
     data:{
         id: number;
-        username: string;
+        firstName: string;
+        lastName: string;
         email: string;
         role: string;
         status: string;
@@ -113,9 +114,7 @@ export interface UserUpdaterRequest {
     firstName: string;
     lastName: string;
     email: string;
-    role: string;
     password: string;
-    status: string;
 }
 
 export interface UserUpdateResponse{

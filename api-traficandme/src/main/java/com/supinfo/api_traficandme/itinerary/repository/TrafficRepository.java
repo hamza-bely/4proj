@@ -1,6 +1,6 @@
-package com.supinfo.api_traficandme.traffic.fetch;
+package com.supinfo.api_traficandme.itinerary.repository;
 
-import com.supinfo.api_traficandme.traffic.model.TrafficModel;
+import com.supinfo.api_traficandme.itinerary.entity.Traffic;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -8,12 +8,12 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface TrafficRepository extends JpaRepository<TrafficModel,Integer> {
+public interface TrafficRepository extends JpaRepository<Traffic,Integer> {
 
     boolean existsByStartLongitudeAndStartLatitudeAndEndLongitudeAndEndLatitudeAndUser(
             String startLongitude, String startLatitude, String endLongitude, String endLatitude, String userInfo);
 
-    List<TrafficModel> findByUser(String user);
+    List<Traffic> findByUser(String user);
     int countByUser(String email);
 
     @Query(value = "SELECT mode, COUNT(*) AS count" +

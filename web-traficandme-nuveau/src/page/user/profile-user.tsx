@@ -7,7 +7,7 @@ import {Dialog} from "../../assets/kit-ui/dialog.tsx";
 import ModalDeleteUser from "./modal-delete-user.tsx";
 import ReportsUser from "./reports-user.tsx";
 import {MdReportProblem} from "react-icons/md";
-import RoutesUser from "./routes-user.tsx";
+import ItineraryUser from "./itinerary-user.tsx";
 import {FaRoute} from "react-icons/fa";
 
 const secondaryNavigation = [
@@ -18,14 +18,17 @@ const secondaryNavigation = [
 
 export default function ProfileUser() {
     const { t } = useTranslation();
-    const { user, fetchUser } = useUserStore();
+    const { user, fetchUser, updateUser } = useUserStore();
     const [isOpen, setIsOpen] = useState(false);
     const [editMode, setEditMode] = useState(false);
     const [currentNavigation, setCurrentNavigation] = useState("General");
+    console.log(user)
     const [formData, setFormData] = useState({
-        name: user?.username || "",
+        firstName: user?.firstName || "",
+        lastName: user?.lastName || "",
         email: user?.email || "",
         password: "",
+        role : user?.roles || ""
     });
     const [isUserLoading, setIsUserLoading] = useState(true);
 
@@ -53,7 +56,7 @@ export default function ProfileUser() {
 
     const handleSubmit = async () => {
         try {
-            //await updateUser(formData);
+            await updateUser(formData,user.id);
             setEditMode(false);
         } catch (error) {
             console.error("Erreur lors de la mise à jour de l'utilisateur:", error);
@@ -103,7 +106,7 @@ export default function ProfileUser() {
                                         <dl className="border-t border-gray-200 divide-y divide-gray-100 text-sm">
                                             <div className="flex justify-between py-3">
                                                 <dt className="text-gray-500">{t("profile.name")}</dt>
-                                                <dd className="text-gray-900">{user.username}</dd>
+                                                <dd className="text-gray-900">{user.firstName} {user.lastName}</dd>
                                             </div>
                                             <div className="flex justify-between py-3">
                                                 <dt className="text-gray-500">{t("common.email")}</dt>
@@ -117,13 +120,23 @@ export default function ProfileUser() {
                                     ) : (
                                         <div className="space-y-4">
                                             <div>
-                                                <label className="block text-sm font-medium text-gray-700">{t("profile.name")}</label>
+                                                <label className="block text-sm font-medium text-gray-700">{t("profile.firstName")}</label>
                                                 <input
                                                     type="text"
-                                                    name="name"
-                                                    value={formData.name}
+                                                    name="firstName"
+                                                    value={formData.firstName}
                                                     onChange={handleChange}
-                                                    className="w-full p-2 mt-1 border rounded-md"
+                                                    className="block w-full rounded-md bg-white px-3 py-2 text-base text-gray-900 outline-1 outline-gray-300 placeholder-gray-400 focus:outline-2 focus:outline-indigo-600 sm:text-sm"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700">{t("profile.lastName")}</label>
+                                                <input
+                                                    type="text"
+                                                    name="lastName"
+                                                    value={formData.lastName}
+                                                    onChange={handleChange}
+                                                    className="block w-full rounded-md bg-white px-3 py-2 text-base text-gray-900 outline-1 outline-gray-300 placeholder-gray-400 focus:outline-2 focus:outline-indigo-600 sm:text-sm"
                                                 />
                                             </div>
                                             <div>
@@ -133,7 +146,7 @@ export default function ProfileUser() {
                                                     name="email"
                                                     value={formData.email}
                                                     onChange={handleChange}
-                                                    className="w-full p-2 mt-1 border rounded-md"
+                                                    className="block w-full rounded-md bg-white px-3 py-2 text-base text-gray-900 outline-1 outline-gray-300 placeholder-gray-400 focus:outline-2 focus:outline-indigo-600 sm:text-sm"
                                                 />
                                             </div>
                                             <div>
@@ -143,7 +156,7 @@ export default function ProfileUser() {
                                                     name="password"
                                                     value={formData.password}
                                                     onChange={handleChange}
-                                                    className="w-full p-2 mt-1 border rounded-md"
+                                                    className="block w-full rounded-md bg-white px-3 py-2 text-base text-gray-900 outline-1 outline-gray-300 placeholder-gray-400 focus:outline-2 focus:outline-indigo-600 sm:text-sm"
                                                 />
                                             </div>
                                         </div>
@@ -162,7 +175,7 @@ export default function ProfileUser() {
                                                     onClick={() => setEditMode(false)}
                                                     className="px-4 py-2 text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300"
                                                 >
-                                                    {t("profile.cancel")}
+                                                    {t("common.cancel")}
                                                 </button>
                                             </>
                                         ) : (
@@ -172,7 +185,7 @@ export default function ProfileUser() {
                                                     onClick={() => setEditMode(true)}
                                                     className="px-4 py-2 text-white bg-gray-950 rounded-md hover:bg-gray-800 hover:text-white"
                                                 >
-                                                    {t("profile.edit")}
+                                                    {t("common.edit")}
                                                 </button>
 
                                                 <button
@@ -197,7 +210,7 @@ export default function ProfileUser() {
                     )}
 
                     {currentNavigation === "Routes" && (
-                        <RoutesUser/>
+                        <ItineraryUser/>
                     )}
                 </div>
                 <Dialog style={{ zIndex: 11, position: "fixed", top: 0, left: 0, right: 0, bottom: 0, display: "flex", justifyContent: "center", alignItems: "center" }} open={isOpen} onClose={() => setIsOpen(false)}>

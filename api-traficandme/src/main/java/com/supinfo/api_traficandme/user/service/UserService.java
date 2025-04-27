@@ -52,6 +52,10 @@ public class UserService {
                 .orElseThrow();
     }
 
+    public UserInfo getUserByEmailUserInfo(String email){
+        return userRepository.findByEmail(email).orElseThrow();
+    }
+
     public UserResponse createUser(UserRequest request){
         if (isNullOrEmpty(request.firstName())) throw new IllegalArgumentException("First name is required.");
         if (isNullOrEmpty(request.lastName())) throw new IllegalArgumentException("Last name is required.");
@@ -100,7 +104,7 @@ public class UserService {
         userRepository.deleteById(id);
     }
 
-    public UserResponse updateUser(Integer id, UserRequest request) {
+    public UserInfo updateUser(Integer id, UserRequest request) {
 
         var user = userRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("User not found."));
@@ -140,7 +144,7 @@ public class UserService {
 
         userRepository.save(user);
 
-        return userMapper.toResponse(user);
+        return user;
     }
 
     public void mergeUser(UserInfo userToUpdate, UserRequest user){
@@ -196,13 +200,4 @@ public class UserService {
         return value == null || value.trim().isEmpty();
     }
 
-    /*
-    public void softDeleteUser(String email){
-        Optional<UserInfo> user = userRepository.findByEmail(email);
-        if(user.isPresent()){
-            user.get().setFlSup("N");
-            userRepository.save(user.get());
-        }
-    }
-     */
 }

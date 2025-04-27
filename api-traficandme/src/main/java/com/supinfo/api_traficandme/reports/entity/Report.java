@@ -42,13 +42,17 @@ public class Report {
     private Integer likeCount;
     private Integer dislikeCount;
 
-    // Constructeurs
+    private String address;
+
     public Report() {
     }
 
     public Report(Integer id, TypeReport type, double latitude, double longitude, String user,
                   Date createDate, Date updateDate, StatusReport status,
-                  Integer likeCount, Integer dislikeCount) {
+                  Integer likeCount, Integer dislikeCount,
+                  String address
+
+    ) {
         this.id = id;
         this.type = type;
         this.latitude = latitude;
@@ -59,9 +63,8 @@ public class Report {
         this.status = status;
         this.likeCount = likeCount;
         this.dislikeCount = dislikeCount;
+        this.address = address;
     }
-
-    // Getters et Setters
 
     public Integer getId() {
         return id;
@@ -141,5 +144,13 @@ public class Report {
 
     public void setDislikeCount(Integer dislikeCount) {
         this.dislikeCount = dislikeCount;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 }

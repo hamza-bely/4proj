@@ -17,7 +17,14 @@
     "status" : "Status",
     "role" : "Role",
     "createDate" : "Create date",
-    "admin" : "Administration"
+    "admin" : "Administration",
+    "add": "Ajouter",
+    "error-global" : "Something went wrong try again later",
+    "email" : "Email",
+    "close": "Close",
+    "save": "Save",
+    "back": "Back",
+    "next": "Next"
   },
 
   "reportStatus": {
@@ -30,7 +37,8 @@
     "accidents": "Accidents",
     "traffic": "Traffic",
     "roadsClosed": "Roads Closed",
-    "policeChecks": "Police Checks"
+    "policeChecks": "Police Checks",
+    "obstacles": "Obstacles"
   },
 
   "header": {
@@ -46,6 +54,12 @@
 
   "home": {
     "title-mobile" : "Discover your world differently",
+    "new": "New",
+    "version": "Version 1.0 available!",
+    "title": "Your smart traffic solution",
+    "description": "Discover the app that revolutionizes your driving experience with real-time alerts, community reports, and much more.",
+    "download": "Download the App",
+    "learnMore": "Learn more",
     "description-mobile" : "Our mobile mapping app gives you seamless navigation, precise directions, and personalized recommendations for exploring your surroundings."
   },
 
@@ -155,16 +169,42 @@
   "map": {
     "route-planner"  : "Route planner",
     "look-place" : "Look for a place",
-    "fastest": "Fastest Route",
-    "shortest": "Shortest Route",
-    "no-tolls": "Without Tolls",
     "with-tolls": "With Tolls",
     "start-point": "Starting Point",
     "destination": "Destination",
+    "click-map" : "Click on the map",
     "available-routes": "Available Routes",
+    "driving-instructions": "Driving Instructions",
+    "fastest": "Fastest",
+    "shortest": "Shortest",
+    "no-tolls": "No tolls",
+    "select-points": "Please select a starting point and destination",
     "calculating": "Calculating...",
     "calculate-routes": "Calculate Routes",
-    "click-map" : "Click on the map"
+    "no-routes": "No routes found",
+    "select-route-save": "Please select a route to save",
+    "select-route-qr": "Please select a route to generate a QR code",
+    "route-not-found": "Route not found",
+    "route-saved": "Route saved successfully",
+    "back-to-search": "Back to search",
+    "back-to-routes": "Back to routes",
+    "no-instructions": "No instructions available",
+    "saving": "Saving...",
+    "save-route": "Save Route",
+    "qr-code": "QR Code",
+    "scan-qr": "Scan this QR code to share the route",
+    "qr-contains": "This QR code contains your route information",
+    "from": "From",
+    "to": "To",
+    "transport-mode": "Transport mode",
+    "mode-fast": "Fast",
+    "mode-short": "Short",
+    "transport": {
+      "car": "Car",
+      "bike": "Bicycle",
+      "bus": "Bus/Truck",
+      "walk": "Walking"
+    }
   },
   "user-admin" :{
     "title" : "User Management",
@@ -177,6 +217,8 @@
   },
 
   "profile": {
+    "firstName": "First Name",
+    "lastName": "Last Name",
     "title": "Profile",
     "date-create-profile": "Creation date",
     "name": "Name",
@@ -276,8 +318,44 @@
   "axios-report-error": {
     "user_undefined": "Utilisateur non défini",
     "generic": "Une erreur s'est produite"
+  },
+  "report": {
+    "new_report": "Ajouter un nouveau rapport"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "period": "Period",
+    "lastUpdate": "Last update",
+    "userCount": "Users",
+    "routeSearches": "Route searches",
+    "trafficInfo": "Traffic info",
+    "errorCount": "Errors",
+    "dailyUsage": "Daily usage",
+    "itinerarySearchTypes": "Itinerary search types",
+    "reportTypes": "Report types",
+    "apiErrorTypes": "API error types",
+    "today": "Today",
+    "week": "Week",
+    "month": "Month",
+    "quarter": "Quarter"
+  },
+  "createUser": {
+    "title": "Add a user",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "email": "Email",
+    "password": "Password",
+    "role": "Role",
+    "user": "User",
+    "admin": "Administrator",
+    "moderator": "Moderator",
+    "submit": "Add User",
+    "loading": "Loading..."
+  },
+  "error": {
+    "global": "An error occurred",
+    "route-calculation": "Error calculating route",
+    "save-route": "Error saving route",
+    "qr-generation": "Error generating QR code"
   }
-
-
-
 }

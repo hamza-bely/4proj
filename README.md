@@ -107,7 +107,7 @@ cd ../api-traficandme
 npm install
 ```
 
-### 4. Initialiser la Base de Données
+### 3. Initialiser la Base de Données
 
 Initialiser la base de données avec les données initiales:
 
@@ -115,7 +115,7 @@ Initialiser la base de données avec les données initiales:
 Processus automatique après le lancement du projet
 ```
 
-### 5. Démarrer les Services
+### 4. Démarrer les Services
 
 Démarrer chaque service dans un terminal séparé:
 
