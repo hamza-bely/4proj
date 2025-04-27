@@ -3,6 +3,7 @@ import { useState, useRef, useEffect } from "react";
 import { LuSearch } from "react-icons/lu";
 import { TbRouteSquare } from "react-icons/tb";
 import { MdOutlineGpsFixed } from "react-icons/md";
+import { BiExpand, BiCollapse } from "react-icons/bi"; // Added for minimize/expand icons
 import tt, { Popup, Marker } from "@tomtom-international/web-sdk-maps";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -28,6 +29,8 @@ export default function ContainerMap({ map }: ContainerMapProps) {
     const [search, setSearch] = useState<boolean>(false);
     const [isRouteActive, setIsRouteActive] = useState<boolean>(false);
     const [startAddress, setStartAddress] = useState<string>("");
+    const [show, setShow] = useState<boolean>(true);
+    const [minimized, setMinimized] = useState<boolean>(false);
     const { t } = useTranslation();
 
     const popups = useRef<Popup[]>([]);
@@ -346,66 +349,102 @@ export default function ContainerMap({ map }: ContainerMapProps) {
         });
     }
 
+    function toggleMinimize(): void {
+        setMinimized(!minimized);
+    }
+
     return (
         <div>
-            <ToastContainer />
-            <div className="bg-white shadow-sm sm:rounded-lg container-modal">
-                <div className="px-4 py-5 sm:p-6">
-                    <div className="flex justify-center">
-                        <img
-                            className="h-12 w-auto"
-                            src="/images/logo/logo_2.png"
-                            alt="Logo"
-                            height="400"
-                            width="400"
-                        />
-                    </div>
-                    <div className="mt-5">
-                        <div className="flex" style={{ alignItems: "center", justifyContent: "space-between" }}>
-                            <div className="cursor-pointer position-user hover:py-1">
-                                <MdOutlineGpsFixed
-                                    className="hover:p-[1px]"
-                                    style={{ fontSize: "20px" }}
-                                    onClick={getUserPosition}
-                                />
-                            </div>
-                            <div className="flex justify-end items-center">
-                                <LuSearch
-                                    onClick={() => setSearch(false)}
-                                    style={{ fontSize: "20px" }}
-                                    className={`text-md m-2 cursor-pointer hover:p-[1px] ${search ? 'text-gray-500' : 'text-blue-500'}`}
-                                />
-                                <TbRouteSquare
-                                    onClick={() => setSearch(true)}
-                                    style={{ fontSize: "20px" }}
-                                    className={`text-md m-2 cursor-pointer hover:p-[1px] ${search ? 'text-blue-500' : 'text-gray-500'}`}
-                                />
-                            </div>
+            {show ? (
+                <div>
+                    <ToastContainer />
+                    <div className="bg-white shadow-sm sm:rounded-lg container-modal">
+                        <div className="flex justify-between items-center px-2 pt-2">
+                            <button
+                                onClick={toggleMinimize}
+                                className="text-gray-500 hover:text-gray-700"
+                                title={minimized ? "Agrandir" : "Réduire"}
+                            >
+                                {minimized ? <BiExpand size={20} /> : <BiCollapse size={20} />}
+                            </button>
+                            <button
+                                onClick={() => setShow(false)}
+                                className="text-gray-500 hover:text-gray-700"
+                                title="Fermer"
+                            >
+                                ✕
+                            </button>
                         </div>
 
-                        {!search && <Search onSearchResultSelect={onSearchResultSelect} initialValue={""} />}
-                        {search && (
-                            <>
-                                <RoutePlanner
-                                    onRouteCalculated={onRouteCalculated}
-                                    startAddress={startAddress}
-                                />
-                                {isRouteActive && (
-                                    <div className="mt-2 text-center">
-                                        <button
-                                            onClick={stopRouteTracking}
-                                            className="px-3 py-1 text-xs bg-red-500 text-white rounded-md hover:bg-red-600"
-                                        >
-                                            Arrêter le suivi du trafic
-                                        </button>
+                        {!minimized && (
+                            <div className="px-4 py-5 sm:p-6">
+                                <div className="flex justify-center">
+                                    <img
+                                        className="h-12 w-auto"
+                                        src="/images/logo/logo_2.png"
+                                        alt="Logo"
+                                        height="400"
+                                        width="400"
+                                    />
+                                </div>
+                                <div className="mt-5">
+                                    <div className="flex" style={{ alignItems: "center", justifyContent: "space-between" }}>
+                                        <div className="cursor-pointer position-user hover:py-1">
+                                            <MdOutlineGpsFixed
+                                                className="hover:p-[1px]"
+                                                style={{ fontSize: "20px" }}
+                                                onClick={getUserPosition}
+                                            />
+                                        </div>
+                                        <div className="flex justify-end items-center">
+                                            <LuSearch
+                                                onClick={() => setSearch(false)}
+                                                style={{ fontSize: "20px" }}
+                                                className={`text-md m-2 cursor-pointer hover:p-[1px] ${search ? 'text-gray-500' : 'text-blue-500'}`}
+                                            />
+                                            <TbRouteSquare
+                                                onClick={() => setSearch(true)}
+                                                style={{ fontSize: "20px" }}
+                                                className={`text-md m-2 cursor-pointer hover:p-[1px] ${search ? 'text-blue-500' : 'text-gray-500'}`}
+                                            />
+                                        </div>
                                     </div>
-                                )}
-                            </>
+
+                                    {!search && <Search onSearchResultSelect={onSearchResultSelect} initialValue={""} />}
+                                    {search && (
+                                        <>
+                                            <RoutePlanner
+                                                onRouteCalculated={onRouteCalculated}
+                                                startAddress={startAddress}
+                                            />
+                                            {isRouteActive && (
+                                                <div className="mt-2 text-center">
+                                                    <button
+                                                        onClick={stopRouteTracking}
+                                                        className="px-3 py-1 text-xs bg-red-500 text-white rounded-md hover:bg-red-600"
+                                                    >
+                                                        Arrêter le suivi du trafic
+                                                    </button>
+                                                </div>
+                                            )}
+                                        </>
+                                    )}
+                                </div>
+                                <TrafficIndicator />
+                            </div>
+                        )}
+                        {minimized && (
+                            <div className="px-4 py-2 flex items-center justify-center">
+                                <span className="text-sm font-medium">Carte - Cliquez pour agrandir</span>
+                            </div>
                         )}
                     </div>
-                    <TrafficIndicator />
                 </div>
-            </div>
+            ) : (
+                <div className="fixed bottom-4 right-4 bg-white shadow-md rounded-lg p-2 cursor-pointer" onClick={() => setShow(true)}>
+                    <span className="text-sm font-medium">Ouvrir la carte</span>
+                </div>
+            )}
         </div>
     );
 }

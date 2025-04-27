@@ -3,7 +3,6 @@ import i18n from "i18next";
 
 export const translateMessage = async (message: string): Promise<string> => {
     const currentLang = i18n.language ;
-    console.log(currentLang)
     if (currentLang === "en") return message;
 
     try {

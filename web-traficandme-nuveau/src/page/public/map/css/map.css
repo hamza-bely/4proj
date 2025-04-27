@@ -11,8 +11,7 @@
     position: absolute;
     z-index: 1000;
     margin-top: 20px;
-    width: 400px;
-    margin-left: 50px;
+    left: 10px;
 }
 
 .container-trafic{
