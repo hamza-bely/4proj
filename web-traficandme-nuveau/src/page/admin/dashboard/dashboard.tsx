@@ -102,7 +102,29 @@ const Dashboard: React.FC = () => {
     return (
         <div className="p-4 bg-gray-50 rounded-lg">
             <h1 className="text-2xl font-bold mb-6">{t('dashboard.title')}</h1>
-            <div className="mb-6 flex justify-between items-center">
+            
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                <div className="bg-white p-4 rounded-lg shadow">
+                    <h3 className="text-gray-500 text-sm">{t('dashboard.userCount')}</h3>
+                    <p className="text-2xl font-bold">{mapData?.data.userTotal}</p>
+                </div>
+                <div className="bg-white p-4 rounded-lg shadow">
+                    <h3 className="text-gray-500 text-sm">{t('dashboard.routeSearches')}</h3>
+                    <p className="text-2xl font-bold">{mapData?.data.routeSearches}</p>
+                </div>
+                <div className="bg-white p-4 rounded-lg shadow">
+                    <h3 className="text-gray-500 text-sm">{t('dashboard.trafficInfo')}</h3>
+                    <p className="text-2xl font-bold">{mapData?.data.trafficInfo}</p>
+                </div>
+                <div className="bg-white p-4 rounded-lg shadow">
+                    <h3 className="text-gray-500 text-sm">{t('dashboard.userDeleted')}</h3>
+                    <p className="text-2xl font-bold text-red-500">{mapData?.data.deletedUsers}</p>
+                </div>
+            </div>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div className="bg-white p-4 rounded-lg shadow">
+                    <h2 className="text-lg font-semibold mb-4">{t('dashboard.dailyUsage')}</h2>
+                    <div className="mb-6 flex justify-between items-center">
                 <div>
                     <label htmlFor="timeRange" className="mr-2 font-medium">
                         {t('dashboard.period')}:
@@ -123,27 +145,6 @@ const Dashboard: React.FC = () => {
                     {t('dashboard.lastUpdate')}: {new Date().toLocaleString()}
                 </div>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-                <div className="bg-white p-4 rounded-lg shadow">
-                    <h3 className="text-gray-500 text-sm">{t('dashboard.userCount')}</h3>
-                    <p className="text-2xl font-bold">{mapData?.data.userTotal}</p>
-                </div>
-                <div className="bg-white p-4 rounded-lg shadow">
-                    <h3 className="text-gray-500 text-sm">{t('dashboard.routeSearches')}</h3>
-                    <p className="text-2xl font-bold">{mapData?.data.routeSearches}</p>
-                </div>
-                <div className="bg-white p-4 rounded-lg shadow">
-                    <h3 className="text-gray-500 text-sm">{t('dashboard.trafficInfo')}</h3>
-                    <p className="text-2xl font-bold">{mapData?.data.trafficInfo}</p>
-                </div>
-                <div className="bg-white p-4 rounded-lg shadow">
-                    <h3 className="text-gray-500 text-sm">{t('dashboard.errorCount')}</h3>
-                    <p className="text-2xl font-bold text-red-500">{mapData?.data.deletedUsers}</p>
-                </div>
-            </div>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div className="bg-white p-4 rounded-lg shadow">
-                    <h2 className="text-lg font-semibold mb-4">{t('dashboard.dailyUsage')}</h2>
                     <ResponsiveContainer width="100%" height={300}>
                         <LineChart data={usageData}>
                             <CartesianGrid strokeDasharray="3 3" />
