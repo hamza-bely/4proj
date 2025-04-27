@@ -1,13 +1,14 @@
-import React, { useEffect, useRef, useState, useCallback, useMemo } from 'react';
+import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { View, StyleSheet, ActivityIndicator, Text } from 'react-native';
 import { WebView } from 'react-native-webview';
 import * as Location from 'expo-location';
+import { DeviceMotion } from 'expo-sensors';
 import TomTomMapProps from '@interfaces/TomTomMapProps';
-
 
 export default function TomTomMap({ destination, routeOptions, selectedRoute }: TomTomMapProps) {
   const webviewRef = useRef<WebView | null>(null);
-  const [location, setLocation] = useState<{ latitude: number; longitude: number } | null>(null);
+  const [location, setLocation] = useState<{ latitude: number; longitude: number; heading: number } | null>(null);
+  const [orientation, setOrientation] = useState<number>(0);
 
   useEffect(() => {
     const requestLocationPermission = async () => {
@@ -21,6 +22,7 @@ export default function TomTomMap({ destination, routeOptions, selectedRoute }: 
       setLocation({
         latitude: loc.coords.latitude,
         longitude: loc.coords.longitude,
+        heading: loc.coords.heading || 0, // Assure-toi que heading est toujours défini
       });
     };
 
@@ -38,11 +40,13 @@ export default function TomTomMap({ destination, routeOptions, selectedRoute }: 
         const coords = {
           latitude: loc.coords.latitude,
           longitude: loc.coords.longitude,
+          heading: loc.coords.heading || 0, // Assure-toi que heading est toujours défini
         };
         setLocation(coords);
+        // Injecte le script JS dans la WebView avec la valeur du heading
         webviewRef.current?.injectJavaScript(`
           if (window.updateUserLocation) {
-            updateUserLocation(${coords.longitude}, ${coords.latitude});
+            updateUserLocation(${coords.longitude}, ${coords.latitude}, ${coords.heading});
           }
         `);
       }
@@ -52,6 +56,26 @@ export default function TomTomMap({ destination, routeOptions, selectedRoute }: 
       watch.then((subscription) => subscription.remove());
     };
   }, []);
+
+  useEffect(() => {
+    const subscription = DeviceMotion.addListener(({ rotation }) => {
+      const { alpha } = rotation;
+      setOrientation(alpha);
+      if (location) {
+        webviewRef.current?.injectJavaScript(`
+          if (window.updateUserLocation) {
+            updateUserLocation(${location.longitude}, ${location.latitude}, ${alpha});
+          }
+        `);
+      }
+    });
+
+    DeviceMotion.setUpdateInterval(100);
+
+    return () => {
+      subscription.remove();
+    };
+  }, [location]);
 
   useEffect(() => {
     if (destination && location) {
@@ -78,6 +102,16 @@ export default function TomTomMap({ destination, routeOptions, selectedRoute }: 
       webviewRef.current?.injectJavaScript(`
         if (window.highlightSelectedRoute) {
           highlightSelectedRoute(${JSON.stringify(selectedRoute)});
+        }
+      `);
+    }
+  }, [selectedRoute]);
+
+  useEffect(() => {
+    if (selectedRoute === null) {
+      webviewRef.current?.injectJavaScript(`
+        if (window.clearRoute) {
+          window.clearRoute();
         }
       `);
     }
@@ -114,16 +148,28 @@ export default function TomTomMap({ destination, routeOptions, selectedRoute }: 
             zoom: 18,
             pitch: 100,
             dragRotate: true,
+            bearingSnap: 7,
           });
 
           map.addControl(new tt.FullscreenControl());
 
-          userMarker = new tt.Marker().setLngLat(userCoords).addTo(map);
+          const userIcon = document.createElement('div');
+          userIcon.style.width = '40px';
+          userIcon.style.height = '40px';
+          userIcon.style.backgroundImage = 'url(https://img.icons8.com/?size=100&id=HZC1E42sHiI3&format=png&color=000000)';
+          userIcon.style.backgroundSize = 'contain';
+          userIcon.style.backgroundRepeat = 'no-repeat';
+          userIcon.style.transform = 'rotate(0deg)';
+          userIcon.style.transition = 'transform 0.5s ease';
 
-          window.updateUserLocation = (lng, lat) => {
+          userMarker = new tt.Marker({ element: userIcon }).setLngLat(userCoords).addTo(map);
+
+          window.updateUserLocation = (lng, lat, heading) => {
             userCoords = [lng, lat];
             userMarker.setLngLat(userCoords);
+            userMarker.getElement().style.transform = \`rotate(\${heading}deg)\`;
             map.setCenter(userCoords);
+            map.rotateTo(heading, { duration: 500 });
           };
 
           window.searchAndRoute = function(coords) {
@@ -140,7 +186,6 @@ export default function TomTomMap({ destination, routeOptions, selectedRoute }: 
 
                 const points = routeData.routes[0].legs[0].points.map(p => [p.longitude, p.latitude]);
 
-                // Supprimer ancienne route si existante
                 if (map.getLayer('route')) {
                   map.removeLayer('route');
                   map.removeSource('route');
@@ -165,7 +210,6 @@ export default function TomTomMap({ destination, routeOptions, selectedRoute }: 
                   }
                 });
 
-                // Ajouter ou mettre à jour le marqueur de destination
                 if (destMarker) {
                   destMarker.setLngLat(destCoords);
                 } else {
@@ -180,7 +224,7 @@ export default function TomTomMap({ destination, routeOptions, selectedRoute }: 
           window.displayAllRoutes = function(routes) {
             routes.forEach((route, index) => {
               const points = route.legs[0].points.map(p => [p.longitude, p.latitude]);
-              const color = colors[index % colors.length]; // Utiliser une couleur différente pour chaque itinéraire
+              const color = colors[index % colors.length];
 
               map.addLayer({
                 id: 'route-' + index,
@@ -205,9 +249,8 @@ export default function TomTomMap({ destination, routeOptions, selectedRoute }: 
 
           window.highlightSelectedRoute = function(route) {
             const points = route.legs[0].points.map(p => [p.longitude, p.latitude]);
-            const color = '#ffd700'; // Couleur pour l'itinéraire sélectionné
+            const color = '#ffd700';
 
-            // Supprimer anciennes routes
             for (let i = 0; i < colors.length; i++) {
               if (map.getLayer('route-' + i)) {
                 map.removeLayer('route-' + i);
@@ -234,12 +277,32 @@ export default function TomTomMap({ destination, routeOptions, selectedRoute }: 
               }
             });
 
-            // Ajouter ou mettre à jour le marqueur de destination
             const destCoords = [route.legs[0].points[route.legs[0].points.length - 1].longitude, route.legs[0].points[route.legs[0].points.length - 1].latitude];
             if (destMarker) {
               destMarker.setLngLat(destCoords);
             } else {
               destMarker = new tt.Marker({ color: 'red' }).setLngLat(destCoords).addTo(map);
+            }
+          };
+
+          window.clearRoute = function() {
+            if (map.getLayer('route')) {
+              map.removeLayer('route');
+              map.removeSource('route');
+            }
+            if (map.getLayer('selected-route')) {
+              map.removeLayer('selected-route');
+              map.removeSource('selected-route');
+            }
+            for (let i = 0; i < colors.length; i++) {
+              if (map.getLayer('route-' + i)) {
+                map.removeLayer('route-' + i);
+                map.removeSource('route-' + i);
+              }
+            }
+            if (destMarker) {
+              destMarker.remove();
+              destMarker = null;
             }
           };
         </script>

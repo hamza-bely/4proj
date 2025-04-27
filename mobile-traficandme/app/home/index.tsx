@@ -10,7 +10,8 @@ import {
   Text,
   TouchableOpacity,
   FlatList,
-  Image
+  Image,
+  ActivityIndicator
 } from 'react-native';
 import { Colors } from '@/constants/Colors';
 import TomTomMap from '@components/TomTomMaps';
@@ -39,6 +40,7 @@ export default function HomeScreen() {
   const [currentDistance, setCurrentDistance] = useState<number>(0);
   const [currentManeuver, setCurrentManeuver] = useState<string>('STRAIGHT');
   const [instructions, setInstructions] = useState<NavigationInstruction[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
     if (searchText.length > 2) {
@@ -110,7 +112,6 @@ export default function HomeScreen() {
 
     const userLat = coords.latitude;
     const userLon = coords.longitude;
-
     let closestInstruction: ClosestInstruction | null = null;
     let minDistance = Number.MAX_SAFE_INTEGER;
 
@@ -136,8 +137,7 @@ export default function HomeScreen() {
       console.log('No closest instruction found');
     }
 
-    // Check if the user is off route and recalculate the route if necessary
-    if (minDistance > 50) { // Adjust the threshold as needed
+    if (minDistance > 50) {
       await recalculateRoute(coords);
     }
   }, [selectedRoute]);
@@ -145,6 +145,7 @@ export default function HomeScreen() {
   const recalculateRoute = async (coords: Location.LocationObjectCoords) => {
     if (!destination) return;
 
+    setLoading(true);
     try {
       const response = await fetch(
         `https://api.tomtom.com/routing/1/calculateRoute/${coords.latitude},${coords.longitude}:${destination.latitude},${destination.longitude}/json?key=QBsKzG3zoRyZeec28eUDje0U8DeNoRSO&routeType=fastest&maxAlternatives=3&instructionsType=text&language=fr`
@@ -162,6 +163,8 @@ export default function HomeScreen() {
       }
     } catch (error) {
       console.error('Erreur lors du recalcul de l\'itinéraire :', error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -210,6 +213,7 @@ export default function HomeScreen() {
   };
 
   const fetchRouteOptions = async (destination: { latitude: number; longitude: number }) => {
+    setLoading(true);
     try {
       const location = await Location.getCurrentPositionAsync({});
       const { latitude, longitude } = location.coords;
@@ -228,6 +232,8 @@ export default function HomeScreen() {
       }
     } catch (error) {
       console.error('Erreur lors de la récupération des itinéraires :', error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -269,8 +275,6 @@ export default function HomeScreen() {
     <TomTomMap destination={destination} routeOptions={routeOptions} selectedRoute={selectedRoute} />
   ), [destination, routeOptions, selectedRoute]);
 
-  console.log('Rendering HomeScreen with:', { destination, routeOptions, selectedRoute });
-
   return (
     <View style={styles.container}>
       <StatusBar style="light" translucent backgroundColor="transparent" />
@@ -284,6 +288,13 @@ export default function HomeScreen() {
         style={styles.gradientOverlay}
       />
 
+      {loading && (
+        <View style={styles.loader}>
+          <ActivityIndicator size="large" color="#0000ff" />
+          <Text>Chargement...</Text>
+        </View>
+      )}
+
       {selectedRoute && instructions.length > 0 && (
         <View style={styles.roadInstructionContainer}>
           {selectedAddress && (
@@ -294,7 +305,7 @@ export default function HomeScreen() {
             <View style={styles.roadInstruction}>
               <Image
                 source={getInstructionIcon(currentManeuver)}
-                style={{ width: (50), height: (50), tintColor: '#00bfff', marginRight: 15 }}
+                style={{ width: 50, height: 50, tintColor: '#00bfff', marginRight: 15 }}
               />
 
               <View>
@@ -384,6 +395,17 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
     flex: 1,
   },
+  loader: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    zIndex: 100,
+  },
   roadInstructionContainer:{
     position: 'absolute',
     top: 0,
@@ -403,33 +425,6 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 15,
     textAlign:'center'
-  },
-  instructionTitle: {
-    fontWeight: 'bold',
-    color: '#fff',
-    marginBottom: 5,
-  },
-  instructionText: {
-    color: '#fff',
-    fontSize: 14,
-    marginBottom: 3,
-  },
-  distanceText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginBottom: 10,
-    textAlign: 'center',
-  },
-  arrowContainer: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 10,
-  },
-  arrowIcon: {
-    width: 30,
-    height: 30,
-    resizeMode: 'contain',
   },
   gradientOverlay: {
     position: 'absolute',
@@ -567,11 +562,6 @@ const styles = StyleSheet.create({
     width: '100%',
     paddingHorizontal: 10,
   },
-  routeInfoTime: {
-    fontSize: 30,
-    fontWeight: 'bold',
-    textAlign: 'center',
-  },
   clearRouteButton: {
     backgroundColor: 'red',
     flexDirection: 'row',
@@ -580,10 +570,6 @@ const styles = StyleSheet.create({
     borderRadius: '100%',
     width: 40,
     height: 40,
-  },
-  clearRouteButtonText: {
-    color: '#fff',
-    fontWeight: 'bold',
   },
   closeBtn:{
     height:20,

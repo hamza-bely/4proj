@@ -30,14 +30,14 @@ export default function Login() {
 
     const toLog = async () => {
 
-        try {
-            const user = await loginUser(email, password);
+        // try {
+        //     const user = await loginUser(email, password);
 
-            router.push('/home');
-        } catch (error) {
-            setError('Email ou mot de passe incorrect');
-        }
-
+        //     router.push('/home');
+        // } catch (error) {
+        //     setError('Email ou mot de passe incorrect');
+        // }
+        router.push('/home');
     };
     
     
