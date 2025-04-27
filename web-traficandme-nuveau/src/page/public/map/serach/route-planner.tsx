@@ -3,30 +3,24 @@
 import React, { useEffect, useState, useRef } from "react";
 import "../css/map.css";
 import { toast } from "react-toastify";
-import Search from "./search-bar.tsx";
+import Search from "./search-bar";
 import { useTranslation } from "react-i18next";
 import { LuRabbit, LuArrowLeft, LuSave, LuX, LuChevronDown, LuChevronUp } from "react-icons/lu";
 import { TbBarrierBlockOff, TbRoute2 } from "react-icons/tb";
-import {MdQrCode2, MdDirectionsCar, MdDirectionsWalk} from "react-icons/md";
+import { MdQrCode2, MdDirectionsCar, MdDirectionsWalk } from "react-icons/md";
 import { FaBus } from "react-icons/fa";
-import useRouteStore from "../../../../services/store/route-store.tsx";
+import useRouteStore from "../../../../services/store/route-store";
 import Cookies from "js-cookie";
-import {getUserRole} from "../../../../services/service/token-service.tsx";
-import {fetchUser} from "../../../../services/service/user-service.tsx";
-import {RouteOption, RoutePlannerProps, RouteSaveData} from "../model/route-planner-model.tsx";
-import {Coordinate, RouteResponse} from "../model/map.tsx";
-
+import { getUserRole } from "../../../../services/service/token-service";
+import { fetchUser } from "../../../../services/service/user-service";
+import {RouteOption, RoutePlannerProps, RouteSaveData} from "../model/route-planner-model";
+import { Coordinate } from "../model/map";
 import { QRCodeSVG } from 'qrcode.react';
-import {getAddressFromCoordinates} from "./methode.tsx";
-
-type TransportMode = "car" | "bike" | "walk" | "bus";
-
-// Instructions interface for route directions
-interface Instruction {
-    message: string;
-    distance: number;
-    duration: number;
-}
+import {
+    calculateRoutes,
+    getAddressFromCoordinates,
+    getCoordinatesFromAddress, TransportMode
+} from "../../../../services/service/map-servie";
 
 const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated, startAddress: initialStartAddress }) => {
     const [start, setStart] = useState<Coordinate>({ lat: 47.6640, lon: 2.8357 });
@@ -49,7 +43,6 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated, startAdd
     const [qrCodeData, setQrCodeData] = useState<string>("");
     const [transportMode, setTransportMode] = useState<TransportMode>("car");
     const simulationIntervalRef = useRef<number | null>(null);
-    const apiKey: string = import.meta.env.VITE_TOMTOM_API_KEY;
 
     useEffect(() => {
         if (initialStartAddress) {
@@ -62,35 +55,17 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated, startAdd
                             setStart(coords);
                         }
                     })
-                    .catch(error => console.error(t("error-global"), error));
+                    .catch(error => console.error(t("error.global"), error));
             }
         }
-    }, [initialStartAddress]);
-
-    const getCoordinatesFromAddress = async (address: string): Promise<Coordinate | null> => {
-        const url = `https://api.tomtom.com/search/2/geocode/${encodeURIComponent(address)}.json?key=${apiKey}`;
-
-        try {
-            const response = await fetch(url);
-            const data = await response.json();
-
-            if (data.results && data.results.length > 0) {
-                const position = data.results[0].position;
-                return { lat: position.lat, lon: position.lon };
-            }
-            return null;
-        } catch (error) {
-            toast.error(t("error-global"));
-            return null;
-        }
-    };
+    }, [initialStartAddress, t]);
 
     useEffect(() => {
         setRole(getUserRole());
         if (token) fetchUser().catch(console.error);
 
         return () => {
-            if (simulationIntervalRef.current) {
+            if (simulationIntervalRef.current !== null) {
                 window.clearInterval(simulationIntervalRef.current);
             }
         };
@@ -98,20 +73,18 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated, startAdd
 
     useEffect(() => {
         if (end && end.lat && end.lon) {
-            getAddressFromCoordinates(end.lat, end.lon,t)
+            getAddressFromCoordinates(end.lat, end.lon, t)
                 .then(address => setEndAddress(address))
-                .catch(error => console.error(t("error-global"), error));
+                .catch(error => console.error(t("error.global"), error));
         }
-    }, [end]);
+    }, [end, t]);
 
     useEffect(() => {
-        if ( selectedRouteId) {
+        if (selectedRouteId) {
             const selectedRoute = routeOptions.find(route => route.id === selectedRouteId);
             if (selectedRoute && selectedRoute.coordinates && selectedRoute.coordinates.length > 0) {
-                const currentCoordIndex = Math.floor(0 * (selectedRoute.coordinates.length - 1));
-                const currentCoord = selectedRoute.coordinates[currentCoordIndex];
                 const vehiclePosition = {
-                    position: [currentCoord[0], currentCoord[1]],
+                    position: [selectedRoute.coordinates[0][0], selectedRoute.coordinates[0][1]],
                     type: transportMode,
                     progress: 0
                 };
@@ -119,7 +92,7 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated, startAdd
                 window.dispatchEvent(event);
             }
         }
-    }, [ selectedRouteId, transportMode, routeOptions]);
+    }, [selectedRouteId, transportMode, routeOptions]);
 
     const formatDuration = (seconds: number): string => {
         const hours = Math.floor(seconds / 3600);
@@ -132,74 +105,9 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated, startAdd
         return `${km.toFixed(1)} km`;
     };
 
-    const calculateRoute = async (routeType: "fastest" | "shortest", avoidTolls: boolean): Promise<RouteOption | null> => {
-        let travelMode = "car";
-        switch (transportMode) {
-            case "bike":
-                travelMode = "bicycle";
-                break;
-            case "walk":
-                travelMode = "pedestrian";
-                break;
-            case "bus":
-                travelMode = "truck";
-                break;
-            default:
-                travelMode = "car";
-        }
-
-        const shouldAvoidTolls = avoidTolls && transportMode !== "walk";
-        const avoid = shouldAvoidTolls ? "&avoid=tollRoads" : "";
-
-        // Add instructionsType=text to get text instructions
-        const url = `https://api.tomtom.com/routing/1/calculateRoute/${start.lat},${start.lon}:${end.lat},${end.lon}/json?key=${apiKey}&routeType=${routeType}${avoid}&travelMode=${travelMode}&instructionsType=text`;
-
-        try {
-            const response = await fetch(url);
-            const data: RouteResponse = await response.json();
-
-            if (data.routes.length > 0 && data.routes[0].legs.length > 0) {
-                const route = data.routes[0];
-                const points = route.legs[0].points;
-                const coordinates = points.map((p) => [p.longitude, p.latitude] as [number, number]);
-
-                // Extract instructions from the route
-                const instructions: Instruction[] = [];
-
-                if (route.guidance && route.guidance.instructions) {
-                    route.guidance.instructions.forEach(instruction => {
-                        instructions.push({
-                            message: instruction.message || "",
-                            distance: instruction.routeOffsetInMeters || 0,
-                            duration: instruction.travelTimeInSeconds || 0
-                        });
-                    });
-                }
-
-                const id = `${routeType}-${shouldAvoidTolls ? 'no-tolls' : 'with-tolls'}-${travelMode}-${Date.now()}`;
-                const name = `${routeType === 'fastest' ? t('map.fastest') : t('map.shortest')}${shouldAvoidTolls ? ` (${t('map.no-tolls')})` : ''}`;
-
-                return {
-                    id,
-                    name,
-                    coordinates,
-                    distance: route.summary.lengthInMeters,
-                    duration: route.summary.travelTimeInSeconds,
-                    type: routeType,
-                    avoidTolls: shouldAvoidTolls,
-                    instructions: instructions
-                };
-            }
-            return null;
-        } catch (error) {
-            console.error(t("error-global"), error);
-            return null;
-        }
-    };
-
     const handleCalculateRoutes = async (): Promise<void> => {
         if (!start || !end) {
-            toast.error("Veuillez sélectionner un point de départ et une destination.");
+            toast.error(t("map.select-points"));
             return;
         }
 
@@ -211,43 +119,36 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated, startAdd
         setShowInstructions(false);
 
         try {
-            let routePromises = [];
-            if (transportMode === "walk") {
-                routePromises = [
-                    calculateRoute("fastest", false),
-                    calculateRoute("shortest", false)
-                ];
-            } else {
-                routePromises = [
-                    calculateRoute("fastest", false),
-                    calculateRoute("shortest", false),
-                    calculateRoute("fastest", true),
-                    calculateRoute("shortest", true)
-                ];
-            }
+            // Use our new service function with translations
+            const routeNameTranslations = {
+                fastest: t("map.fastest"),
+                shortest: t("map.shortest"),
+                noTolls: t("map.no-tolls")
+            };
 
-            const results = await Promise.all(routePromises);
-            const validRoutes = results.filter(route => route !== null) as RouteOption[];
+            const validRoutes = await calculateRoutes(start, end, transportMode, routeNameTranslations);
 
             if (validRoutes.length > 0) {
                 setRouteOptions(validRoutes);
                 setSelectedRouteId(validRoutes[0].id);
-                onRouteCalculated(JSON.stringify(validRoutes[0].coordinates)); // afficher la première route
+                onRouteCalculated(JSON.stringify(validRoutes[0].coordinates)); // Display first route
                 setShowResults(true);
+            } else {
+                toast.error(t("map.no-routes"));
             }
         } catch (error) {
-            console.error(t("error-global"), error);
+            console.error(t("error.global"), error);
+            toast.error(t("error.route-calculation"));
         } finally {
             setIsLoading(false);
         }
     };
 
     const handleRouteSelect = (routeId: string) => {
-        const selectedRoute = routeOptions.find(route => route.id === routeId);
+        const selectedRoute = routeOptions.find((route) => route.id === routeId);
         if (selectedRoute) {
             setSelectedRouteId(routeId);
             onRouteCalculated(JSON.stringify(selectedRoute.coordinates));
-            // Close instructions when selecting a new route
             setShowInstructions(false);
         }
     };
@@ -259,7 +160,7 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated, startAdd
 
     const handleSaveRoute = async () => {
         if (!selectedRouteId) {
-            toast.error("Veuillez sélectionner un itinéraire à sauvegarder");
+            toast.error(t("map.select-route-save"));
             return;
         }
 
@@ -267,7 +168,7 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated, startAdd
         try {
             const selectedRoute = routeOptions.find(route => route.id === selectedRouteId);
             if (!selectedRoute) {
-                toast.error("Itinéraire non trouvé");
+                toast.error(t("map.route-not-found"));
                 return;
             }
 
@@ -279,13 +180,15 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated, startAdd
                 address_start: startAddress,
                 address_end: endAddress,
                 user: "",
-                mode: selectedRoute.type === "fastest" ? "Rapide" : "Court",
+                mode: selectedRoute.type === "fastest" ? t("map.mode-fast") : t("map.mode-short"),
                 peage: !selectedRoute.avoidTolls
             };
 
             await createRoute(routeData);
+            toast.success(t("map.route-saved"));
         } catch (error) {
-            console.error("Erreur lors de la sauvegarde de l'itinéraire :", error);
+            console.error(t("error.save-route"), error);
+            toast.error(t("error.save-route"));
         } finally {
             setIsSaving(false);
         }
@@ -293,18 +196,18 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated, startAdd
 
     const handleGenerateQRCode = () => {
         if (!selectedRouteId) {
-            toast.error("Veuillez sélectionner un itinéraire pour générer un QR code");
+            toast.error(t("map.select-route-qr"));
             return;
         }
 
         try {
-            const selectedRoute = routeOptions.find(route => route.id === selectedRouteId);
+            const selectedRoute = routeOptions.find((route) => route.id === selectedRouteId);
             if (!selectedRoute) {
-                toast.error("Itinéraire non trouvé");
+                toast.error(t("map.route-not-found"));
                 return;
             }
 
-            // Création des données pour le QR code
+            // Create QR code data
             const qrData = {
                 start: {
                     lat: start.lat,
@@ -325,15 +228,15 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated, startAdd
                 }
             };
 
-            // Convertir les données en chaîne JSON
+            // Convert data to JSON string
             const qrCodeDataStr = JSON.stringify(qrData);
             setQrCodeData(qrCodeDataStr);
 
-            // Afficher la modale
+            // Show modal
             setShowQRCode(true);
         } catch (error) {
-            console.error("Erreur lors de la génération du QR code :", error);
-            toast.error("Erreur lors de la génération du QR code");
+            console.error(t("error.qr-generation"), error);
+            toast.error(t("error.qr-generation"));
         }
     };
 
@@ -352,26 +255,36 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated, startAdd
         setShowInstructions(!showInstructions);
     };
 
+    const getTransportModeText = (mode: TransportMode): string => {
+        switch (mode) {
+            case "car": return t("map.transport.car");
+            case "bike": return t("map.transport.bike");
+            case "bus": return t("map.transport.bus");
+            case "walk": return t("map.transport.walk");
+            default: return t("map.transport.car");
+        }
+    };
+
     const renderTransportModeSelector = () => (
         <div className="flex justify-center mb-4 p-2 rounded">
             <button
                 onClick={() => handleTransportModeChange("car")}
                 className={`mx-2 p-2 rounded ${transportMode === "car" ? "bg-blue-500 text-white" : "bg-white text-gray-700"}`}
-                title="Voiture"
+                title={t("map.transport.car")}
             >
                 <MdDirectionsCar size={24}/>
             </button>
             <button
                 onClick={() => handleTransportModeChange("bus")}
                 className={`mx-2 p-2 rounded ${transportMode === "bus" ? "bg-blue-500 text-white" : "bg-white text-gray-700"}`}
-                title="Bus/Camion"
+                title={t("map.transport.bus")}
             >
                 <FaBus size={24}/>
             </button>
             <button
                 onClick={() => handleTransportModeChange("walk")}
                 className={`mx-2 p-2 rounded ${transportMode === "walk" ? "bg-blue-500 text-white" : "bg-white text-gray-700"}`}
-                title="À pied"
+                title={t("map.transport.walk")}
             >
                 <MdDirectionsWalk size={24}/>
             </button>
@@ -382,7 +295,7 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated, startAdd
         if (!selectedRouteId) return null;
         const selectedRoute = routeOptions.find(route => route.id === selectedRouteId);
         if (!selectedRoute || !selectedRoute.instructions || selectedRoute.instructions.length === 0) {
-            return <div className="text-center text-gray-500 py-2">Aucune instruction disponible</div>;
+            return <div className="text-center text-gray-500 py-2">{t("map.no-instructions")}</div>;
         }
 
         return (
@@ -391,7 +304,7 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated, startAdd
                     className="flex justify-between items-center cursor-pointer font-medium text-blue-600"
                     onClick={toggleInstructions}
                 >
-                    <span>Instructions de conduite</span>
+                    <span>{t("map.driving-instructions")}</span>
                     {showInstructions ?
                         <LuChevronUp className="text-lg" /> :
                         <LuChevronDown className="text-lg" />
@@ -421,9 +334,6 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated, startAdd
         );
     };
 
-    // Determine whether to show the route options or not
-    const shouldShowRouteOptions = showResults && !showInstructions;
-
     return (
         <div className="relative">
             <h2 className="flex items-center">
@@ -431,13 +341,13 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated, startAdd
                     <button
                         onClick={handleBackToSearch}
                         className="mr-2 p-1 rounded-full hover:bg-gray-200"
-                        aria-label="Retour à la recherche"
+                        aria-label={t("map.back-to-search")}
                     >
                         <LuArrowLeft className="text-xl" />
                     </button>
                 )}
                 {showResults ?
-                    (showInstructions ? "Instructions de conduite" : t("map.available-routes"))
+                    (showInstructions ? t("map.driving-instructions") : t("map.available-routes"))
                     : t("map.route-planner")}
             </h2>
 
@@ -468,7 +378,7 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated, startAdd
                             onClick={handleCalculateRoutes}
                             disabled={isLoading}
                         >
-                            {isLoading ? "Calcul en cours..." : "Calculer les itinéraires"}
+                            {isLoading ? t("map.calculating") : t("map.calculate-routes")}
                         </button>
                     </div>
                 </>
@@ -517,7 +427,7 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated, startAdd
                                     onClick={toggleInstructions}
                                     className="flex items-center text-blue-600 hover:text-blue-800"
                                 >
-                                    <LuArrowLeft className="mr-1" /> Retour aux itinéraires
+                                    <LuArrowLeft className="mr-1" /> {t("map.back-to-routes")}
                                 </button>
 
                                 <div className="text-sm text-gray-600">
@@ -540,7 +450,7 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated, startAdd
                             <div className="bg-white rounded-lg border p-4 max-h-96 overflow-y-auto">
                                 <ol className="list-decimal list-inside text-sm space-y-3 pl-2">
                                     {(() => {
-                                        const selectedRoute = routeOptions.find(route => route.id === selectedRouteId);
+                                        const selectedRoute = routeOptions.find((route) => route.id === selectedRouteId);
                                         if (selectedRoute && selectedRoute.instructions) {
                                             return selectedRoute.instructions.map((instruction, index) => (
                                                 <li key={index} className="border-b pb-3">
@@ -556,7 +466,7 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated, startAdd
                                                 </li>
                                             ));
                                         }
-                                        return <li>Aucune instruction disponible</li>;
+                                        return <li>{t("map.no-instructions")}</li>;
                                     })()}
                                 </ol>
                             </div>
@@ -570,7 +480,7 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated, startAdd
                             className="rounded-sm px-4 py-2 text-sm font-semibold text-white bg-green-600 hover:bg-green-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-600 flex items-center"
                         >
                             <LuSave className="mr-2" />
-                            {isSaving ? "Sauvegarde en cours..." : "Sauvegarder l'itinéraire"}
+                            {isSaving ? t("map.saving") : t("map.save-route")}
                         </button>
 
                         <button
@@ -579,7 +489,7 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated, startAdd
                             className="rounded-sm px-4 py-2 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 flex items-center"
                         >
                             <MdQrCode2 className="mr-2" />
-                            Code QR
+                            {t("map.qr-code")}
                         </button>
                     </div>}
                 </div>
@@ -589,11 +499,11 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated, startAdd
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
                     <div className="bg-white rounded-lg p-6 max-w-md w-full">
                         <div className="flex justify-between items-center mb-4">
-                            <h3 className="text-lg font-medium">Scannez ce code QR pour partager l'itinéraire</h3>
+                            <h3 className="text-lg font-medium">{t("map.scan-qr")}</h3>
                             <button
                                 onClick={handleCloseQRModal}
                                 className="text-gray-500 hover:text-gray-700"
-                                aria-label="Fermer"
+                                aria-label={t("common.close")}
                             >
                                 <LuX size={24} />
                             </button>
@@ -603,20 +513,16 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated, startAdd
                             <QRCodeSVG
                                 value={qrCodeData}
                                 size={250}
-                                level="M" // Niveau de correction d'erreur
+                                level="M"
                                 includeMargin={true}
                             />
                         </div>
 
                         <div className="text-center text-sm text-gray-500 mb-4">
-                            <p>Ce QR code contient les informations de votre itinéraire</p>
-                            <p>De: {startAddress}</p>
-                            <p>À: {endAddress}</p>
-                            <p>Mode de transport: {
-                                transportMode === "car" ? "Voiture" :
-                                    transportMode === "bike" ? "Vélo" :
-                                        transportMode === "bus" ? "Bus/Camion" : "À pied"
-                            }</p>
+                            <p>{t("map.qr-contains")}</p>
+                            <p>{t("map.from")}: {startAddress}</p>
+                            <p>{t("map.to")}: {endAddress}</p>
+                            <p>{t("map.transport-mode")}: {getTransportModeText(transportMode)}</p>
                         </div>
 
                         <div className="flex justify-center">

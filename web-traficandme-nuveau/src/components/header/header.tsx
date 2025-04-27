@@ -16,7 +16,6 @@ export default function Header() {
     const [role, setRole] = useState<string | string[] | null>(null);
     const token = Cookies.get("authToken");
     const { fetchUser } = useUserStore();
-
     const navigation = [
         { name: t("header.home"), href: "/" },
         { name: t("header.map"), href: "/map" },

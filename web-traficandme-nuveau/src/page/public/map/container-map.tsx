@@ -10,8 +10,8 @@ import TrafficIndicator from "./components/traffic-indicator.tsx";
 import Search from "./serach/search-bar.tsx";
 import RoutePlanner from "./serach/route-planner.tsx";
 import {createMarkerDOMElement} from "./serach/marker-icon.tsx";
-import {getAddressFromCoordinates} from "./serach/methode.tsx";
 import {useTranslation} from "react-i18next";
+import { getAddressFromCoordinates } from "../../../services/service/map-servie.tsx";
 
 interface ContainerMapProps {
     map: tt.Map | null;

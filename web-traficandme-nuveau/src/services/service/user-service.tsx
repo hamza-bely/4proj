@@ -4,7 +4,7 @@ import {toast} from "react-toastify";
 import {
     UserLoginRequest, UserLoginResponse,
     UserRegisterRequest, UserRegisterResponse,
-    UserResponseFetchUser, UserUpdateResponse, UserUpdaterRequest
+     UserUpdateResponse, UserUpdaterRequest
 } from "../model/user.tsx";
 import Cookies from "js-cookie";
 import {translateMessage} from "../../assets/i18/translateMessage.tsx";
@@ -43,9 +43,9 @@ export const login = async (params: UserLoginRequest): Promise<UserLoginResponse
     }
 };
 
-export const fetchUser = async (): Promise<UserResponseFetchUser> => {
+export const fetchUser = async (): Promise<any> => {
     try {
-        const response = await axios.get<UserResponseFetchUser>(`${API_URL}users/me`, { headers: getAuthHeaders() });
+        const response = await axios.get<any>(`${API_URL}users/me`, { headers: getAuthHeaders() });
         return response.data;
     } catch (error: any) {
         toast.error(await translateMessage(error.response.data.message || "An error has occurred"));
@@ -54,13 +54,12 @@ export const fetchUser = async (): Promise<UserResponseFetchUser> => {
 };
 
 
-//TODO A FAIRE
-export const updateUser = async ( params: UserUpdaterRequest): Promise<UserUpdateResponse> => {
+export const updateUser = async ( params: UserUpdaterRequest, id : number): Promise<UserUpdateResponse> => {
     try {
-        const response = await axios.put<UserUpdateResponse>(`${API_URL}users/update`, params, { headers: getAuthHeaders() });
+        const response = await axios.put<UserUpdateResponse>(`${API_URL}users/update/${id}`, params, { headers: getAuthHeaders() });
         toast.success(await translateMessage(response.data.message));
         return response.data;
-    }catch (error : any) {
+    }catch (error: any) {
         toast.error(await translateMessage(error.response.data.message || "An error has occurred"));
         throw error;
 
@@ -69,7 +68,7 @@ export const updateUser = async ( params: UserUpdaterRequest): Promise<UserUpdat
 
 export const deleteUserForAnUser = async (): Promise<void> => {
     try {
-        const status = "DELETED" //TODO A CHANGE
+        const status = "DELETED"
         const response = await axios.patch(`${API_URL}users/update-status`,status, { headers: getAuthHeaders() });
         toast.success(await translateMessage(response.data.message));
     } catch (error : any) {

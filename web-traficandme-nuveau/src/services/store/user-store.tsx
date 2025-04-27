@@ -14,11 +14,11 @@ import {
 
 interface UserState {
     users: User[];
-    user: User | null;
+    user: any | null;
     fetchUsers: () => Promise<void>;
     fetchUser: () => Promise<void>;
     createUser : (params: UserCreateRequest) => Promise<void>;
-    updateUser : (params : UserUpdaterRequest) => Promise<void>;
+    updateUser : (params : UserUpdaterRequest,id: number) => Promise<void>;
     updateUserForAnAdmin : (id: number, params : UserUpdaterRequest) => Promise<void>;
 
     deleteUserForAnUser: (id: number | undefined) => Promise<void>;
@@ -48,11 +48,9 @@ const useUserStore = create<UserState>((set) => ({
         }));
     },
 
-    updateUser: async ( params)  => {
-        const response  = await updateUser(params);
-        set((state ) => ({
-            users: state.users.map((h) => (h.id === response.data.id ? response.data : h)),
-        }));
+    updateUser: async ( params,id)  => {
+        const response  = await updateUser(params,id);
+        set({ user : response.data })
     },
 
     updateUserForAnAdmin: async ( id,params)  => {

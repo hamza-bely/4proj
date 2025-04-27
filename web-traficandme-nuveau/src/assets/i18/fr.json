@@ -7,12 +7,10 @@
   "common": {
     "loading": "Chargement...",
     "edit": "Modifier",
-    "cancel": "Annuler",
     "delete": "Supprimer",
     "delete-definitive": "Supprimer definitive",
     "email" : "Email",
     "actions": "Actions",
-    "search" : "Recherche",
     "confirm": "Confirm",
     "message-confirm-delete" : "Êtes-vous sûr de vouloir supprimer ?",
     "status" : "Status",
@@ -20,7 +18,13 @@
     "createDate" : "Date de création",
     "admin" : "Administrateur",
     "add": "Add",
-    "error-global" : "Quelque chose s'est mal passé, réessayez plus tard"
+    "error-global" : "Quelque chose s'est mal passé, réessayez plus tard",
+    "close": "Fermer",
+    "save": "Sauvegarder",
+    "cancel": "Annuler",
+    "back": "Retour",
+    "next": "Suivant",
+    "search": "Rechercher"
   },
 
   "status" : {
@@ -53,6 +57,12 @@
     "users": "Utilisateurs"
   },
   "home": {
+    "new": "Nouveauté",
+    "version": "Version 1.0 disponible !",
+    "title": "Votre solution de trafic intelligente",
+    "description": "Découvrez l'application qui révolutionne votre expérience de conduite avec des alertes en temps réel, des rapports communautaires et bien plus encore.",
+    "download": "Télécharger l'App",
+    "learnMore": "En savoir plus",
     "title-mobile": "Découvrez votre monde différemment",
     "description-mobile": "Notre application mobile de cartographie vous offre une navigation fluide, des itinéraires précis et des recommandations personnalisées pour explorer votre environnement."
   },
@@ -159,10 +169,35 @@
     "with-tolls": "Avec péages",
     "start-point": "Point de départ",
     "destination": "Destination",
-    "available-routes": "Itinéraires disponibles",
     "calculating": "Calcul en cours...",
+    "click-map" : "Cliquez sur la carte",
+    "driving-instructions": "Instructions de conduite",
+    "select-points": "Veuillez sélectionner un point de départ et une destination",
     "calculate-routes": "Calculer les itinéraires",
-    "click-map" : "Cliquez sur la carte"
+    "no-routes": "Aucun itinéraire trouvé",
+    "select-route-save": "Veuillez sélectionner un itinéraire à sauvegarder",
+    "select-route-qr": "Veuillez sélectionner un itinéraire pour générer un QR code",
+    "route-not-found": "Itinéraire non trouvé",
+    "route-saved": "Itinéraire sauvegardé avec succès",
+    "back-to-search": "Retour à la recherche",
+    "back-to-routes": "Retour aux itinéraires",
+    "no-instructions": "Aucune instruction disponible",
+    "saving": "Sauvegarde en cours...",
+    "save-route": "Sauvegarder l'itinéraire",
+    "qr-code": "Code QR",
+    "scan-qr": "Scannez ce code QR pour partager l'itinéraire",
+    "qr-contains": "Ce QR code contient les informations de votre itinéraire",
+    "from": "De",
+    "to": "À",
+    "transport-mode": "Mode de transport",
+    "mode-fast": "Rapide",
+    "mode-short": "Court",
+    "transport": {
+      "car": "Voiture",
+      "bike": "Vélo",
+      "bus": "Bus/Camion",
+      "walk": "À pied"
+    }
   },
   "user-admin": {
     "title": "Gestion des utilisateurs",
@@ -172,6 +207,8 @@
     "no_users": "Aucun utilisateur"
   },
   "profile": {
+    "firstName": "Prénom",
+    "lastName": "Nom",
     "title": "Profil",
     "date-create-profile": "Date de création",
     "name": "Nom",
@@ -305,7 +342,12 @@
     "moderator": "Modérateur",
     "submit": "Ajouter l'utilisateur",
     "loading": "Chargement..."
+  },
+  "error": {
+    "global": "Une erreur est survenue",
+    "route-calculation": "Erreur lors du calcul de l'itinéraire",
+    "save-route": "Erreur lors de la sauvegarde de l'itinéraire",
+    "qr-generation": "Erreur lors de la génération du QR code"
   }
-
 }
 

@@ -167,7 +167,7 @@ export default function MobileHeader({ navigationLinks, role, openLogin, openReg
                                             onClick={toggleAdminMenu}
                                             className="flex w-full items-center justify-between rounded-md px-3 py-2 text-base font-medium text-gray-900 hover:bg-gray-50"
                                         >
-                                            {t('admin')}
+                                            {t("common.admin")}
                                             <ChevronDownIcon
                                                 className={`size-5 text-gray-500 transition-transform ${adminMenuOpen ? 'rotate-180' : ''}`}
                                                 aria-hidden="true"

@@ -10,7 +10,7 @@ import { useTranslation } from "react-i18next";
 import useReportStore from "../../../../services/store/report-store.tsx";
 import {toast} from "react-toastify";
 import {MarkerModel} from "../model/map.tsx";
-import {getAddressFromCoordinates} from "../serach/methode.tsx";
+import { getAddressFromCoordinates } from "../../../../services/service/map-servie.tsx";
 
 
 const Markers: React.FC<any> = ({ map }) => {
