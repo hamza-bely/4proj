@@ -1,10 +1,12 @@
 package com.supinfo.api_traficandme.user.controller;
 
 import com.supinfo.api_traficandme.user.dto.StatusUser;
+import com.supinfo.api_traficandme.user.dto.UserRequest;
 import com.supinfo.api_traficandme.user.dto.UserResponse;
 import com.supinfo.api_traficandme.user.entity.UserInfo;
 import com.supinfo.api_traficandme.user.service.UserService;
 import com.supinfo.api_traficandme.security.dto.ApiResponse;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -56,14 +58,26 @@ public class UserInfoController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<ApiResponse<UserResponse>> getUSerConnected() {
+    public ResponseEntity<ApiResponse<UserInfo>> getUSerConnected() {
         try {
             Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-            UserResponse response = userService.getUserByEmail(((UserDetails) principal).getUsername());
-            ApiResponse<UserResponse> apiResponse = new ApiResponse<>("User", response);
+            UserInfo response = userService.getUserByEmailUserInfo(((UserDetails) principal).getUsername());
+            ApiResponse<UserInfo> apiResponse = new ApiResponse<>("User", response);
             return ResponseEntity.ok(apiResponse);
         } catch (RuntimeException e) {
-            ApiResponse<UserResponse> errorResponse = new ApiResponse<>(e.getMessage(), null);
+            ApiResponse<UserInfo> errorResponse = new ApiResponse<>(e.getMessage(), null);
+            return ResponseEntity.badRequest().body(errorResponse);
+        }
+    }
+
+    @PutMapping("update/{id}")
+    public ResponseEntity<ApiResponse<UserInfo>> updateUser(@PathVariable ("id") String userId,@Valid @RequestBody UserRequest request){
+        try {
+            UserInfo response = userService.updateUser(Integer.valueOf(userId),request);
+            ApiResponse<UserInfo> apiResponse = new ApiResponse<>("Updated User", response);
+            return ResponseEntity.ok(apiResponse);
+        } catch (RuntimeException e) {
+            ApiResponse<UserInfo> errorResponse = new ApiResponse<>(e.getMessage(), null);
             return ResponseEntity.badRequest().body(errorResponse);
         }
     }

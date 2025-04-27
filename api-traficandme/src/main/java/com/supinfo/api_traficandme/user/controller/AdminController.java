@@ -15,7 +15,6 @@ import com.supinfo.api_traficandme.statistiques.service.StatisticService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -37,7 +36,7 @@ public class AdminController {
     }
 
     @PostMapping("create")
-    //@PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<ApiResponse<UserResponse>> createUser(@Valid @RequestBody UserRequest request){
         try {
             UserResponse response = userService.createUser(request);
@@ -63,10 +62,9 @@ public class AdminController {
     }
 
     @PutMapping("update/{id}")
-    //@PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<ApiResponse<UserResponse>> updateUser(@PathVariable ("id") String userId,@Valid @RequestBody UserRequest request){
         try {
-            UserResponse response = userService.updateUser(Integer.valueOf(userId),request);
+            UserResponse response = adminService.updateUserByAdmin(Integer.valueOf(userId),request);
             ApiResponse<UserResponse> apiResponse = new ApiResponse<>("Updated User", response);
             return ResponseEntity.ok(apiResponse);
         } catch (RuntimeException e) {
