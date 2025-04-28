@@ -129,7 +129,7 @@ public class UserService {
             if (!Pattern.compile(".*[!@#$%^&*(),.?\":{}|<>].*").matcher(request.password()).matches()) {
                 throw new IllegalArgumentException("Password must contain at least one special character.");
             }
-            updatedPassword = request.password();
+            updatedPassword = passwordEncoder.encode(request.password());
         }
 
         user.setFirstName(request.firstName());
