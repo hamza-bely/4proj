@@ -1,21 +1,8 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { router } from 'expo-router';
 import * as Location from 'expo-location';
-import {
-  KeyboardAvoidingView,
-  Keyboard,
-  Platform,
-  StyleSheet,
-  TextInput,
-  View,
-  useColorScheme,
-  Text,
-  TouchableOpacity,
-  FlatList,
-  Image,
-  ActivityIndicator
-} from 'react-native';
-import { Colors } from '@/constants/Colors';
+import {KeyboardAvoidingView, Keyboard, Platform, StyleSheet, TextInput, View, useColorScheme, Text, TouchableOpacity, FlatList, Image, ActivityIndicator} from 'react-native';
+
 import TomTomMap from '@components/TomTomMaps';
 import ReportModal from '@components/reportModal';
 import { StatusBar } from 'expo-status-bar';
@@ -25,9 +12,12 @@ import NavigationInstruction from '@interfaces/NavigationInstruction';
 import RouteOption from '@interfaces/RouteOption';
 import ClosestInstruction from '@interfaces/ClosestInstruction';
 import { getDistanceFromLatLonInM } from '@utils/distance';
-import { fetchSuggestions, fetchRouteOption } from '@services/apiService'; // Import the functions
+import { fetchSuggestions, fetchRouteOption } from '@services/apiService';
+import useUserLocation from '@/hooks/useUserLocation';
+import getInstructionIcon from '@utils/getInstructionIcon';
 
 export default function HomeScreen() {
+  
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
   const textColor = isDark ? '#fff' : '#000';
@@ -169,24 +159,7 @@ export default function HomeScreen() {
     }
   };
 
-  const getInstructionIcon = (instructionType: string) => {
-    switch (instructionType) {
-      case 'TURN_LEFT':
-        return require('@assets/images/turn-left.png');
-      case 'TURN_RIGHT':
-        return require('@assets/images/turn-right.png');
-      case 'STRAIGHT':
-        return require('@assets/images/straight.png');
-      case 'UTURN_LEFT':
-      case 'UTURN_RIGHT':
-        return require('@assets/images/u-turn.png');
-      case 'ROUNDABOUT_LEFT':
-      case 'ROUNDABOUT_RIGHT':
-        return require('@assets/images/roundabout.png');
-      default:
-        return require('@assets/images/straight.png');
-    }
-  };
+
 
   const handleSelectAddress = (address: AddressSuggestion) => {
     Keyboard.dismiss();

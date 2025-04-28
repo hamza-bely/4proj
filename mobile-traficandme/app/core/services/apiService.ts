@@ -2,11 +2,11 @@
 import axios from 'axios';
 import * as Location from 'expo-location';
 import NavigationInstruction from '@interfaces/NavigationInstruction';
+import  ReportData  from '@interfaces/ReportData';
+
 
 const API_URL: string = 'http://158.180.229.244:8080';
-
 const API_KEY = 'QBsKzG3zoRyZeec28eUDje0U8DeNoRSO';
-
 
 
 export const loginUser = async (email: string, password: string): Promise<any> => {
@@ -16,6 +16,7 @@ export const loginUser = async (email: string, password: string): Promise<any> =
             password,
         });
         return response.data;
+
     } catch (error: any) {
         const errorMessage: string = error.response?.data?.message || 'Erreur de connexion';
         console.error(errorMessage);
@@ -69,3 +70,30 @@ export const fetchRouteOption = async (destination: { latitude: number; longitud
         throw error;
     }
 };
+
+
+export const createReport = async (reportData: ReportData): Promise<void> => {
+    try {
+        const response = await fetch(`${API_URL}/api/reports/create`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(reportData),
+        });
+
+        const responseBody = await response.json();
+
+        if (!response.ok) {
+            console.error('Erreur retournée par le serveur:', responseBody);
+            throw new Error(responseBody.message || 'Erreur lors de la création du rapport');
+        }
+
+        console.log('Rapport créé avec succès :', responseBody);
+    } catch (error) {
+        console.error('Erreur lors de l\'appel API :', error);
+        throw error;
+    }
+};
+
+
