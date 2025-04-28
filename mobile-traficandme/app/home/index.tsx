@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { router } from 'expo-router';
+import * as Location from 'expo-location';
 import {
   KeyboardAvoidingView,
   Keyboard,
@@ -15,13 +17,15 @@ import {
 } from 'react-native';
 import { Colors } from '@/constants/Colors';
 import TomTomMap from '@components/TomTomMaps';
+import ReportModal from '@components/reportModal';
 import { StatusBar } from 'expo-status-bar';
 import { LinearGradient } from 'expo-linear-gradient';
-import * as Location from 'expo-location';
 import AddressSuggestion from '@interfaces/AddressSuggestion';
 import NavigationInstruction from '@interfaces/NavigationInstruction';
 import RouteOption from '@interfaces/RouteOption';
 import ClosestInstruction from '@interfaces/ClosestInstruction';
+import { getDistanceFromLatLonInM } from '@utils/distance';
+import { fetchSuggestions, fetchRouteOption } from '@services/apiService'; // Import the functions
 
 export default function HomeScreen() {
   const colorScheme = useColorScheme();
@@ -41,18 +45,22 @@ export default function HomeScreen() {
   const [currentManeuver, setCurrentManeuver] = useState<string>('STRAIGHT');
   const [instructions, setInstructions] = useState<NavigationInstruction[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
+  const OpenMenu=()=>{router.push('/home/menu')}
+  const OpenReport=()=>{router.push('/home/menu')}
+  const [modalVisible, setModalVisible] = useState(false);
+  const [userPosition, setUserPosition] = useState<{ latitude: number; longitude: number } | null>(null);
 
   useEffect(() => {
     if (searchText.length > 2) {
-      fetchSuggestions(searchText);
+      fetchSuggestions(searchText).then(setSuggestions).catch(console.error);
     } else {
       setSuggestions([]);
     }
   }, [searchText]);
 
   useEffect(() => {
-    const watchSpeed = async () => {
-      let { status } = await Location.requestForegroundPermissionsAsync();
+    const watchPosition = async () => {
+      const { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
         alert('Permission GPS refusée.');
         return;
@@ -62,47 +70,40 @@ export default function HomeScreen() {
         {
           accuracy: Location.Accuracy.High,
           timeInterval: 1000,
-        },
-        (location) => {
-          setSpeed(location.coords.speed);
-        }
-      );
-
-      return () => {
-        subscription.then((sub) => sub.remove());
-      };
-    };
-
-    watchSpeed();
-  }, []);
-
-  useEffect(() => {
-    if (destination) {
-      fetchRouteOptions(destination);
-    }
-  }, [destination]);
-
-  useEffect(() => {
-    const watchPosition = async () => {
-      const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') return;
-
-      const sub = await Location.watchPositionAsync(
-        {
-          accuracy: Location.Accuracy.High,
-          timeInterval: 2000,
           distanceInterval: 5,
         },
         (location) => {
+          setSpeed(location.coords.speed);
+          setUserPosition({ latitude: location.coords.latitude, longitude: location.coords.longitude });
           updateCurrentInstruction(location.coords);
         }
       );
 
-      return () => sub.remove();
+      return () => subscription.then((sub) => sub.remove());
     };
 
     watchPosition();
   }, [selectedRoute]);
+
+  useEffect(() => {
+    if (destination) {
+      setLoading(true);
+      fetchRouteOption(destination)
+        .then((routes) => {
+          setRouteOptions(routes);
+          if (routes.length > 0) {
+            const instructionsArray: NavigationInstruction[] = routes[0].guidance.instructions.map((instr: any) => ({
+              message: instr.message,
+              distance: instr.routeOffsetInMeters,
+              maneuver: instr.maneuver,
+            }));
+            setInstructions(instructionsArray);
+          }
+        })
+        .catch(console.error)
+        .finally(() => setLoading(false));
+    }
+  }, [destination]);
 
   const updateCurrentInstruction = useCallback(async (coords: Location.LocationObjectCoords) => {
     if (!selectedRoute || !selectedRoute.guidance || !selectedRoute.guidance.instructions) {
@@ -168,21 +169,6 @@ export default function HomeScreen() {
     }
   };
 
-  const getDistanceFromLatLonInM = (lat1: number, lon1: number, lat2: number, lon2: number) => {
-    const R = 6371e3;
-    const φ1 = lat1 * Math.PI / 180;
-    const φ2 = lat2 * Math.PI / 180;
-    const Δφ = (lat2 - lat1) * Math.PI / 180;
-    const Δλ = (lon2 - lon1) * Math.PI / 180;
-
-    const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
-              Math.cos(φ1) * Math.cos(φ2) *
-              Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-
-    return R * c;
-  };
-
   const getInstructionIcon = (instructionType: string) => {
     switch (instructionType) {
       case 'TURN_LEFT':
@@ -199,41 +185,6 @@ export default function HomeScreen() {
         return require('@assets/images/roundabout.png');
       default:
         return require('@assets/images/straight.png');
-    }
-  };
-
-  const fetchSuggestions = async (text: string) => {
-    try {
-      const response = await fetch(`https://api.tomtom.com/search/2/search/${encodeURIComponent(text)}.json?key=QBsKzG3zoRyZeec28eUDje0U8DeNoRSO&typeahead=true&limit=5`);
-      const data = await response.json();
-      setSuggestions(data.results);
-    } catch (error) {
-      console.error('Erreur lors de la récupération des suggestions :', error);
-    }
-  };
-
-  const fetchRouteOptions = async (destination: { latitude: number; longitude: number }) => {
-    setLoading(true);
-    try {
-      const location = await Location.getCurrentPositionAsync({});
-      const { latitude, longitude } = location.coords;
-      const response = await fetch(
-        `https://api.tomtom.com/routing/1/calculateRoute/${latitude},${longitude}:${destination.latitude},${destination.longitude}/json?key=QBsKzG3zoRyZeec28eUDje0U8DeNoRSO&routeType=fastest&maxAlternatives=3&instructionsType=text&language=fr`
-      );
-      const data = await response.json();
-      setRouteOptions(data.routes);
-      if (data.routes.length > 0) {
-        const instructionsArray: NavigationInstruction[] = data.routes[0].guidance.instructions.map((instr: any) => ({
-          message: instr.message,
-          distance: instr.routeOffsetInMeters,
-          maneuver: instr.maneuver,
-        }));
-        setInstructions(instructionsArray);
-      }
-    } catch (error) {
-      console.error('Erreur lors de la récupération des itinéraires :', error);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -277,6 +228,7 @@ export default function HomeScreen() {
 
   return (
     <View style={styles.container}>
+      <ReportModal visible={modalVisible} onClose={() => setModalVisible(false)} />
       <StatusBar style="light" translucent backgroundColor="transparent" />
 
       {memoizedTomTomMap}
@@ -344,9 +296,9 @@ export default function HomeScreen() {
               )}
             </View>
             <View style={styles.myAddress}>
-              <TouchableOpacity style={[styles.addressBlock, { borderColor }]}><Text style={[styles.myAddressText, { color: textColor }]}>Domicile</Text></TouchableOpacity>
-              <TouchableOpacity style={[styles.addressBlock, { borderColor }]}><Text style={[styles.myAddressText, { color: textColor }]}>Travail</Text></TouchableOpacity>
-              <TouchableOpacity style={[styles.addressBlockAdd, { borderColor }]}><Text style={[styles.myAddressText, { color: textColor }]}>+ Ajouter</Text></TouchableOpacity>
+              <TouchableOpacity onPress={OpenMenu} style={[styles.addressBlockA, ]}><Image style={styles.iconImg} source={require('@assets/images/menu-96.png')}></Image></TouchableOpacity>
+              <TouchableOpacity onPress={() => setModalVisible(true)} style={[styles.addressBlock, ]}><Image style={styles.iconImg} source={require('@assets/images/erreur-96.png')}></Image></TouchableOpacity>
+              <TouchableOpacity style={[styles.addressBlock, { borderColor }]}><Text style={[styles.myAddressText, { color: textColor }]}>+ Ajouter</Text></TouchableOpacity>
             </View>
           </>
         ) : (
@@ -500,13 +452,30 @@ const styles = StyleSheet.create({
     marginVertical: 15,
   },
   addressBlock: {
-    borderWidth: 1,
     padding: 10,
     borderRadius: 15,
-    borderColor: '#000',
+
     width: 110,
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems:'center',
+    justifyContent:'center',
+    height:50,
+    maxHeight:50,
+  },
+  addressBlockA: {
+
+    padding: 10,
+    borderRadius: 15,
+    width: 110,
+    flexDirection: 'row',
+    alignItems:'center',
+    justifyContent:'flex-start',
+    height:50,
+    maxHeight:50,
+  },
+  iconImg:{
+    width:45,
+    height:45,
   },
   addressBlockAdd: {
     borderWidth: 1,
@@ -575,4 +544,5 @@ const styles = StyleSheet.create({
     height:20,
     width:20,
   },
+
 });

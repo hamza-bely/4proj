@@ -11,6 +11,7 @@
       "@components/*":["components/*"],
       "@interfaces/*":["app/interfaces/*"],
       "@services/*":["app/core/services/*"],
+      "@utils/*":["app/utils/*"],
       
     }
   },
@@ -19,5 +20,5 @@
     "**/*.tsx",
     ".expo/types/**/*.ts",
     "expo-env.d.ts"
-, "app/core/services/supabase.js"  ]
+, "app/core/services/supabase.js", "app/core/services/apiService.ts"  ]
 }

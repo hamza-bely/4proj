@@ -33,11 +33,11 @@ export default function Login() {
         // try {
         //     const user = await loginUser(email, password);
 
-        //     router.push('/home');
+        //     router.replace('/home');
         // } catch (error) {
         //     setError('Email ou mot de passe incorrect');
         // }
-        router.push('/home');
+        router.replace('/home');
     };
     
     

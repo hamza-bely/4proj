@@ -1,11 +1,11 @@
-import React, { useEffect, useRef, useState, useMemo } from 'react';
+import React, { useEffect, useRef, useState, useMemo, useCallback } from 'react';
 import { View, StyleSheet, ActivityIndicator, Text } from 'react-native';
 import { WebView } from 'react-native-webview';
 import * as Location from 'expo-location';
 import { DeviceMotion } from 'expo-sensors';
 import TomTomMapProps from '@interfaces/TomTomMapProps';
 
-export default function TomTomMap({ destination, routeOptions, selectedRoute }: TomTomMapProps) {
+export default function TomTomMap({ destination, routeOptions, selectedRoute, userPosition }: TomTomMapProps) {
   const webviewRef = useRef<WebView | null>(null);
   const [location, setLocation] = useState<{ latitude: number; longitude: number; heading: number } | null>(null);
   const [orientation, setOrientation] = useState<number>(0);
@@ -22,7 +22,7 @@ export default function TomTomMap({ destination, routeOptions, selectedRoute }: 
       setLocation({
         latitude: loc.coords.latitude,
         longitude: loc.coords.longitude,
-        heading: loc.coords.heading || 0, // Assure-toi que heading est toujours défini
+        heading: loc.coords.heading || 0,
       });
     };
 
@@ -40,10 +40,20 @@ export default function TomTomMap({ destination, routeOptions, selectedRoute }: 
         const coords = {
           latitude: loc.coords.latitude,
           longitude: loc.coords.longitude,
-          heading: loc.coords.heading || 0, // Assure-toi que heading est toujours défini
+          heading: loc.coords.heading || 0,
         };
-        setLocation(coords);
-        // Injecte le script JS dans la WebView avec la valeur du heading
+        setLocation((prevLocation) => {
+          if (
+            prevLocation &&
+            prevLocation.latitude === coords.latitude &&
+            prevLocation.longitude === coords.longitude
+          ) {
+            return prevLocation; // Ne pas mettre à jour si la position n'a pas changé
+          }
+          return coords;
+        });
+
+        // Injecter uniquement la mise à jour de la position sans toucher à l'itinéraire
         webviewRef.current?.injectJavaScript(`
           if (window.updateUserLocation) {
             updateUserLocation(${coords.longitude}, ${coords.latitude}, ${coords.heading});
@@ -77,7 +87,7 @@ export default function TomTomMap({ destination, routeOptions, selectedRoute }: 
     };
   }, [location]);
 
-  useEffect(() => {
+  const updateRoute = useCallback(() => {
     if (destination && location) {
       webviewRef.current?.injectJavaScript(`
         if (window.searchAndRoute) {
@@ -86,6 +96,10 @@ export default function TomTomMap({ destination, routeOptions, selectedRoute }: 
       `);
     }
   }, [destination, location]);
+
+  useEffect(() => {
+    updateRoute();
+  }, [updateRoute]);
 
   useEffect(() => {
     if (routeOptions && routeOptions.length > 0) {
