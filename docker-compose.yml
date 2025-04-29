@@ -1,5 +1,4 @@
 version: "3.8"
-
 services:
   frontend:
     build: ./web-traficandme-nuveau
@@ -7,44 +6,40 @@ services:
       - "5181:80"
     depends_on:
       - backend
-    env_file:
-      - ./web-traficandme-nuveau/.env
+    environment:
+      - VITE_API_URL=${API_URL:-http://localhost:8080/api/}
+      - VITE_TOMTOM_API_KEY=${TOMTOM_API_KEY}
+    restart: unless-stopped
 
   backend:
     build: ./api-traficandme
     ports:
       - "8080:8080"
     environment:
-      - CORS_ALLOWED_ORIGINS=http://158.180.239.85:5181,http://localhost:8081,http://mobile.app.url
+      - CORS_ALLOWED_ORIGINS=${CORS_ALLOWED_ORIGINS:-http://localhost:5181,http://localhost:8081}
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/traficandmedb
-      - SPRING_DATASOURCE_USERNAME_FILE=/run/secrets/db_user
-      - SPRING_DATASOURCE_PASSWORD_FILE=/run/secrets/db_password
+      - SPRING_DATASOURCE_USERNAME=${DB_USER:-postgres}
+      - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD:-postgres}
+      - SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GITHUB_CLIENT_ID=${GITHUB_CLIENT_ID}
+      - SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GITHUB_CLIENT_SECRET=${GITHUB_CLIENT_SECRET}
+      - SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+      - JWT_SECRET=${JWT_SECRET:-4b0e1a3f53a7e8b7eac8c5a2a0cde3e0b2f1d8a5e6c5a7b2f1e8b1c2d3f4e5a6}
     depends_on:
       - db
-    secrets:
-      - db_user
-      - db_password
+    restart: unless-stopped
 
   db:
     image: postgres:15
     restart: always
     environment:
       POSTGRES_DB: traficandmedb
-      POSTGRES_USER_FILE: /run/secrets/db_user
-      POSTGRES_PASSWORD_FILE: /run/secrets/db_password
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
     volumes:
       - db_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
-    secrets:
-      - db_user
-      - db_password
 
 volumes:
   db_data:
-
-secrets:
-  db_user:
-    external: true
-  db_password:
-    external: true
