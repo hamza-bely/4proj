@@ -215,6 +215,7 @@
     "to-enlarge" : "Map - Click to enlarge"
   },
   "user-admin" :{
+    "protected" : "Protected",
     "title" : "User Management",
     "add-user" : "Add user",
     "role" : "Role",

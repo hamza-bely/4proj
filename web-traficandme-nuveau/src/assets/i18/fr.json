@@ -208,6 +208,7 @@
     "to-enlarge" : "Carte - Cliquez pour agrandir"
   },
   "user-admin": {
+    "protected" : "Protégé",
     "title": "Gestion des utilisateurs",
     "add-user": "Ajouter un utilisateur",
     "role": "Role",

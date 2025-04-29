@@ -172,23 +172,24 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated, startAdd
                 return;
             }
 
+            const address_start = await getAddressFromCoordinates(start.lat, start.lon,t)
+
             const routeData: RouteSaveData = {
                 startLongitude: start.lon.toString(),
                 startLatitude: start.lat.toString(),
                 endLongitude: end.lon.toString(),
                 endLatitude: end.lat.toString(),
-                address_start: startAddress,
+                address_start: address_start,
                 address_end: endAddress,
                 user: "",
-                mode: selectedRoute.type === "fastest" ? t("map.mode-fast") : t("map.mode-short"),
+                mode: selectedRoute.type === "fastest" ? t("Rapide") : t("Court"),
                 peage: !selectedRoute.avoidTolls
             };
+            console.log(routeData)
 
             await createRoute(routeData);
-            toast.success(t("map.route-saved"));
         } catch (error) {
             console.error(t("error.save-route"), error);
-            toast.error(t("error.save-route"));
         } finally {
             setIsSaving(false);
         }
@@ -207,7 +208,6 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated, startAdd
                 return;
             }
 
-            // Create QR code data
             const qrData = {
                 start: {
                     lat: start.lat,
