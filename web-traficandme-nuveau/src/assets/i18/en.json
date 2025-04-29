@@ -113,24 +113,30 @@
       "submit": "Submit"
     },
 
-    "content-section": {
-      "values_title": "Our values",
-      "description": "Lorem ipsum dolor sit amet consect adipisicing elit. Possimus magnam voluptatum cupiditate veritatis in accusamus quisquam.",
-      "be_world_class": "Be world-class",
-      "be_world_class_desc": "Aut illo quae. Ut et harum ea animi natus. Culpa maiores et sed sint et magnam exercitationem quia. Ullam voluptas nihil vitae dicta molestiae et. Aliquid velit porro vero.",
-      "share_knowlege": "Share everything you know",
-      "share_knowlege_desc": "Mollitia delectus a omnis. Quae velit aliquid. Qui nulla maxime adipisci illo id molestiae. Cumque cum ut minus rerum architecto magnam consequatur. Quia quaerat minima.",
-      "always_learning": "Always learning",
-      "always_learning_desc": "Aut repellendus et officiis dolor possimus. Deserunt velit quasi sunt fuga error labore quia ipsum. Commodi autem voluptatem nam. Quos voluptatem totam.",
-      "be_supportive": "Be supportive",
-      "be_supportive_desc": "Magnam provident veritatis odit. Vitae eligendi repellat non. Eum fugit impedit veritatis ducimus. Non qui aspernatur laudantium modi. Praesentium rerum error deserunt harum.",
-      "take_responsibility": "Take responsibility",
-      "take_responsibility_desc": "Sit minus expedita quam in ullam molestiae dignissimos in harum. Tenetur dolorem iure. Non nesciunt dolorem veniam necessitatibus laboriosam voluptas perspiciatis error.",
-      "enjoy_downtime": "Enjoy downtime",
-      "enjoy_downtime_desc": "Ipsa in earum deserunt aut. Quos minus aut animi et soluta. Ipsum dicta ut quia eius. Possimus reprehenderit iste aspernatur ut est velit consequatur distinctio."
-    },
+  "content-section": {
+    "values_title": "Our Values",
+    "description": "We are developing a smart real-time navigation app that provides users with live traffic updates, accident alerts, and obstacle reports. The app also allows users to report incidents and receive optimized routes based on traffic conditions.",
 
-    "feature": {
+    "be_world_class": "Deliver a world-class navigation experience",
+    "be_world_class_desc": "We strive for excellence by providing accurate data, smooth user interfaces, and top-tier performance on every route.",
+
+    "share_knowlege": "Share real-time information",
+    "share_knowlege_desc": "Each user contributes to a safer and more efficient road experience by reporting incidents they encounter.",
+
+    "always_learning": "Always learning and adapting",
+    "always_learning_desc": "With the help of AI and user feedback, our system continuously learns and improves route recommendations.",
+
+    "be_supportive": "Build a supportive community",
+    "be_supportive_desc": "Our app is designed as a community-driven tool where everyone helps each other avoid delays and navigate smarter.",
+
+    "take_responsibility": "Take responsibility for safer roads",
+    "take_responsibility_desc": "We believe in individual responsibility—reporting hazards protects everyone on the road.",
+
+    "enjoy_downtime": "Drive with peace of mind",
+    "enjoy_downtime_desc": "By guiding you efficiently and minimizing surprises, we help make your journeys smoother and more enjoyable."
+  },
+
+  "feature": {
       "real_time_updates": {
         "title": "Real-time Updates",
         "description": "Get instant information about traffic conditions, accidents, and obstacles for a smoother journey."
@@ -204,9 +210,12 @@
       "bike": "Bicycle",
       "bus": "Bus/Truck",
       "walk": "Walking"
-    }
+    },
+    "stop-tracking" : "Stop the traffic tracking",
+    "to-enlarge" : "Map - Click to enlarge"
   },
   "user-admin" :{
+    "protected" : "Protected",
     "title" : "User Management",
     "add-user" : "Add user",
     "role" : "Role",

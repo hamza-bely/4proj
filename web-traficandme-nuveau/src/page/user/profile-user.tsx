@@ -62,6 +62,7 @@ export default function ProfileUser() {
             console.error("Erreur lors de la mise à jour de l'utilisateur:", error);
         }
     };
+    console.log(user)
 
     return (
         <div className="mx-auto max-w-7xl pt-16 lg:flex lg:gap-x-16 lg:px-8">
@@ -180,6 +181,8 @@ export default function ProfileUser() {
                                             </>
                                         ) : (
                                             <div>
+                                                {user.roles !== "ADMIN" &&
+                                                    <div>
 
                                                 <button
                                                     onClick={() => setEditMode(true)}
@@ -188,12 +191,14 @@ export default function ProfileUser() {
                                                     {t("common.edit")}
                                                 </button>
 
-                                                <button
+
+                                                    <button
                                                     onClick={() =>   setIsOpen(true)}
                                                     className="px-4 ml-5 py-2 text-white bg-red-700 rounded-md hover:bg-red-600 hover:text-white"
                                                 >
                                                     {t("profile.delete")}
                                                 </button>
+                                                    </div>}
                                             </div>
 
                                         )}

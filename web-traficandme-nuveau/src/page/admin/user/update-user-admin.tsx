@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import useUserStore from "../../../services/store/user-store";
 import Spinner from "../../../components/sniper/sniper.tsx";
-import {UserUpdaterRequest} from "../../../services/model/user.tsx";
 
 export default function UpdateUserAdmin({
                                             id,
@@ -11,7 +10,7 @@ export default function UpdateUserAdmin({
     setIsOpenUpdate: (open: boolean) => void;
 }) {
     const { updateUserForAnAdmin, users } = useUserStore();
-    const [userData, setUserData] = useState<UserUpdaterRequest>({
+    const [userData, setUserData] = useState<any>({
         firstName: "",
         lastName: "",
         email: "",

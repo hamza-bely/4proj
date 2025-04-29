@@ -5,8 +5,11 @@ import UpdateUserAdmin from "./update-user-admin.tsx";
 import CreateUserAdmin from "./create-user-admin.tsx";
 import Spinner from "../../../components/sniper/sniper.tsx";
 import { Dialog } from "../../../assets/kit-ui/dialog";
-import { ToastContainer } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
 import ConfirmDialog from "../../../components/dialog/dialog.tsx";
+
+// Définir les utilisateurs protégés
+const PROTECTED_USERS = ["admin@traficandme.com"];
 
 export default function ListUserAdmin() {
     const { t } = useTranslation();
@@ -19,6 +22,7 @@ export default function ListUserAdmin() {
     const [isLoading, setIsLoading] = useState(false);
     const [searchTerm, setSearchTerm] = useState("");
     const [isPermanentDelete, setIsPermanentDelete] = useState(false);
+    const [selectedUserEmail, setSelectedUserEmail] = useState<string | null>(null);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -30,31 +34,59 @@ export default function ListUserAdmin() {
     }, [fetchUsers]);
 
     const handleUpdateClick = (id: number) => {
+        // Vérifier si l'utilisateur est protégé avant de permettre la modification
+        const user = users.find(u => u.id === id);
+        if (user && PROTECTED_USERS.includes(user.email)) {
+            toast.error(t("user-admin.protected_user", "Cet utilisateur est protégé et ne peut pas être modifié"));
+            return;
+        }
         setSelectedUserId(id);
         setIsOpenUpdate(true);
     };
 
     const handleDeleteClick = (userId: number, permanent: boolean = false) => {
+        // Vérifier si l'utilisateur est protégé avant de permettre la suppression
+        const user = users.find(u => u.id === userId);
+        if (user && PROTECTED_USERS.includes(user.email)) {
+            toast.error(t("user-admin.protected_user", "Cet utilisateur est protégé et ne peut pas être supprimé"));
+            return;
+        }
         setSelectedUserId(userId);
+        setSelectedUserEmail(user?.email || null);
         setIsPermanentDelete(permanent);
         setIsConfirmDeleteOpen(true);
     };
 
-    const confirmDelete = () => {
+    const confirmDelete = async () => {
         if (selectedUserId !== null) {
+            // Double vérification pour s'assurer que l'utilisateur n'est pas protégé
+            if (selectedUserEmail && PROTECTED_USERS.includes(selectedUserEmail)) {
+                toast.error(t("user-admin.protected_user", "Cet utilisateur est protégé et ne peut pas être supprimé"));
+                setIsConfirmDeleteOpen(false);
+                return;
+            }
+
             setIsDeleting(true);
-            if (isPermanentDelete) {
-                deleteDefinitiveUserFoAnAdmin(selectedUserId).finally(() => {
-                    setIsDeleting(false);
-                    setIsConfirmDeleteOpen(false);
-                });
-            } else {
-                deleteUserForAnAdmin(selectedUserId).finally(() => {
-                    setIsDeleting(false);
-                    setIsConfirmDeleteOpen(false);
-                });
+            try {
+                if (isPermanentDelete) {
+                    await deleteDefinitiveUserFoAnAdmin(selectedUserId);
+                    toast.success(t("user-admin.delete_success", "Utilisateur supprimé définitivement avec succès"));
+                } else {
+                    await deleteUserForAnAdmin(selectedUserId);
+                    toast.success(t("user-admin.delete_success", "Utilisateur supprimé avec succès"));
+                }
+            } catch (error) {
+                console.error("Erreur lors de la suppression de l'utilisateur", error);
+                toast.error(t("user-admin.delete_error", "Erreur lors de la suppression de l'utilisateur"));
+            } finally {
+                setIsDeleting(false);
+                setIsConfirmDeleteOpen(false);
             }
         }
+    };
+
+    const isProtectedUser = (email: string) => {
+        return PROTECTED_USERS.includes(email);
     };
 
     const filteredUsers = users.filter((user) => {
@@ -169,7 +201,14 @@ export default function ListUserAdmin() {
                                     <td className="py-4 pr-3 pl-4 text-sm font-medium text-gray-900 sm:pl-3">
                                         {user.username}
                                     </td>
-                                    <td className="px-3 py-4 text-sm text-gray-500">{user.email}</td>
+                                    <td className="px-3 py-4 text-sm text-gray-500">
+                                        {user.email}
+                                        {isProtectedUser(user.email) && (
+                                            <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                                {t("user-admin.protected", "Protégé")}
+                                            </span>
+                                        )}
+                                    </td>
                                     <td className="px-3 py-4 text-sm text-gray-500">{user.role}</td>
                                     <td className="px-3 py-4 text-sm text-gray-500">{user.status}</td>
                                     <td className="px-3 py-4 text-sm text-gray-500">{user.createDate}</td>
@@ -177,21 +216,24 @@ export default function ListUserAdmin() {
                                         <div className="flex gap-2 justify-end">
                                             <button
                                                 onClick={() => handleUpdateClick(user.id)}
-                                                className="text-blue-800 hover:text-blue-900 font-medium px-2"
+                                                className={`text-blue-800 hover:text-blue-900 font-medium px-2 ${isProtectedUser(user.email) ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                                disabled={isProtectedUser(user.email)}
                                             >
                                                 {t("common.edit")}
                                             </button>
 
                                             <button
                                                 onClick={() => handleDeleteClick(user.id, false)}
-                                                className="text-red-700 hover:text-red-800 font-medium px-2"
+                                                className={`text-red-700 hover:text-red-800 font-medium px-2 ${isProtectedUser(user.email) ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                                disabled={isProtectedUser(user.email)}
                                             >
                                                 {t("common.delete")}
                                             </button>
 
                                             <button
                                                 onClick={() => handleDeleteClick(user.id, true)}
-                                                className="bg-red-700 hover:bg-red-800 text-white rounded-lg px-3 py-1 text-sm"
+                                                className={`${isProtectedUser(user.email) ? 'bg-gray-400 cursor-not-allowed' : 'bg-red-700 hover:bg-red-800'} text-white rounded-lg px-3 py-1 text-sm`}
+                                                disabled={isProtectedUser(user.email)}
                                             >
                                                 {t("common.delete-definitive")}
                                             </button>
@@ -233,7 +275,14 @@ export default function ListUserAdmin() {
                                 <div className="grid grid-cols-2 gap-3 text-sm mb-4">
                                     <div>
                                         <p className="font-medium text-gray-500">{t("common.email")}:</p>
-                                        <p className="truncate">{user.email}</p>
+                                        <p className="flex items-center">
+                                            <span className="truncate">{user.email}</span>
+                                            {isProtectedUser(user.email) && (
+                                                <span className="ml-1 inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                                    {t("user-admin.protected", "Protégé")}
+                                                </span>
+                                            )}
+                                        </p>
                                     </div>
                                     <div>
                                         <p className="font-medium text-gray-500">{t("common.role")}:</p>
@@ -248,21 +297,24 @@ export default function ListUserAdmin() {
                                 <div className="grid grid-cols-3 gap-2 mt-4">
                                     <button
                                         onClick={() => handleUpdateClick(user.id)}
-                                        className="flex items-center justify-center text-blue-800 bg-blue-50 border border-blue-200 hover:bg-blue-100 rounded-lg py-2 text-sm"
+                                        className={`flex items-center justify-center text-blue-800 bg-blue-50 border border-blue-200 ${isProtectedUser(user.email) ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-100'} rounded-lg py-2 text-sm`}
+                                        disabled={isProtectedUser(user.email)}
                                     >
                                         {t("common.edit")}
                                     </button>
 
                                     <button
                                         onClick={() => handleDeleteClick(user.id, false)}
-                                        className="flex items-center justify-center text-red-700 bg-red-50 border border-red-200 hover:bg-red-100 rounded-lg py-2 text-sm"
+                                        className={`flex items-center justify-center text-red-700 bg-red-50 border border-red-200 ${isProtectedUser(user.email) ? 'opacity-50 cursor-not-allowed' : 'hover:bg-red-100'} rounded-lg py-2 text-sm`}
+                                        disabled={isProtectedUser(user.email)}
                                     >
                                         {t("common.delete")}
                                     </button>
 
                                     <button
                                         onClick={() => handleDeleteClick(user.id, true)}
-                                        className="flex items-center justify-center text-white bg-red-700 hover:bg-red-800 rounded-lg py-2 text-sm"
+                                        className={`flex items-center justify-center text-white ${isProtectedUser(user.email) ? 'bg-gray-400 cursor-not-allowed' : 'bg-red-700 hover:bg-red-800'} rounded-lg py-2 text-sm`}
+                                        disabled={isProtectedUser(user.email)}
                                     >
                                         {t("common.delete-definitive")}
                                     </button>

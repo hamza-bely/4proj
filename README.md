@@ -158,6 +158,11 @@ Le système est fourni avec des utilisateurs pré-configurés:
 - Email: hamza.bely@traficandme.com
 - Mot de passe: UserPass123!
 - Rôle: USER
+- 
+### Moderator
+- Email: moderator.@traficandme.com
+- Mot de passe: ModeratorPass123!
+- Rôle: MODERATOR
 
 ## Documentation de l'API
 

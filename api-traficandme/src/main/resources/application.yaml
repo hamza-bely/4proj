@@ -13,9 +13,9 @@ spring:
       hibernate:
         format_sql: true
   datasource:
-    url: jdbc:postgresql://89.168.25.138:5432/supmap
-    username: postgres
-    password: waris
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
     driver-class-name: org.postgresql.Driver
   h2:
     console:

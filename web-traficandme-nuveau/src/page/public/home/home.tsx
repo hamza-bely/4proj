@@ -40,7 +40,7 @@ export default function Home() {
                                     {t('home.new')}
                                 </span>
                                 <span className="text-sm font-medium text-gray-600">
-                                    <span className="text-color-global">{t('home.version')}</span> →
+                                    <span className="text-color-global">{t('home.version')}</span>
                                 </span>
                             </a>
                         </div>
@@ -53,15 +53,6 @@ export default function Home() {
                             {t('home.description')}
                         </p>
 
-                        <div className="mt-8 flex flex-wrap items-center gap-4">
-                            <a href="#"
-                               className="rounded-md bg-indigo-600 px-5 py-3 text-sm font-semibold text-white shadow hover:bg-indigo-500 transition">
-                                {t('home.download')}
-                            </a>
-                            <a href="#" className="text-sm font-semibold text-gray-900 hover:underline">
-                                {t('home.learnMore')} →
-                            </a>
-                        </div>
                     </div>
 
                     <div className={`mt-8 p-5 rounded-xl lg:mt-0 flex justify-center relative transition-colors duration-1000 ${bgColor}`}>

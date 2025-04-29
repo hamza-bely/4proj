@@ -50,7 +50,6 @@ export default function ListRouteAdmin() {
     const filteredRoutes = routes.filter((route) => {
         const searchTermLower = searchTerm.toLowerCase();
         return (
-            route.id.toString().includes(searchTermLower) ||
             (route.mode && route.mode.toLowerCase().includes(searchTermLower)) ||
             (route.user && route.user.toLowerCase().includes(searchTermLower)) ||
             (route.status && route.status.toLowerCase().includes(searchTermLower)) ||

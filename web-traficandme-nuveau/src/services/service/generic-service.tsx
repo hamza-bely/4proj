@@ -27,7 +27,7 @@ export const apiRequest = async (method: string, url: string, data?: any) => {
         }
         return response.data;
     } catch (error: any) {
-        toast.error(await translateMessage(error.response?.data?.message || "An error has occurred"));
+        toast.error(await translateMessage(error.response?.data?.message) || await translateMessage("An error has occurred"));
         throw error;
     }
 };
