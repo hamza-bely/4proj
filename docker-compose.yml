@@ -1,7 +1,11 @@
 version: "3.8"
 services:
   frontend:
-    build: ./web-traficandme-nuveau
+    build:
+      context: ./web-traficandme-nuveau
+      args:
+        VITE_API_URL: ${API_URL}
+        VITE_TOMTOM_API_KEY: ${TOMTOM_API_KEY}
     ports:
       - "5181:80"
     depends_on:
