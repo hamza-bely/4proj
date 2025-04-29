@@ -12,6 +12,7 @@
       "@interfaces/*":["app/interfaces/*"],
       "@services/*":["app/core/services/*"],
       "@utils/*":["app/utils/*"],
+      "@hooks/*":["hooks/*"],
       
     }
   },

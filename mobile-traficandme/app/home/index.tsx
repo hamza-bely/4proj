@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { router } from 'expo-router';
-import * as Location from 'expo-location';
-import {KeyboardAvoidingView, Keyboard, Platform, StyleSheet, TextInput, View, useColorScheme, Text, TouchableOpacity, FlatList, Image, ActivityIndicator} from 'react-native';
-
+import { KeyboardAvoidingView, Keyboard, Platform, StyleSheet, TextInput, View, useColorScheme, Text, TouchableOpacity, FlatList, Image, ActivityIndicator } from 'react-native';
+import * as ExpoLocation from 'expo-location';
 import TomTomMap from '@components/TomTomMaps';
 import ReportModal from '@components/reportModal';
 import { StatusBar } from 'expo-status-bar';
@@ -13,11 +12,10 @@ import RouteOption from '@interfaces/RouteOption';
 import ClosestInstruction from '@interfaces/ClosestInstruction';
 import { getDistanceFromLatLonInM } from '@utils/distance';
 import { fetchSuggestions, fetchRouteOption } from '@services/apiService';
-import useUserLocation from '@/hooks/useUserLocation';
+import { useLocation } from '@hooks/useLocation';
 import getInstructionIcon from '@utils/getInstructionIcon';
 
 export default function HomeScreen() {
-  
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
   const textColor = isDark ? '#fff' : '#000';
@@ -35,10 +33,11 @@ export default function HomeScreen() {
   const [currentManeuver, setCurrentManeuver] = useState<string>('STRAIGHT');
   const [instructions, setInstructions] = useState<NavigationInstruction[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
-  const OpenMenu=()=>{router.push('/home/menu')}
-  const OpenReport=()=>{router.push('/home/menu')}
+  const OpenMenu = () => { router.push('/home/menu') }
+  const OpenReport = () => { router.push('/home/menu') }
   const [modalVisible, setModalVisible] = useState(false);
-  const [userPosition, setUserPosition] = useState<{ latitude: number; longitude: number } | null>(null);
+  const { location, error } = useLocation();
+  const [userPosition, setUserPosition] = useState<{ latitude: number; longitude: number } | null>(location);
 
   useEffect(() => {
     if (searchText.length > 2) {
@@ -49,31 +48,10 @@ export default function HomeScreen() {
   }, [searchText]);
 
   useEffect(() => {
-    const watchPosition = async () => {
-      const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') {
-        alert('Permission GPS refusée.');
-        return;
-      }
-
-      const subscription = Location.watchPositionAsync(
-        {
-          accuracy: Location.Accuracy.High,
-          timeInterval: 1000,
-          distanceInterval: 5,
-        },
-        (location) => {
-          setSpeed(location.coords.speed);
-          setUserPosition({ latitude: location.coords.latitude, longitude: location.coords.longitude });
-          updateCurrentInstruction(location.coords);
-        }
-      );
-
-      return () => subscription.then((sub) => sub.remove());
-    };
-
-    watchPosition();
-  }, [selectedRoute]);
+    if (location) {
+      setUserPosition(location);
+    }
+  }, [location]);
 
   useEffect(() => {
     if (destination) {
@@ -95,7 +73,34 @@ export default function HomeScreen() {
     }
   }, [destination]);
 
-  const updateCurrentInstruction = useCallback(async (coords: Location.LocationObjectCoords) => {
+  useEffect(() => {
+    const watchPosition = async () => {
+      const { status } = await ExpoLocation.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        alert('Permission GPS refusée.');
+        return;
+      }
+
+      const subscription = ExpoLocation.watchPositionAsync(
+        {
+          accuracy: ExpoLocation.Accuracy.High,
+          timeInterval: 1000,
+          distanceInterval: 5,
+        },
+        (location) => {
+          setSpeed(location.coords.speed);
+          setUserPosition({ latitude: location.coords.latitude, longitude: location.coords.longitude });
+          updateCurrentInstruction(location.coords);
+        }
+      );
+
+      return () => subscription.then((sub) => sub.remove());
+    };
+
+    watchPosition();
+  }, [selectedRoute]);
+
+  const updateCurrentInstruction = useCallback(async (coords: ExpoLocation.LocationObjectCoords) => {
     if (!selectedRoute || !selectedRoute.guidance || !selectedRoute.guidance.instructions) {
       console.log('selectedRoute or guidance is null');
       return;
@@ -133,7 +138,7 @@ export default function HomeScreen() {
     }
   }, [selectedRoute]);
 
-  const recalculateRoute = async (coords: Location.LocationObjectCoords) => {
+  const recalculateRoute = async (coords: ExpoLocation.LocationObjectCoords) => {
     if (!destination) return;
 
     setLoading(true);
@@ -158,8 +163,6 @@ export default function HomeScreen() {
       setLoading(false);
     }
   };
-
-
 
   const handleSelectAddress = (address: AddressSuggestion) => {
     Keyboard.dismiss();
@@ -270,8 +273,8 @@ export default function HomeScreen() {
             </View>
             <View style={styles.myAddress}>
               <TouchableOpacity onPress={OpenMenu} style={[styles.addressBlockA, ]}><Image style={styles.iconImg} source={require('@assets/images/menu-96.png')}></Image></TouchableOpacity>
-              <TouchableOpacity onPress={() => setModalVisible(true)} style={[styles.addressBlock, ]}><Image style={styles.iconImg} source={require('@assets/images/erreur-96.png')}></Image></TouchableOpacity>
-              <TouchableOpacity style={[styles.addressBlock, { borderColor }]}><Text style={[styles.myAddressText, { color: textColor }]}>+ Ajouter</Text></TouchableOpacity>
+              <TouchableOpacity style={[styles.addressBlock, { borderColor }]}><Text style={[styles.myAddressText, { color: textColor }]}>Ajouter</Text></TouchableOpacity>
+              <TouchableOpacity onPress={() => setModalVisible(true)} style={[styles.addressBlockC, ]}><Image style={styles.iconImg} source={require('@assets/images/erreur-96.png')}></Image></TouchableOpacity>
             </View>
           </>
         ) : (
@@ -436,13 +439,22 @@ const styles = StyleSheet.create({
     maxHeight:50,
   },
   addressBlockA: {
-
     padding: 10,
     borderRadius: 15,
     width: 110,
     flexDirection: 'row',
     alignItems:'center',
     justifyContent:'flex-start',
+    height:50,
+    maxHeight:50,
+  },
+  addressBlockC: {
+    padding: 10,
+    borderRadius: 15,
+    width: 110,
+    flexDirection: 'row',
+    alignItems:'center',
+    justifyContent:'flex-end',
     height:50,
     maxHeight:50,
   },

@@ -1,71 +1,14 @@
 import React, { useEffect, useRef, useState, useMemo, useCallback } from 'react';
 import { View, StyleSheet, ActivityIndicator, Text } from 'react-native';
 import { WebView } from 'react-native-webview';
-import * as Location from 'expo-location';
+import { useLocation } from '@hooks/useLocation';
 import { DeviceMotion } from 'expo-sensors';
 import TomTomMapProps from '@interfaces/TomTomMapProps';
 
 export default function TomTomMap({ destination, routeOptions, selectedRoute, userPosition }: TomTomMapProps) {
   const webviewRef = useRef<WebView | null>(null);
-  const [location, setLocation] = useState<{ latitude: number; longitude: number; heading: number } | null>(null);
+  const { location, error } = useLocation();
   const [orientation, setOrientation] = useState<number>(0);
-
-  useEffect(() => {
-    const requestLocationPermission = async () => {
-      const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') {
-        alert('Permission GPS refusée.');
-        return;
-      }
-
-      const loc = await Location.getCurrentPositionAsync({});
-      setLocation({
-        latitude: loc.coords.latitude,
-        longitude: loc.coords.longitude,
-        heading: loc.coords.heading || 0,
-      });
-    };
-
-    requestLocationPermission();
-  }, []);
-
-  useEffect(() => {
-    const watch = Location.watchPositionAsync(
-      {
-        accuracy: Location.Accuracy.High,
-        timeInterval: 2000,
-        distanceInterval: 2,
-      },
-      (loc) => {
-        const coords = {
-          latitude: loc.coords.latitude,
-          longitude: loc.coords.longitude,
-          heading: loc.coords.heading || 0,
-        };
-        setLocation((prevLocation) => {
-          if (
-            prevLocation &&
-            prevLocation.latitude === coords.latitude &&
-            prevLocation.longitude === coords.longitude
-          ) {
-            return prevLocation; // Ne pas mettre à jour si la position n'a pas changé
-          }
-          return coords;
-        });
-
-        // Injecter uniquement la mise à jour de la position sans toucher à l'itinéraire
-        webviewRef.current?.injectJavaScript(`
-          if (window.updateUserLocation) {
-            updateUserLocation(${coords.longitude}, ${coords.latitude}, ${coords.heading});
-          }
-        `);
-      }
-    );
-
-    return () => {
-      watch.then((subscription) => subscription.remove());
-    };
-  }, []);
 
   useEffect(() => {
     const subscription = DeviceMotion.addListener(({ rotation }) => {
@@ -170,21 +113,34 @@ export default function TomTomMap({ destination, routeOptions, selectedRoute, us
           const userIcon = document.createElement('div');
           userIcon.style.width = '40px';
           userIcon.style.height = '40px';
-          userIcon.style.backgroundImage = 'url(https://img.icons8.com/?size=100&id=HZC1E42sHiI3&format=png&color=000000)';
-          userIcon.style.backgroundSize = 'contain';
-          userIcon.style.backgroundRepeat = 'no-repeat';
-          userIcon.style.transform = 'rotate(0deg)';
-          userIcon.style.transition = 'transform 0.5s ease';
+          userIcon.style.display = 'flex';
+          userIcon.style.justifyContent = 'center';
+          userIcon.style.alignItems = 'center';
+
+
+          const userIconInner = document.createElement('div');
+          userIconInner.style.width = '100%';
+          userIconInner.style.height = '100%';
+          userIconInner.style.backgroundImage = 'url(https://img.icons8.com/?size=100&id=HZC1E42sHiI3&format=png&color=000000)';
+          userIconInner.style.backgroundSize = 'contain';
+          userIconInner.style.backgroundRepeat = 'no-repeat';
+          userIconInner.style.transition = 'transform 0.5s ease';
+          userIconInner.style.transform = 'rotate(0deg)';
+
+          userIcon.appendChild(userIconInner);
+
 
           userMarker = new tt.Marker({ element: userIcon }).setLngLat(userCoords).addTo(map);
 
           window.updateUserLocation = (lng, lat, heading) => {
+            console.log(\`Updating user location: lng=\${lng}, lat=\${lat}, heading=\${heading}\`);
             userCoords = [lng, lat];
             userMarker.setLngLat(userCoords);
-            userMarker.getElement().style.transform = \`rotate(\${heading}deg)\`;
+            userIconInner.style.transform = \`rotate(\${heading}deg)\`;
             map.setCenter(userCoords);
             map.rotateTo(heading, { duration: 500 });
           };
+
 
           window.searchAndRoute = function(coords) {
             const [lat, lon] = coords.split(',').map(Number);

@@ -33,6 +33,7 @@ export default function Menu() {
 
 const styles = StyleSheet.create({
   container: {
+    paddingTop: 50,
     flex: 1,
     backgroundColor: '#fff',
     padding: 20,
