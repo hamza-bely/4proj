@@ -423,7 +423,7 @@ export default function ContainerMap({ map }: ContainerMapProps) {
                                                         onClick={stopRouteTracking}
                                                         className="px-3 py-1 text-xs bg-red-500 text-white rounded-md hover:bg-red-600"
                                                     >
-                                                        Arrêter le suivi du trafic
+                                                        {t("map.stop-tracking")}
                                                     </button>
                                                 </div>
                                             )}
@@ -435,7 +435,7 @@ export default function ContainerMap({ map }: ContainerMapProps) {
                         )}
                         {minimized && (
                             <div className="px-4 py-2 flex items-center justify-center">
-                                <span className="text-sm font-medium">Carte - Cliquez pour agrandir</span>
+                                <span className="text-sm font-medium">{t("map.to-enlarge")}</span>
                             </div>
                         )}
                     </div>

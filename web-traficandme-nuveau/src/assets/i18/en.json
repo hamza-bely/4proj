@@ -204,7 +204,9 @@
       "bike": "Bicycle",
       "bus": "Bus/Truck",
       "walk": "Walking"
-    }
+    },
+    "stop-tracking" : "Stop the traffic tracking",
+    "to-enlarge" : "Map - Click to enlarge"
   },
   "user-admin" :{
     "title" : "User Management",

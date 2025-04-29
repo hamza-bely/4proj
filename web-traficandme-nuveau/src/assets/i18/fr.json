@@ -197,7 +197,9 @@
       "bike": "Vélo",
       "bus": "Bus/Camion",
       "walk": "À pied"
-    }
+    },
+    "stop-tracking" : "Arrêter le suivi du trafic",
+    "to-enlarge" : "Carte - Cliquez pour agrandir"
   },
   "user-admin": {
     "title": "Gestion des utilisateurs",
