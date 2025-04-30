@@ -15,6 +15,8 @@ import { fetchSuggestions, fetchRouteOption } from '@services/apiService';
 import { useLocation } from '@hooks/useLocation';
 import getInstructionIcon from '@utils/getInstructionIcon';
 
+
+
 export default function HomeScreen() {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
@@ -34,7 +36,6 @@ export default function HomeScreen() {
   const [instructions, setInstructions] = useState<NavigationInstruction[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const OpenMenu = () => { router.push('/home/menu') }
-  const OpenReport = () => { router.push('/home/menu') }
   const [modalVisible, setModalVisible] = useState(false);
   const { location, error } = useLocation();
   const [userPosition, setUserPosition] = useState<{ latitude: number; longitude: number } | null>(location);
@@ -140,20 +141,22 @@ export default function HomeScreen() {
 
   const recalculateRoute = async (coords: ExpoLocation.LocationObjectCoords) => {
     if (!destination) return;
-
+  
     setLoading(true);
     try {
       const response = await fetch(
         `https://api.tomtom.com/routing/1/calculateRoute/${coords.latitude},${coords.longitude}:${destination.latitude},${destination.longitude}/json?key=QBsKzG3zoRyZeec28eUDje0U8DeNoRSO&routeType=fastest&maxAlternatives=3&instructionsType=text&language=fr`
       );
       const data = await response.json();
-      setRouteOptions(data.routes);
+  
       if (data.routes.length > 0) {
         const instructionsArray: NavigationInstruction[] = data.routes[0].guidance.instructions.map((instr: any) => ({
           message: instr.message,
           distance: instr.routeOffsetInMeters,
           maneuver: instr.maneuver,
         }));
+  
+        setRouteOptions(data.routes);
         setInstructions(instructionsArray);
         setSelectedRoute(data.routes[0]);
       }
@@ -163,6 +166,7 @@ export default function HomeScreen() {
       setLoading(false);
     }
   };
+  
 
   const handleSelectAddress = (address: AddressSuggestion) => {
     Keyboard.dismiss();

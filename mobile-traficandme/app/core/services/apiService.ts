@@ -5,7 +5,7 @@ import NavigationInstruction from '@interfaces/NavigationInstruction';
 import  ReportData  from '@interfaces/ReportData';
 
 
-const API_URL: string = 'http://158.180.229.244:8080';
+const API_URL: string = 'http://204.216.214.8:5181';
 const API_KEY = 'QBsKzG3zoRyZeec28eUDje0U8DeNoRSO';
 
 
@@ -95,5 +95,6 @@ export const createReport = async (reportData: ReportData): Promise<void> => {
         throw error;
     }
 };
+
 
 
