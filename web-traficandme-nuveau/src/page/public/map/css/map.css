@@ -9,7 +9,7 @@
 
 .container-modal{
     position: absolute;
-    z-index: 1000;
+    z-index: 800;
     margin-top: 20px;
 }
 
