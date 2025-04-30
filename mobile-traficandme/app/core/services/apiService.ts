@@ -5,18 +5,19 @@ import NavigationInstruction from '@interfaces/NavigationInstruction';
 import  ReportData  from '@interfaces/ReportData';
 
 
-const API_URL: string = 'http://204.216.214.8:5181';
+const API_URL: string = 'http://204.216.214.8:8080';
 const API_KEY = 'QBsKzG3zoRyZeec28eUDje0U8DeNoRSO';
 
 
 export const loginUser = async (email: string, password: string): Promise<any> => {
+
     try {
         const response = await axios.post(`${API_URL}/api/auth/authenticate`, {
             email,
             password,
         });
         return response.data;
-
+        console.log('Détail de la réponse :', response.data);
     } catch (error: any) {
         const errorMessage: string = error.response?.data?.message || 'Erreur de connexion';
         console.error(errorMessage);
@@ -24,12 +25,7 @@ export const loginUser = async (email: string, password: string): Promise<any> =
     }
 };
 
-export const registerUser = async (
-    firstName: string,
-    lastName: string,
-    email: string,
-    password: string
-): Promise<any> => {
+export const registerUser = async (firstName: string,lastName: string,email: string,password: string): Promise<any> => {
     try {
         const response = await axios.post(`${API_URL}/api/auth/register`, {
             firstName,
@@ -39,7 +35,7 @@ export const registerUser = async (
         });
         return response.data;
     } catch (error: any) {
-        const errorMessage: string = error.response?.data?.message || 'Erreur d\'enregistrement';
+        const errorMessage: any = error.response?.data?.message || 'Erreur d\'enregistrement';
         console.error(errorMessage);
         throw new Error(errorMessage);
     }

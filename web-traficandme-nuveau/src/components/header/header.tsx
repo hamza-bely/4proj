@@ -44,10 +44,10 @@ export default function Header() {
                 />
             </nav>
 
-            <Dialog open={isOpenLogin} onClose={() => setIsOpenLogin(false)}>
+            <Dialog style={{ position: 'absolute', zIndex: 1001 }} open={isOpenLogin} onClose={() => setIsOpenLogin(false)}>
                 <Login closeModal={() => setIsOpenLogin(false)} />
             </Dialog>
-            <Dialog open={isOpenRegister} onClose={() => setIsOpenRegister(false)}>
+            <Dialog style={{ position: 'absolute', zIndex: 1001 }} open={isOpenRegister} onClose={() => setIsOpenRegister(false)}>
                 <Register closeModal={() => setIsOpenRegister(false)} />
             </Dialog>
         </header>

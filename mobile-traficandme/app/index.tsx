@@ -1,21 +1,24 @@
 import { useEffect } from "react";
 import { View, Text, StyleSheet, ImageBackground, ActivityIndicator, Image } from 'react-native';
 import { useRouter } from 'expo-router';
-import { supabase } from "@/app/core/services/supabase";
+import asyncStorage from '@services/localStorage';
 
 export default function IndexScreen() {
+
     const router = useRouter();
+    const { getToken } = asyncStorage();
 
     useEffect(() => {
-        const checkUser = async () => {
-            const { data: { user } } = await supabase.auth.getUser();
-            if (!user) {
-                router.replace('/start');
-            } else {
+        const checkSession = async () => {
+            const token = await getToken();
+            if (token) {
                 router.replace('/home');
+            } else {
+                router.replace('/start'); 
             }
         };
-        checkUser();
+
+        checkSession();
     }, []);
 
     return (

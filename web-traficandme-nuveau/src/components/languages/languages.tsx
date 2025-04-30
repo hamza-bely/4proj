@@ -41,7 +41,7 @@ const languageOptions = [
 
 export default function Languages() {
     const [isOpen, setIsOpen] = useState(false);
-    const [selectedLanguage, setSelectedLanguage] = useState(languageOptions[0]);
+    const [selectedLanguage, setSelectedLanguage] = useState(languageOptions[1]);
 
     const toggleDropdown = () => setIsOpen(!isOpen);
 
