@@ -30,4 +30,6 @@ export default function asyncStorage() {
         console.error('Erreur lors de la suppression du token :', error);
     }
     };
+
+    return {storeToken,getToken,removeToken,};
 };

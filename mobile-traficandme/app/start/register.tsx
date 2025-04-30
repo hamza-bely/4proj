@@ -7,8 +7,10 @@ import { Ionicons } from '@expo/vector-icons';
 import { Link, router } from "expo-router";
 import { useColorScheme } from 'react-native';
 import { registerUser } from '@services/apiService';
+import asyncStorage from '@services/localStorage';
 
 export default function Register() {
+
     const colorScheme = useColorScheme();
     const [isDarkMode, setIsDarkMode] = useState(colorScheme === 'dark');
     const [firstName, setFirstName] = useState('');
@@ -17,17 +19,12 @@ export default function Register() {
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [error, setError] = useState('');
+    const { storeToken } = asyncStorage();
 
     useEffect(() => {
-        const handleAppearanceChange = ({ colorScheme }: { colorScheme: any }) => {
-            setIsDarkMode(colorScheme === 'dark');
-        }
-
+        const handleAppearanceChange = ({ colorScheme }: { colorScheme: any }) => {setIsDarkMode(colorScheme === 'dark');}
         const subscription = Appearance.addChangeListener(handleAppearanceChange);
-
-        return () => {
-            subscription.remove();
-        };
+        return () => {subscription.remove();};
     }, []);
 
     const handleRegister = async () => {
@@ -37,7 +34,8 @@ export default function Register() {
         }
 
         try {
-            const user = await registerUser({ firstName, lastName, email, password });
+            const user = await registerUser( firstName, lastName, email, password );
+            await storeToken(user.token);
             router.push('/home');
         } catch (error: any) {
             setError(error.message);
@@ -45,10 +43,7 @@ export default function Register() {
     };
 
     return (
-        <KeyboardAvoidingView
-            behavior={Platform.OS === "ios" ? "padding" : "height"}
-            style={{ flex: 1 }}
-        >
+        <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"}style={{ flex: 1 }}>
             <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
                 <View style={[styles.container, isDarkMode ? styles.darkContainer : styles.lightContainer]}>
                     <ScrollView

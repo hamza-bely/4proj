@@ -1,13 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { 
-    StyleSheet, Text, View, TextInput, TouchableOpacity, Image, Pressable, Appearance, 
-    KeyboardAvoidingView, ScrollView, Platform, TouchableWithoutFeedback, Keyboard 
-} from 'react-native';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, Image, Pressable, Appearance,KeyboardAvoidingView, ScrollView, Platform, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Link, router } from "expo-router";
 import { useColorScheme } from 'react-native';
-import { supabase } from '@supabase';
 import {loginUser} from '@services/apiService'
+import asyncStorage from '@services/localStorage';
+
 
 export default function Login() {
     const colorScheme = useColorScheme();
@@ -15,33 +13,40 @@ export default function Login() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
+    const { storeToken } = asyncStorage();
+
+
 
     useEffect(() => {
-        const handleAppearanceChange = ({ colorScheme }: { colorScheme: any }) => {
-            setIsDarkMode(colorScheme === 'dark');
-        };
-
+        const handleAppearanceChange = ({ colorScheme }: { colorScheme: any }) => {setIsDarkMode(colorScheme === 'dark');};
         const subscription = Appearance.addChangeListener(handleAppearanceChange);
-
-        return () => {
-            subscription.remove();
-        };
+        return () => {subscription.remove();
+    };
     }, []);
+    
+
 
     const toLog = async () => {
-
-        // try {
-        //     const user = await loginUser(email, password);
-
-        //     router.replace('/home');
-        // } catch (error) {
-        //     setError('Email ou mot de passe incorrect');
-        // }
-        router.replace('/home');
+        try {
+            const user = await loginUser(email, password);
+    
+            if (user?.data?.token) {
+                await storeToken(user.data.token);
+                router.replace('/home');
+                console.log("Token d'authentification :", user.data.token);
+            } else {
+                setError('Erreur : token manquant dans la réponse du serveur.');
+                console.log('Détail de la réponse :', user);
+            }
+        } catch (error) {
+            setError('Email ou mot de passe incorrect');
+            console.error('Erreur lors de la tentative de connexion :', error);
+        }
     };
     
     
-
+    
+    
     return (
         <KeyboardAvoidingView 
             behavior={Platform.OS === "ios" ? "padding" : "height"} 
