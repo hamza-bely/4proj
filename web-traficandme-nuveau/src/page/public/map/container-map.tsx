@@ -3,7 +3,7 @@ import { useState, useRef, useEffect } from "react";
 import { LuSearch } from "react-icons/lu";
 import { TbRouteSquare } from "react-icons/tb";
 import { MdOutlineGpsFixed } from "react-icons/md";
-import { BiExpand, BiCollapse } from "react-icons/bi"; // Added for minimize/expand icons
+import { BiExpand, BiCollapse } from "react-icons/bi";
 import tt, { Popup, Marker } from "@tomtom-international/web-sdk-maps";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -56,13 +56,11 @@ export default function ContainerMap({ map }: ContainerMapProps) {
         try {
             const trafficInfo = await checkTrafficConditions(startPointRefresh.current, endPointRefresh.current);
 
-            // Si les conditions ont changé et nécessitent un recalcul
             if (trafficInfo.needsRerouting &&
                 (!lastTrafficInfoRef.current ||
                     trafficInfo.congestion !== lastTrafficInfoRef.current.congestion ||
                     trafficInfo.incidents !== lastTrafficInfoRef.current.incidents)) {
 
-                // Afficher une notification toast
                 const message = `${trafficInfo.incidents > 0 ? `${trafficInfo.incidents} incident(s) détecté(s). ` : ''}` +
                     `${trafficInfo.congestion !== 'none' ? `Circulation ${getCongestionLabel(trafficInfo.congestion)}. ` : ''}` +
                     'Recalcul de l\'itinéraire en cours...';
@@ -75,12 +73,9 @@ export default function ContainerMap({ map }: ContainerMapProps) {
                     pauseOnHover: true,
                     draggable: true,
                 });
-
-                // Recalculer l'itinéraire
                 await updateRoute(startPointRefresh.current, endPointRefresh.current);
             }
 
-            // Mettre à jour les dernières infos de trafic
             lastTrafficInfoRef.current = trafficInfo;
 
         } catch (error) {
@@ -103,15 +98,12 @@ export default function ContainerMap({ map }: ContainerMapProps) {
         const incidentsUrl = `https://api.tomtom.com/traffic/services/5/incidentDetails?key=${apiKey}&bbox=${Math.min(startPoint[0], endPoint[0])},${Math.min(startPoint[1], endPoint[1])},${Math.max(startPoint[0], endPoint[0])},${Math.max(startPoint[1], endPoint[1])}&fields={incidents{type,geometry,properties}}`;
 
         try {
-            // Obtenir les informations de congestion
             const flowResponse = await fetch(trafficUrl);
             const flowData = await flowResponse.json();
 
-            // Obtenir les informations d'incidents
             const incidentsResponse = await fetch(incidentsUrl);
             const incidentsData = await incidentsResponse.json();
 
-            // Analyser le niveau de congestion
             let congestion: 'light' | 'moderate' | 'heavy' | 'none' = 'none';
             if (flowData.flowSegmentData) {
                 const currentSpeed = flowData.flowSegmentData.currentSpeed;
@@ -125,10 +117,8 @@ export default function ContainerMap({ map }: ContainerMapProps) {
                 }
             }
 
-            // Compter les incidents
             const incidentsCount = incidentsData.incidents?.length || 0;
 
-            // Déterminer si un recalcul est nécessaire
             const needsRerouting = congestion !== 'none' || incidentsCount > 0;
 
             return {
@@ -212,19 +202,16 @@ export default function ContainerMap({ map }: ContainerMapProps) {
                 .addTo(map);
             markers.current.push(endMarker);
 
-            // Activer le suivi de route et le recalcul automatique
             setIsRouteActive(true);
 
-            // Démarrer le minuteur pour le recalcul de l'itinéraire (toutes les 60 secondes = 60000 ms)
             if (routeIntervalRef.current) {
                 clearInterval(routeIntervalRef.current);
             }
 
             routeIntervalRef.current = window.setInterval(() => {
                 checkTrafficAndRecalculate();
-            }, 60000); // 60000 ms = 1 minute
+            }, 60000);
 
-            // Toast pour indiquer que l'itinéraire est actif avec suivi du trafic
             toast.success("Itinéraire calculé. Surveillance du trafic activée.", {
                 position: "top-right",
                 autoClose: 3000,
@@ -367,13 +354,7 @@ export default function ContainerMap({ map }: ContainerMapProps) {
                             >
                                 {minimized ? <BiExpand size={20} /> : <BiCollapse size={20} />}
                             </button>
-                            <button
-                                onClick={() => setShow(false)}
-                                className="text-gray-500 hover:text-gray-700"
-                                title="Fermer"
-                            >
-                                ✕
-                            </button>
+
                         </div>
 
                         {!minimized && (
@@ -442,7 +423,7 @@ export default function ContainerMap({ map }: ContainerMapProps) {
                 </div>
             ) : (
                 <div className="fixed bottom-4 right-4 bg-white shadow-md rounded-lg p-2 cursor-pointer" onClick={() => setShow(true)}>
-                    <span className="text-sm font-medium">Ouvrir la carte</span>
+                    <span className="text-sm font-medium"></span>
                 </div>
             )}
         </div>
