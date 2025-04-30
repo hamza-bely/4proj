@@ -212,7 +212,19 @@
       "walk": "Walking"
     },
     "stop-tracking" : "Stop the traffic tracking",
-    "to-enlarge" : "Map - Click to enlarge"
+    "to-enlarge" : "Map - Click to enlarge",
+    "cost-details": "Cost details",
+    "generate-qr": "Generate QR code",
+    "route-qr-code": "Route QR code",
+    "scan-qr-code": "Scan this QR code to access route details",
+    "total-cost": "Estimated total cost",
+    "select-fuel-type": "Select fuel type",
+    "fuel": {
+      "electric": "Electric",
+      "gasoline": "Gasoline",
+      "diesel": "Diesel"
+    }
+
   },
   "user-admin" :{
     "protected" : "Protected",

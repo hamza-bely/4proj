@@ -28,7 +28,7 @@ export default function Register({ closeModal }: { closeModal: () => void }) {
             if (response) {
                 Cookies.set("authToken", response.data.token, {
                     expires: 7,
-                    secure: true,
+                    secure: false,
                     sameSite: "Strict",
                     path: "/"
                 });

@@ -8,7 +8,9 @@ import { useTranslation } from "react-i18next";
 import { LuRabbit, LuArrowLeft, LuSave, LuX, LuChevronDown, LuChevronUp } from "react-icons/lu";
 import { TbBarrierBlockOff, TbRoute2 } from "react-icons/tb";
 import { MdQrCode2, MdDirectionsCar, MdDirectionsWalk } from "react-icons/md";
-import { FaBus } from "react-icons/fa";
+import { FaBus, FaGasPump } from "react-icons/fa";
+import { PiEngineBold } from "react-icons/pi";
+import { RiEBike2Line } from "react-icons/ri";
 import useRouteStore from "../../../../services/store/route-store";
 import Cookies from "js-cookie";
 import { getUserRole } from "../../../../services/service/token-service";
@@ -22,6 +24,25 @@ import {
     getCoordinatesFromAddress, TransportMode
 } from "../../../../services/service/map-servie";
 
+// Fuel type constants
+type FuelType = "electric" | "gasoline" | "diesel";
+
+// Constants for consumption calculations
+const CONSUMPTION_RATES = {
+    electric: 18, // kWh per 100km
+    gasoline: 7, // liters per 100km
+    diesel: 6, // liters per 100km
+};
+
+const FUEL_PRICES = {
+    electric: 0.20, // € per kWh
+    gasoline: 1.85, // € per liter
+    diesel: 1.75, // € per liter
+};
+
+// Average toll rate per km for highways in France (estimated)
+const TOLL_RATE_PER_KM = 0.12; // € per km
+
 const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated, startAddress: initialStartAddress }) => {
     const [start, setStart] = useState<Coordinate>({ lat: 47.6640, lon: 2.8357 });
     const [end, setEnd] = useState<Coordinate>({ lat: 45.7640, lon: 4.835 });
@@ -34,6 +55,7 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated, startAdd
     const token = Cookies.get("authToken");
 
     const [showInstructions, setShowInstructions] = useState<boolean>(false);
+    const [showCostDetails, setShowCostDetails] = useState<boolean>(false);
 
     const [startAddress, setStartAddress] = useState<string>("");
     const [endAddress, setEndAddress] = useState<string>("");
@@ -42,6 +64,7 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated, startAdd
     const [showQRCode, setShowQRCode] = useState<boolean>(false);
     const [qrCodeData, setQrCodeData] = useState<string>("");
     const [transportMode, setTransportMode] = useState<TransportMode>("car");
+    const [fuelType, setFuelType] = useState<FuelType>("gasoline");
     const simulationIntervalRef = useRef<number | null>(null);
 
     useEffect(() => {
@@ -105,6 +128,33 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated, startAdd
         return `${km.toFixed(1)} km`;
     };
 
+    const formatCurrency = (amount: number): string => {
+        return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(amount);
+    };
+
+    // Calculate fuel consumption for a given distance in meters
+    const calculateFuelConsumption = (distanceMeters: number, fuelType: FuelType): { consumption: number; cost: number } => {
+        const distanceKm = distanceMeters / 1000;
+
+        // Calculate consumption based on fuel type
+        const consumption = (distanceKm * CONSUMPTION_RATES[fuelType]) / 100;
+
+        // Calculate cost
+        const cost = consumption * FUEL_PRICES[fuelType];
+
+        return { consumption, cost };
+    };
+
+    // Calculate toll cost for a route
+    const calculateTollCost = (distanceMeters: number, avoidTolls: boolean): number => {
+        if (avoidTolls) return 0;
+
+        // Estimate highway distance as a percentage of total distance
+        // For routes with tolls, assume 80% is on highways with tolls
+        const highwayDistanceKm = (distanceMeters / 1000) * 0.8;
+        return highwayDistanceKm * TOLL_RATE_PER_KM;
+    };
+
     const handleCalculateRoutes = async (): Promise<void> => {
         if (!start || !end) {
             toast.error(t("map.select-points"));
@@ -117,6 +167,7 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated, startAdd
         setRouteOptions([]);
         setSelectedRouteId(null);
         setShowInstructions(false);
+        setShowCostDetails(false);
 
         try {
             // Use our new service function with translations
@@ -150,12 +201,14 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated, startAdd
             setSelectedRouteId(routeId);
             onRouteCalculated(JSON.stringify(selectedRoute.coordinates));
             setShowInstructions(false);
+            setShowCostDetails(false);
         }
     };
 
     const handleBackToSearch = () => {
         setShowResults(false);
         setShowInstructions(false);
+        setShowCostDetails(false);
     };
 
     const handleSaveRoute = async () => {
@@ -188,8 +241,10 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated, startAdd
             console.log(routeData)
 
             await createRoute(routeData);
+            toast.success(t("map.route-saved"));
         } catch (error) {
             console.error(t("error.save-route"), error);
+            toast.error(t("error.save-route"));
         } finally {
             setIsSaving(false);
         }
@@ -208,6 +263,10 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated, startAdd
                 return;
             }
 
+            // Calculate fuel and toll costs
+            const { consumption, cost: fuelCost } = calculateFuelConsumption(selectedRoute.distance, fuelType);
+            const tollCost = calculateTollCost(selectedRoute.distance, selectedRoute.avoidTolls);
+
             const qrData = {
                 start: {
                     lat: start.lat,
@@ -224,7 +283,11 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated, startAdd
                     avoidTolls: selectedRoute.avoidTolls,
                     distance: selectedRoute.distance,
                     duration: selectedRoute.duration,
-                    transportMode: transportMode
+                    transportMode: transportMode,
+                    fuelType: fuelType,
+                    fuelConsumption: consumption,
+                    fuelCost: fuelCost,
+                    tollCost: tollCost
                 }
             };
 
@@ -251,18 +314,14 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated, startAdd
         }
     };
 
-    const toggleInstructions = () => {
-        setShowInstructions(!showInstructions);
+    const handleFuelTypeChange = (type: FuelType) => {
+        setFuelType(type);
+        // No need to recalculate routes, just update the cost information
     };
 
-    const getTransportModeText = (mode: TransportMode): string => {
-        switch (mode) {
-            case "car": return t("map.transport.car");
-            case "bike": return t("map.transport.bike");
-            case "bus": return t("map.transport.bus");
-            case "walk": return t("map.transport.walk");
-            default: return t("map.transport.car");
-        }
+    const toggleInstructions = () => {
+        setShowInstructions(!showInstructions);
+        setShowCostDetails(false);
     };
 
     const renderTransportModeSelector = () => (
@@ -288,6 +347,38 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated, startAdd
             >
                 <MdDirectionsWalk size={24}/>
             </button>
+        </div>
+    );
+
+    const renderFuelTypeSelector = () => (
+        <div className="mt-4 mb-4">
+            <h3 className="text-sm font-medium mb-2">{t("map.select-fuel-type")}</h3>
+            <div className="flex justify-center p-2 rounded bg-gray-50">
+                <button
+                    onClick={() => handleFuelTypeChange("electric")}
+                    className={`mx-2 p-2 rounded ${fuelType === "electric" ? "bg-blue-500 text-white" : "bg-white text-gray-700"}`}
+                    title={t("map.fuel.electric")}
+                >
+                    <RiEBike2Line size={20}/>
+                    <span className="text-xs block mt-1">{t("map.fuel.electric")}</span>
+                </button>
+                <button
+                    onClick={() => handleFuelTypeChange("gasoline")}
+                    className={`mx-2 p-2 rounded ${fuelType === "gasoline" ? "bg-blue-500 text-white" : "bg-white text-gray-700"}`}
+                    title={t("map.fuel.gasoline")}
+                >
+                    <FaGasPump size={20}/>
+                    <span className="text-xs block mt-1">{t("map.fuel.gasoline")}</span>
+                </button>
+                <button
+                    onClick={() => handleFuelTypeChange("diesel")}
+                    className={`mx-2 p-2 rounded ${fuelType === "diesel" ? "bg-blue-500 text-white" : "bg-white text-gray-700"}`}
+                    title={t("map.fuel.diesel")}
+                >
+                    <PiEngineBold size={20}/>
+                    <span className="text-xs block mt-1">{t("map.fuel.diesel")}</span>
+                </button>
+            </div>
         </div>
     );
 
@@ -334,6 +425,7 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated, startAdd
         );
     };
 
+
     return (
         <div className="relative">
             <h2 className="flex items-center">
@@ -347,11 +439,13 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated, startAdd
                     </button>
                 )}
                 {showResults ?
-                    (showInstructions ? t("map.driving-instructions") : t("map.available-routes"))
+                    (showInstructions ? t("map.driving-instructions") :
+                        showCostDetails ? t("map.cost-details") : t("map.available-routes"))
                     : t("map.route-planner")}
             </h2>
 
             {!showResults && renderTransportModeSelector()}
+            {!showResults && transportMode === "car" && renderFuelTypeSelector()}
 
             {!showResults ? (
                 <>
@@ -384,42 +478,51 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated, startAdd
                 </>
             ) : (
                 <div className="route-options">
-                    {/* Show route options only when instructions are not displayed */}
-                    {!showInstructions && (
+                    {/* Show route options only when instructions and cost details are not displayed */}
+                    {!showInstructions && !showCostDetails && (
                         <div className="space-y-2">
-                            {routeOptions.map((route) => (
-                                <div
-                                    key={route.id}
-                                    className={`route-item p-3 border rounded cursor-pointer hover:bg-gray-100 ${selectedRouteId === route.id ? 'bg-blue-50 border-blue-300' : ''}`}
-                                    onClick={() => handleRouteSelect(route.id)}
-                                >
-                                    <div className="flex items-center justify-between">
-                                        <div className="flex items-center">
-                                            {route.type === "fastest" ? (
-                                                <LuRabbit className="text-xl mr-2" />
-                                            ) : (
-                                                <TbRoute2 className="text-xl mr-2" />
-                                            )}
-                                            <span className="font-medium">{route.name}</span>
+                            {routeOptions.map((route) => {
+                                const { cost: fuelCost } = calculateFuelConsumption(route.distance, fuelType);
+                                const tollCost = calculateTollCost(route.distance, route.avoidTolls);
+                                const totalCost = fuelCost + tollCost;
+
+                                return (
+                                    <div
+                                        key={route.id}
+                                        className={`route-item p-3 border rounded cursor-pointer hover:bg-gray-100 ${selectedRouteId === route.id ? 'bg-blue-50 border-blue-300' : ''}`}
+                                        onClick={() => handleRouteSelect(route.id)}
+                                    >
+                                        <div className="flex items-center justify-between">
+                                            <div className="flex items-center">
+                                                {route.type === "fastest" ? (
+                                                    <LuRabbit className="text-xl mr-2" />
+                                                ) : (
+                                                    <TbRoute2 className="text-xl mr-2" />
+                                                )}
+                                                <span className="font-medium">{route.name}</span>
+                                            </div>
+                                            <div className="flex items-center">
+                                                {route.avoidTolls && (
+                                                    <TbBarrierBlockOff className="text-lg ml-2" title={t("map.no-tolls")} />
+                                                )}
+                                                <span className="ml-2 text-sm font-medium" title={t("map.total-cost")}>
+                                                    {formatCurrency(totalCost)}
+                                                </span>
+                                            </div>
                                         </div>
-                                        {route.avoidTolls && (
-                                            <TbBarrierBlockOff className="text-lg ml-2" />
-                                        )}
+                                        <div className="text-sm text-gray-600 mt-1">
+                                            <span>{formatDistance(route.distance)}</span>
+                                            <span className="mx-2">•</span>
+                                            <span>{formatDuration(route.duration)}</span>
+                                        </div>
                                     </div>
-                                    <div className="text-sm text-gray-600 mt-1">
-                                        <span>{formatDistance(route.distance)}</span>
-                                        <span className="mx-2">•</span>
-                                        <span>{formatDuration(route.duration)}</span>
-                                    </div>
-                                </div>
-                            ))}
+                                );
+                            })}
                         </div>
                     )}
 
-                    {/* Always render the driving instructions toggle if a route is selected */}
                     {selectedRouteId && !showInstructions && renderDrivingInstructions()}
 
-                    {/* When instructions are showing, display the full instructions list */}
                     {showInstructions && selectedRouteId && (
                         <div className="mt-2">
                             <div className="flex justify-between items-center mb-4">
@@ -466,73 +569,62 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated, startAdd
                                                 </li>
                                             ));
                                         }
-                                        return <li>{t("map.no-instructions")}</li>;
                                     })()}
                                 </ol>
                             </div>
                         </div>
                     )}
 
-                    {role && !showInstructions && <div className="flex justify-center mt-4 space-x-2">
-                        <button
-                            onClick={handleSaveRoute}
-                            disabled={isSaving || !selectedRouteId}
-                            className="rounded-sm px-4 py-2 text-sm font-semibold text-white bg-green-600 hover:bg-green-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-600 flex items-center"
-                        >
-                            <LuSave className="mr-2" />
-                            {isSaving ? t("map.saving") : t("map.save-route")}
-                        </button>
 
-                        <button
-                            onClick={handleGenerateQRCode}
-                            disabled={!selectedRouteId}
-                            className="rounded-sm px-4 py-2 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 flex items-center"
-                        >
-                            <MdQrCode2 className="mr-2" />
-                            {t("map.qr-code")}
-                        </button>
-                    </div>}
+
+                    {selectedRouteId && !showInstructions && !showCostDetails && (
+                        <div className="mt-6 flex justify-center gap-4">
+                            {role && (
+                                <button
+                                    onClick={handleSaveRoute}
+                                    disabled={isSaving}
+                                    className="flex items-center px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+                                >
+                                    <LuSave className="mr-2" />
+                                    {isSaving ? t("map.saving") : t("map.save-route")}
+                                </button>
+                            )}
+                            <button
+                                onClick={handleGenerateQRCode}
+                                className="flex items-center px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors"
+                            >
+                                <MdQrCode2 className="mr-2" />
+                                {t("map.generate-qr")}
+                            </button>
+                        </div>
+                    )}
                 </div>
             )}
 
+            {/* QR Code Modal */}
             {showQRCode && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                    <div className="bg-white rounded-lg p-6 max-w-md w-full">
+                    <div className="bg-white rounded-lg p-6 w-96 max-w-lg">
                         <div className="flex justify-between items-center mb-4">
-                            <h3 className="text-lg font-medium">{t("map.scan-qr")}</h3>
+                            <h3 className="text-xl font-medium">{t("map.route-qr-code")}</h3>
                             <button
                                 onClick={handleCloseQRModal}
-                                className="text-gray-500 hover:text-gray-700"
-                                aria-label={t("common.close")}
+                                className="text-gray-400 hover:text-gray-500"
                             >
                                 <LuX size={24} />
                             </button>
                         </div>
-
-                        <div className="flex justify-center mb-4">
+                        <div className="flex justify-center p-4 bg-white rounded-lg">
                             <QRCodeSVG
                                 value={qrCodeData}
                                 size={250}
-                                level="M"
+                                level="H"
                                 includeMargin={true}
                             />
                         </div>
-
-                        <div className="text-center text-sm text-gray-500 mb-4">
-                            <p>{t("map.qr-contains")}</p>
-                            <p>{t("map.from")}: {startAddress}</p>
-                            <p>{t("map.to")}: {endAddress}</p>
-                            <p>{t("map.transport-mode")}: {getTransportModeText(transportMode)}</p>
-                        </div>
-
-                        <div className="flex justify-center">
-                            <button
-                                onClick={handleCloseQRModal}
-                                className="rounded-sm px-4 py-2 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700"
-                            >
-                                {t('common.close')}
-                            </button>
-                        </div>
+                        <p className="text-sm text-center mt-4 text-gray-600">
+                            {t("map.scan-qr-code")}
+                        </p>
                     </div>
                 </div>
             )}

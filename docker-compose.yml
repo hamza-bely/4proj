@@ -1,13 +1,17 @@
 version: "3.8"
 services:
   frontend:
-    build: ./web-traficandme-nuveau
+    build:
+      context: ./web-traficandme-nuveau
+      args:
+        VITE_API_URL: ${API_URL}
+        VITE_TOMTOM_API_KEY: ${TOMTOM_API_KEY}
     ports:
       - "5181:80"
     depends_on:
       - backend
     environment:
-      - VITE_API_URL=${API_URL:-http://localhost:8080/api/}
+      - VITE_API_URL=${API_URL}
       - VITE_TOMTOM_API_KEY=${TOMTOM_API_KEY}
     restart: unless-stopped
 
@@ -17,9 +21,9 @@ services:
       - "8080:8080"
     environment:
       - CORS_ALLOWED_ORIGINS=${CORS_ALLOWED_ORIGINS:-http://localhost:5181,http://localhost:8081}
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/traficandmedb
-      - SPRING_DATASOURCE_USERNAME=${DB_USER:-postgres}
-      - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD:-postgres}
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/postgres
+      - SPRING_DATASOURCE_USERNAME=${DB_USER}
+      - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
       - SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GITHUB_CLIENT_ID=${GITHUB_CLIENT_ID}
       - SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GITHUB_CLIENT_SECRET=${GITHUB_CLIENT_SECRET}
       - SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
@@ -34,8 +38,8 @@ services:
     restart: always
     environment:
       POSTGRES_DB: traficandmedb
-      POSTGRES_USER: ${DB_USER:-postgres}
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
     volumes:
       - db_data:/var/lib/postgresql/data
     ports:

@@ -205,7 +205,20 @@
       "walk": "À pied"
     },
     "stop-tracking" : "Arrêter le suivi du trafic",
-    "to-enlarge" : "Carte - Cliquez pour agrandir"
+    "to-enlarge" : "Carte - Cliquez pour agrandir",
+    "available-routes": "Itinéraires disponibles",
+    "cost-details": "Détails des coûts",
+    "generate-qr": "Générer QR code",
+    "route-qr-code": "QR code de l'itinéraire",
+    "scan-qr-code": "Scannez ce QR code pour accéder aux détails de l'itinéraire",
+    "total-cost": "Coût total estimé",
+    "select-fuel-type": "Sélectionnez le type de carburant",
+    "fuel": {
+      "electric": "Électrique",
+      "gasoline": "Essence",
+      "diesel": "Diesel"
+    }
+
   },
   "user-admin": {
     "protected" : "Protégé",
