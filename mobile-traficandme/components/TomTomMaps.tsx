@@ -1,167 +1,147 @@
-import React, { useEffect, useRef, useState, useMemo, useCallback } from 'react';
-import { View, StyleSheet, ActivityIndicator, Text } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { View, StyleSheet, ActivityIndicator } from 'react-native';
 import { WebView } from 'react-native-webview';
-import { useLocation } from '@hooks/useLocation';
 import { DeviceMotion } from 'expo-sensors';
-import TomTomMapProps from '@interfaces/TomTomMapProps';
+import { useLocation } from '@hooks/useLocation';
+import ReportData from '@interfaces/ReportData';
+import { ReportType } from '@core/types';
 import { tomtomInjectedFunctions } from '@hooks/injectedScript';
+import { fetchReports } from '@services/apiService';
+import { Image } from 'react-native';
 
 
-export default function TomTomMap({ destination, routeOptions, selectedRoute, userPosition }: TomTomMapProps) {
-  
+const reportIcons: Record<ReportType, any> = {
+  TRAFFIC:       require('@/assets/images/traffic.png'),
+  POLICE_CHECKS: require('@/assets/images/police.png'),
+  ACCIDENTS:     require('@/assets/images/crash.png'),
+  OBSTACLES:     require('@/assets/images/danger.png'),
+  ROADS_CLOSED:  require('@/assets/images/roads_closed.png'),
+};
+
+export default function TomTomMap() {
   const webviewRef = useRef<WebView | null>(null);
   const { location, error } = useLocation();
-  const [orientation, setOrientation] = useState<number>(0);
+  const [reports, setReports] = useState<ReportData[]>([]);
 
-  useEffect(() => {
-    const timeout = setTimeout(() => {
-      webviewRef.current?.injectJavaScript(tomtomInjectedFunctions);
-    }, 2000);
-  
-    return () => clearTimeout(timeout);
-  }, [location]);
+
+  const handleWebViewLoad = () => {
+    webviewRef.current?.injectJavaScript(tomtomInjectedFunctions);
+    fetchReports().then(fetched => {
+      setReports(fetched);
+      fetched.forEach(report => {
+        const asset = Image.resolveAssetSource(reportIcons[report.type]);
+        const js = `
+          if (window.addReportMarker) {
+            addReportMarker(${report.longitude}, ${report.latitude}, "${asset.uri}");
+          }
+        `;
+        webviewRef.current?.injectJavaScript(js);
+      });
+    }).catch(err => console.error('fetchReports error', err));
+  };
 
   useEffect(() => {
     const subscription = DeviceMotion.addListener(({ rotation }) => {
-      const { alpha } = rotation;
-      setOrientation(alpha);
+      const alpha = rotation.alpha;
       if (location) {
-        webviewRef.current?.injectJavaScript(`
+        const js = `
           if (window.updateUserLocation) {
             updateUserLocation(${location.longitude}, ${location.latitude}, ${alpha});
           }
-        `);
+        `;
+        webviewRef.current?.injectJavaScript(js);
       }
     });
-
     DeviceMotion.setUpdateInterval(100);
     return () => subscription.remove();
   }, [location]);
 
-  const updateRoute = useCallback(() => {
-    if (destination && location) {
-      webviewRef.current?.injectJavaScript(`
+  useEffect(() => {
+    const destLng = null;
+    const destLat = null;
+    if (location && destLng != null && destLat != null) {
+      const js = `
         if (window.searchAndRoute) {
-          searchAndRoute('${destination.latitude},${destination.longitude}');
+          searchAndRoute('${destLat},${destLng}');
         }
-      `);
+      `;
+      webviewRef.current?.injectJavaScript(js);
     }
-  }, [destination, location]);
-
-  useEffect(() => {
-    updateRoute();
-  }, [updateRoute]);
-
-  useEffect(() => {
-    if (routeOptions?.length) {
-      webviewRef.current?.injectJavaScript(`
-        if (window.displayAllRoutes) {
-          displayAllRoutes(${JSON.stringify(routeOptions)});
-        }
-      `);
-    }
-  }, [routeOptions]);
-
-  useEffect(() => {
-    if (selectedRoute) {
-      webviewRef.current?.injectJavaScript(`
-        if (window.highlightSelectedRoute) {
-          highlightSelectedRoute(${JSON.stringify(selectedRoute)});
-        }
-      `);
-    } else {
-      webviewRef.current?.injectJavaScript(`
-        if (window.clearRoute) {
-          clearRoute();
-        }
-      `);
-    }
-  }, [selectedRoute]);
-
-  const htmlContent = useMemo(() => {
-    if (!location) return '';
-
-    return `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <meta name="viewport" content="initial-scale=1.0, width=device-width"/>
-        <script src="https://api.tomtom.com/maps-sdk-for-web/cdn/6.x/6.19.0/maps/maps-web.min.js"></script>
-        <script src="https://api.tomtom.com/maps-sdk-for-web/cdn/6.x/6.19.0/services/services-web.min.js"></script>
-        <link rel="stylesheet" href="https://api.tomtom.com/maps-sdk-for-web/cdn/6.x/6.19.0/maps/maps.css"/>
-        <style>
-          html, body, #map { margin: 0; padding: 0; height: 100%; width: 100%; }
-        </style>
-      </head>
-      <body>
-        <div id="map"></div>
-        <script>
-          let map, userMarker, destMarker;
-          let userCoords = [${location.longitude}, ${location.latitude}];
-
-          tt.setProductInfo('DelonApp', '1.0');
-
-          map = tt.map({
-            key: 'QBsKzG3zoRyZeec28eUDje0U8DeNoRSO',
-            container: 'map',
-            center: userCoords,
-            zoom: 18,
-            pitch: 100,
-            dragRotate: true,
-            bearingSnap: 7,
-          });
-
-          map.addControl(new tt.FullscreenControl());
-
-          const userIcon = document.createElement('div');
-          userIcon.style.width = '40px';
-          userIcon.style.height = '40px';
-          userIcon.style.display = 'flex';
-          userIcon.style.justifyContent = 'center';
-          userIcon.style.alignItems = 'center';
-
-          const userIconInner = document.createElement('div');
-          userIconInner.style.width = '100%';
-          userIconInner.style.height = '100%';
-          userIconInner.style.backgroundImage = 'url(https://img.icons8.com/?size=100&id=HZC1E42sHiI3&format=png&color=000000)';
-          userIconInner.style.backgroundSize = 'contain';
-          userIconInner.style.backgroundRepeat = 'no-repeat';
-          userIconInner.style.transition = 'transform 0.5s ease';
-          userIconInner.style.transform = 'rotate(0deg)';
-
-          userIcon.appendChild(userIconInner);
-          userMarker = new tt.Marker({ element: userIcon }).setLngLat(userCoords).addTo(map);
-        </script>
-      </body>
-      </html>
-    `;
   }, [location]);
 
-  if (!location) {
+  const htmlContent = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta name="viewport" content="initial-scale=1.0, width=device-width"/>
+      <script src="https://api.tomtom.com/maps-sdk-for-web/cdn/6.x/6.19.0/maps/maps-web.min.js"></script>
+      <script src="https://api.tomtom.com/maps-sdk-for-web/cdn/6.x/6.19.0/services/services-web.min.js"></script>
+      <link rel="stylesheet" href="https://api.tomtom.com/maps-sdk-for-web/cdn/6.x/6.19.0/maps/maps.css"/>
+      <style>html, body, #map { margin:0; padding:0; height:100%; width:100%; }</style>
+    </head>
+    <body>
+      <div id="map"></div>
+      <script>
+        const defaultCoords = [0, 0];
+        tt.setProductInfo('DelonApp', '1.0');
+        const map = tt.map({
+          key: 'QBsKzG3zoRyZeec28eUDje0U8DeNoRSO',
+          container: 'map',
+          center: defaultCoords,
+          zoom: 17,
+          pitch: 40,
+          bearingSnap: 7,
+        });
+        map.addControl(new tt.FullscreenControl());
+
+        // Set up user marker placeholder
+        let userCoords = defaultCoords;
+        let userMarker = null;
+        let userIconInner = null;
+        function createUserMarker() {
+          const icon = document.createElement('div');
+          icon.style.width = '40px'; icon.style.height = '40px';
+          const inner = document.createElement('div');
+          inner.style.width = '100%'; inner.style.height = '100%';
+          inner.style.backgroundImage = 'url(https://img.icons8.com/?size=100&id=HZC1E42sHiI3&format=png&color=000000)';
+          inner.style.backgroundSize = 'contain'; inner.style.transition = 'transform 0.5s ease';
+          icon.appendChild(inner);
+          userIconInner = inner;
+          userMarker = new tt.Marker({ element: icon }).setLngLat(userCoords).addTo(map);
+        }
+        createUserMarker();
+
+        let destMarker = null;
+      </script>
+    </body>
+    </html>
+  `;
+
+  if (error || !location) {
     return (
       <View style={styles.loader}>
         <ActivityIndicator size="large" color="#0000ff" />
-        <Text>Chargement de la position...</Text>
       </View>
     );
   }
 
   return (
-    <WebView
-      ref={webviewRef}
-      originWhitelist={['*']}
-      source={{ html: htmlContent }}
-      javaScriptEnabled
-      domStorageEnabled
-      style={{ flex: 1 }}
-    />
+    <View style={styles.container}>
+      <WebView
+        ref={webviewRef}
+        originWhitelist={['*']}
+        source={{ html: htmlContent }}
+        style={styles.webview}
+        javaScriptEnabled
+        domStorageEnabled
+        onLoadEnd={handleWebViewLoad}
+      />
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  loader: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
+  container: { flex: 1 },
+  webview: { flex: 1 },
+  loader: { flex: 1, justifyContent: 'center', alignItems: 'center' },
 });

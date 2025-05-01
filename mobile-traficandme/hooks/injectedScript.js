@@ -122,12 +122,12 @@ export const tomtomInjectedFunctions = `
 
     window.clearRoute = function() {
         if (map.getLayer('route')) {
-        map.removeLayer('route');
-        map.removeSource('route');
+            map.removeLayer('route');
+            map.removeSource('route');
         }
         if (map.getLayer('selected-route')) {
-        map.removeLayer('selected-route');
-        map.removeSource('selected-route');
+            map.removeLayer('selected-route');
+            map.removeSource('selected-route');
         }
         for (let i = 0; i < 3; i++) {
         if (map.getLayer('route-' + i)) {
@@ -136,8 +136,27 @@ export const tomtomInjectedFunctions = `
         }
         }
         if (destMarker) {
-        destMarker.remove();
-        destMarker = null;
+            destMarker.remove();
+            destMarker = null;
         }
+    };
+
+    /**
+   * Ajoute un marker « report » sur la carte avec une icône custom.
+   * @param {number} lng Longitude du signalement
+   * @param {number} lat Latitude du signalement
+   * @param {string} iconUrl URL publique de l'icône (ex. via Image.resolveAssetSource)
+   */
+    window.addReportMarker = function(lng, lat, iconUrl) {
+    const el = document.createElement('img');
+    el.src = iconUrl;
+    el.style.width = '40px';
+    el.style.height = '40px';
+    el.style.objectFit = 'contain';
+
+
+    new tt.Marker({ element: el })
+        .setLngLat([lng, lat])
+        .addTo(map);
     };
 `;

@@ -1,7 +1,6 @@
 
 import axios from 'axios';
 import * as Location from 'expo-location';
-import NavigationInstruction from '@interfaces/NavigationInstruction';
 import  ReportData  from '@interfaces/ReportData';
 
 
@@ -91,6 +90,42 @@ export const createReport = async (reportData: ReportData): Promise<void> => {
         throw error;
     }
 };
+
+
+export const fetchReports = async (): Promise<ReportData[]> => {
+    try {
+        const response = await fetch(`${API_URL}/api/reports`, {
+            method: 'GET',
+            headers: {
+            'Accept': 'application/json',
+            },
+        });
+    
+        if (response.status === 204) {
+            return [];
+        }
+
+        const text = await response.text();
+    
+        if (!text) {
+            return [];
+        }
+    
+        const body = JSON.parse(text) as { data: ReportData[]; message?: string };
+    
+        if (!response.ok) {
+            console.error('Erreur retournée par le serveur:', body);
+            throw new Error(body.message || 'Erreur lors de la récupération des rapports');
+        }
+    
+        return body.data || [];
+        } 
+    catch (err) {
+        console.error("Erreur lors de l'appel API fetchReports :", err);
+        throw err;
+    }
+};
+
 
 
 
