@@ -1,4 +1,7 @@
 
+
+const EXPO_PUBLIC_TOMTOM_API_KEY = process.env.EXPO_PUBLIC_TOMTOM_API_KEY;
+
 export const tomtomInjectedFunctions = `
     window.updateUserLocation = function(lng, lat, heading) {
         userCoords = [lng, lat];
@@ -15,7 +18,7 @@ export const tomtomInjectedFunctions = `
     window.searchAndRoute = function(coords) {
         const [lat, lon] = coords.split(',').map(Number);
         const destCoords = [lon, lat];
-        fetch('https://api.tomtom.com/routing/1/calculateRoute/' + userCoords[1] + ',' + userCoords[0] + ':' + lat + ',' + lon + '/json?key=QBsKzG3zoRyZeec28eUDje0U8DeNoRSO&routeType=fastest&maxAlternatives=3')
+        fetch('https://api.tomtom.com/routing/1/calculateRoute/' + userCoords[1] + ',' + userCoords[0] + ':' + lat + ',' + lon + '/json?key=${EXPO_PUBLIC_TOMTOM_API_KEY}&routeType=fastest&maxAlternatives=3')
         .then(res => res.json())
         .then(routeData => {
             if (!routeData.routes || routeData.routes.length === 0) {

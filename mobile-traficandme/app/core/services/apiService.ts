@@ -2,16 +2,18 @@
 import axios from 'axios';
 import * as Location from 'expo-location';
 import  ReportData  from '@interfaces/ReportData';
+import Constants from 'expo-constants';
 
 
-const API_URL: string = 'http://204.216.214.8:8080';
-const API_KEY = 'QBsKzG3zoRyZeec28eUDje0U8DeNoRSO';
+
+const EXPO_PUBLIC_API_URL = process.env.EXPO_PUBLIC_API_URL;
+const EXPO_PUBLIC_TOMTOM_API_KEY = process.env.EXPO_PUBLIC_TOMTOM_API_KEY;
 
 
 export const loginUser = async (email: string, password: string): Promise<any> => {
 
     try {
-        const response = await axios.post(`${API_URL}/api/auth/authenticate`, {
+        const response = await axios.post(`${EXPO_PUBLIC_API_URL}/api/auth/authenticate`, {
             email,
             password,
         });
@@ -26,7 +28,7 @@ export const loginUser = async (email: string, password: string): Promise<any> =
 
 export const registerUser = async (firstName: string,lastName: string,email: string,password: string): Promise<any> => {
     try {
-        const response = await axios.post(`${API_URL}/api/auth/register`, {
+        const response = await axios.post(`${EXPO_PUBLIC_API_URL}/api/auth/register`, {
             firstName,
             lastName,
             email,
@@ -42,7 +44,7 @@ export const registerUser = async (firstName: string,lastName: string,email: str
 
 export const fetchSuggestions = async (text: string) => {
     try {
-        const response = await fetch(`https://api.tomtom.com/search/2/search/${encodeURIComponent(text)}.json?key=${API_KEY}&typeahead=true&limit=5`);
+        const response = await fetch(`https://api.tomtom.com/search/2/search/${encodeURIComponent(text)}.json?key=${EXPO_PUBLIC_TOMTOM_API_KEY}&typeahead=true&limit=5`);
         const data = await response.json();
         return data.results;
     } catch (error) {
@@ -56,7 +58,7 @@ export const fetchRouteOption = async (destination: { latitude: number; longitud
         const location = await Location.getCurrentPositionAsync({});
         const { latitude, longitude } = location.coords;
         const response = await fetch(
-            `https://api.tomtom.com/routing/1/calculateRoute/${latitude},${longitude}:${destination.latitude},${destination.longitude}/json?key=${API_KEY}&routeType=fastest&maxAlternatives=3&instructionsType=text&language=fr`
+            `https://api.tomtom.com/routing/1/calculateRoute/${latitude},${longitude}:${destination.latitude},${destination.longitude}/json?key=${EXPO_PUBLIC_TOMTOM_API_KEY}&routeType=fastest&maxAlternatives=3&instructionsType=text&language=fr`
         );
         const data = await response.json();
         return data.routes;
@@ -69,7 +71,7 @@ export const fetchRouteOption = async (destination: { latitude: number; longitud
 
 export const createReport = async (reportData: ReportData): Promise<void> => {
     try {
-        const response = await fetch(`${API_URL}/api/reports/create`, {
+        const response = await fetch(`${EXPO_PUBLIC_API_URL}/api/reports/create`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -94,7 +96,7 @@ export const createReport = async (reportData: ReportData): Promise<void> => {
 
 export const fetchReports = async (): Promise<ReportData[]> => {
     try {
-        const response = await fetch(`${API_URL}/api/reports`, {
+        const response = await fetch(`${EXPO_PUBLIC_API_URL}/api/reports`, {
             method: 'GET',
             headers: {
             'Accept': 'application/json',

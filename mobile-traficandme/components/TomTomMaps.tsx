@@ -8,7 +8,9 @@ import { ReportType } from '@core/types';
 import { tomtomInjectedFunctions } from '@hooks/injectedScript';
 import { fetchReports } from '@services/apiService';
 import { Image } from 'react-native';
+import TomTomMapProps from '@interfaces/TomTomMapProps';
 
+const EXPO_PUBLIC_TOMTOM_API_KEY = process.env.EXPO_PUBLIC_TOMTOM_API_KEY;
 
 const reportIcons: Record<ReportType, any> = {
   TRAFFIC:       require('@/assets/images/traffic.png'),
@@ -18,7 +20,7 @@ const reportIcons: Record<ReportType, any> = {
   ROADS_CLOSED:  require('@/assets/images/roads_closed.png'),
 };
 
-export default function TomTomMap() {
+export default function TomTomMap({destination, routeOptions, selectedRoute}: TomTomMapProps) {
   const webviewRef = useRef<WebView | null>(null);
   const { location, error } = useLocation();
   const [reports, setReports] = useState<ReportData[]>([]);
@@ -56,18 +58,50 @@ export default function TomTomMap() {
     return () => subscription.remove();
   }, [location]);
 
+
   useEffect(() => {
-    const destLng = null;
-    const destLat = null;
-    if (location && destLng != null && destLat != null) {
-      const js = `
-        if (window.searchAndRoute) {
-          searchAndRoute('${destLat},${destLng}');
-        }
-      `;
-      webviewRef.current?.injectJavaScript(js);
+    if (!location || !destination) return;
+  
+    const js = `
+      if (window.searchAndRoute) {
+        searchAndRoute('${destination.latitude},${destination.longitude}');
+      }
+    `;
+    webviewRef.current?.injectJavaScript(js);
+  }, [location, destination]);
+
+
+  useEffect(() => {
+    if (!routeOptions?.length) return;
+  
+    const routesJson = JSON.stringify(routeOptions);
+    const js = `
+      if (window.displayAllRoutes) {
+        displayAllRoutes(${routesJson});
+      }
+    `;
+    webviewRef.current?.injectJavaScript(js);
+  }, [routeOptions]);
+
+
+  useEffect(() => {
+    if (!selectedRoute) {
+
+      webviewRef.current?.injectJavaScript(`
+        if (window.clearRoute) clearRoute();
+      `);
+      return;
     }
-  }, [location]);
+    const selectedJson = JSON.stringify(selectedRoute);
+    webviewRef.current?.injectJavaScript(`
+      if (window.highlightSelectedRoute) {
+        highlightSelectedRoute(${selectedJson});
+      }
+    `);
+  }, [selectedRoute]);
+  
+  
+  
 
   const htmlContent = `
     <!DOCTYPE html>
@@ -85,7 +119,7 @@ export default function TomTomMap() {
         const defaultCoords = [0, 0];
         tt.setProductInfo('DelonApp', '1.0');
         const map = tt.map({
-          key: 'QBsKzG3zoRyZeec28eUDje0U8DeNoRSO',
+          key: '${EXPO_PUBLIC_TOMTOM_API_KEY}',
           container: 'map',
           center: defaultCoords,
           zoom: 17,

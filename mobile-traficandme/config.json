@@ -11,6 +11,10 @@
     "ios": {
       "supportsTablet": true
     },
+    "extra": {
+      "apiUrl": "process.env.API_URL",
+      "tomTomKey": "process.env.TOMTOM_API_KEY"
+    },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
