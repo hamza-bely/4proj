@@ -8,16 +8,16 @@
     "loading": "Chargement...",
     "edit": "Modifier",
     "delete": "Supprimer",
-    "delete-definitive": "Supprimer definitive",
+    "delete-definitive": "Supprimer definitivement",
     "email" : "Email",
     "actions": "Actions",
     "confirm": "Confirm",
     "message-confirm-delete" : "Êtes-vous sûr de vouloir supprimer ?",
-    "status" : "Status",
-    "role" : "Role",
+    "status" : "Statut",
+    "role" : "Rôle",
     "createDate" : "Date de création",
     "admin" : "Administrateur",
-    "add": "Add",
+    "add": "Ajouter",
     "error-global" : "Quelque chose s'est mal passé, réessayez plus tard",
     "close": "Fermer",
     "save": "Sauvegarder",
@@ -43,7 +43,7 @@
   "reportStatus": {
     "pending": "En attente",
     "available": "Disponible",
-    "canceled": "Canceled"
+    "canceled": "Annulé"
   },
 
   "header": {
@@ -51,7 +51,7 @@
     "home": "Accueil",
     "map": "Carte",
     "log-in": "Log in",
-    "register": "Registre",
+    "register": "S'inscrire",
     "login": "Se connecter",
     "company": "TraficAndMe",
     "users": "Utilisateurs"
