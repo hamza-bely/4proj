@@ -19,6 +19,7 @@ export default function ReportModal({ visible, onClose }: { visible: boolean; on
     const handleReport = async (reportType: ReportType) => {
         try {
             const { status } = await Location.requestForegroundPermissionsAsync();
+
             if (status !== 'granted') {
                 Alert.alert('Permission refusée', 'La permission de localisation est requise pour faire un report.');
                 return;
@@ -30,8 +31,9 @@ export default function ReportModal({ visible, onClose }: { visible: boolean; on
                 latitude: location.coords.latitude,
                 longitude: location.coords.longitude,
                 status: 'AVAILABLE',
+                address: 'AVAILABLE',
             };
-    
+            console.log('Report data:', reportData);
             await createReport(reportData);
             Alert.alert('Succès', 'Votre report a été envoyé.');
             onClose();
@@ -39,6 +41,7 @@ export default function ReportModal({ visible, onClose }: { visible: boolean; on
             console.error('Erreur lors de la création du report', error);
             Alert.alert('Erreur', 'Impossible de créer le report.');
         }
+        
     };
 
     return (

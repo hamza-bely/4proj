@@ -1,11 +1,13 @@
 import axios from 'axios';
 import * as Location from 'expo-location';
 import  ReportData  from '@interfaces/ReportData';
-
+import asyncStorage from '@services/localStorage';
 
 const EXPO_PUBLIC_API_URL = process.env.EXPO_PUBLIC_API_URL;
 const EXPO_PUBLIC_TOMTOM_API_KEY = process.env.EXPO_PUBLIC_TOMTOM_API_KEY;
 
+const { getToken } = asyncStorage();
+const { removeToken } = asyncStorage();
 
 export const loginUser = async (email: string, password: string): Promise<any> => {
 
@@ -68,15 +70,20 @@ export const fetchRouteOption = async (destination: { latitude: number; longitud
 
 export const createReport = async (reportData: ReportData): Promise<void> => {
     try {
+        const token = await getToken();
         const response = await fetch(`${EXPO_PUBLIC_API_URL}/api/reports/create`, {
+            
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
             },
             body: JSON.stringify(reportData),
         });
-
+        console.log(response)
         const responseBody = await response.json();
+        
+
 
         if (!response.ok) {
             console.error('Erreur retournée par le serveur:', responseBody);
@@ -93,10 +100,12 @@ export const createReport = async (reportData: ReportData): Promise<void> => {
 
 export const fetchReports = async (): Promise<ReportData[]> => {
     try {
+        const token = await getToken();
         const response = await fetch(`${EXPO_PUBLIC_API_URL}/api/reports`, {
             method: 'GET',
             headers: {
             'Accept': 'application/json',
+            'Authorization': `Bearer ${token}`
             },
         });
     

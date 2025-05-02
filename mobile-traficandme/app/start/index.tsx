@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { View, Text, StyleSheet, ImageBackground,Pressable } from 'react-native';
-import { supabase } from "@core/services/supabase";
 import { useRouter, Link } from "expo-router";
 
 export default function StartScreen() {

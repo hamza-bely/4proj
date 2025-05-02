@@ -5,4 +5,5 @@ export default interface ReportData  {
     latitude: number;
     longitude: number;
     status: ReportStatus;
+    address: string;
 }
