@@ -38,6 +38,8 @@ export default function HomeScreen() {
   const [modalVisible, setModalVisible] = useState(false);
   const { location, error } = useLocation();
   const [userPosition, setUserPosition] = useState<{ latitude: number; longitude: number } | null>(location);
+
+  
   const EXPO_PUBLIC_TOMTOM_API_KEY = process.env.EXPO_PUBLIC_TOMTOM_API_KEY;
 
   useEffect(() => {

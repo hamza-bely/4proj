@@ -3,10 +3,6 @@ import { View, Text, StyleSheet, ImageBackground,Pressable } from 'react-native'
 import { useRouter, Link } from "expo-router";
 
 export default function StartScreen() {
-  const router = useRouter();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-
 
 
   return (

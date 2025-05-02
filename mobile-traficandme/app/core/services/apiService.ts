@@ -101,38 +101,40 @@ export const createReport = async (reportData: ReportData): Promise<void> => {
 export const fetchReports = async (): Promise<ReportData[]> => {
     try {
         const token = await getToken();
-        const response = await fetch(`${EXPO_PUBLIC_API_URL}/api/reports`, {
+
+        const response = await fetch(`${EXPO_PUBLIC_API_URL}/api/reports/get-all`, {
             method: 'GET',
             headers: {
-            'Accept': 'application/json',
-            'Authorization': `Bearer ${token}`
+                'Accept': 'application/json',
+                'Authorization': `Bearer ${token}`
             },
         });
-    
+
         if (response.status === 204) {
             return [];
         }
 
         const text = await response.text();
-    
+
         if (!text) {
             return [];
         }
-    
+
         const body = JSON.parse(text) as { data: ReportData[]; message?: string };
-    
+
         if (!response.ok) {
             console.error('Erreur retournée par le serveur:', body);
             throw new Error(body.message || 'Erreur lors de la récupération des rapports');
         }
-    
+
         return body.data || [];
-        } 
-    catch (err) {
+    } catch (err) {
         console.error("Erreur lors de l'appel API fetchReports :", err);
         throw err;
     }
 };
+
+
 
 
 
