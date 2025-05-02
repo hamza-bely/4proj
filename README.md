@@ -147,7 +147,7 @@ Le tableau ci-dessous présente l'état d'avancement des fonctionnalités par pl
 |                                   | Connexion standard                             | 5      | ✅   | ✅    | ✅  |
 | Carte                             | Affichage carte                                | 10     | ✅   | ✅    | ✅  |
 |                                   | Choix itinéraires                              | 30     | ✅   | ✅    | ✅  |
-|                                   | Plusieurs trajets avec durée                   | 20     | ✅   | ❌    | ✅  |
+|                                   | Plusieurs trajets avec durée                   | 20     | ✅   | ✅    | ✅  |
 |                                   | Itinéraire sans péage                          | 5      | ✅   | ❌    | ✅  |
 |                                   | Choix infos du trajet                          | 5      | ❌   | ❌    | ⚠️  |
 | Navigation en temps réel          | Navigation live                                | 30     | ✅   | ⚠️    | ✅  |
