@@ -14,7 +14,7 @@ import { getDistanceFromLatLonInM } from '@utils/distance';
 import { fetchSuggestions, fetchRouteOption } from '@services/apiService';
 import { useLocation } from '@hooks/useLocation';
 import getInstructionIcon from '@utils/getInstructionIcon';
-
+import { styles } from './styles';
 
 
 export default function HomeScreen() {
@@ -27,7 +27,6 @@ export default function HomeScreen() {
   const [suggestions, setSuggestions] = useState<AddressSuggestion[]>([]);
   const [selectedAddress, setSelectedAddress] = useState<AddressSuggestion | null>(null);
   const [speed, setSpeed] = useState<number | null>(null);
-  const [travelTime, setTravelTime] = useState<number | null>(null);
   const [routeOptions, setRouteOptions] = useState<RouteOption[]>([]);
   const [selectedRoute, setSelectedRoute] = useState<RouteOption | null>(null);
   const [currentInstruction, setCurrentInstruction] = useState<string | null>(null);
@@ -39,6 +38,7 @@ export default function HomeScreen() {
   const [modalVisible, setModalVisible] = useState(false);
   const { location, error } = useLocation();
   const [userPosition, setUserPosition] = useState<{ latitude: number; longitude: number } | null>(location);
+  const EXPO_PUBLIC_TOMTOM_API_KEY = process.env.EXPO_PUBLIC_TOMTOM_API_KEY;
 
   useEffect(() => {
     if (searchText.length > 2) {
@@ -145,7 +145,7 @@ export default function HomeScreen() {
     setLoading(true);
     try {
       const response = await fetch(
-        `https://api.tomtom.com/routing/1/calculateRoute/${coords.latitude},${coords.longitude}:${destination.latitude},${destination.longitude}/json?key=QBsKzG3zoRyZeec28eUDje0U8DeNoRSO&routeType=fastest&maxAlternatives=3&instructionsType=text&language=fr`
+        `https://api.tomtom.com/routing/1/calculateRoute/${coords.latitude},${coords.longitude}:${destination.latitude},${destination.longitude}/json?key=${EXPO_PUBLIC_TOMTOM_API_KEY}&routeType=fastest&maxAlternatives=3&instructionsType=text&language=fr`
       );
       const data = await response.json();
   
@@ -300,7 +300,12 @@ export default function HomeScreen() {
                 )}
               </View>
             ) : (
+        
               <View style={styles.routeInfoContainer}>
+                <View style={styles.ButtonContainer}>
+                  <TouchableOpacity onPress={() => setModalVisible(true)} style={styles.iconImgContainerRouteInfo} ><Image style={styles.iconImg} source={require('@assets/images/qr-code.png')}></Image></TouchableOpacity>
+                  <TouchableOpacity onPress={() => setModalVisible(true)} style={styles.iconImgContainerRouteInfo}><Image style={styles.iconImg} source={require('@assets/images/erreur-96.png')}></Image></TouchableOpacity>
+                </View>
                 <View style={styles.routeInfoRowA}>
                   <View style={styles.speed}>
                     <Text style={styles.speedTextNumber}>{Math.round(speed || 0)}</Text>
@@ -322,216 +327,3 @@ export default function HomeScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    ...StyleSheet.absoluteFillObject,
-    flex: 1,
-  },
-  loader: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.8)',
-    zIndex: 100,
-  },
-  roadInstructionContainer:{
-    position: 'absolute',
-    top: 0,
-    height: 160,
-    width: '100%',
-    zIndex: 10,
-    backgroundColor:'rgb(0, 0, 0)',
-    borderRadius:25,
-    paddingTop:75,
-  },
-  roadInstruction:{
-    flexDirection:'row',
-    marginLeft:15,
-  },
-  titleDest:{
-    fontWeight: 'bold',
-    color: '#fff',
-    fontSize: 15,
-    textAlign:'center'
-  },
-  gradientOverlay: {
-    position: 'absolute',
-    top: 0,
-    height: Platform.OS === 'android' ? 50 : 70,
-    width: '100%',
-    zIndex: 10,
-  },
-  tabNavigation: {
-    position: 'absolute',
-    bottom: 30,
-    left: 6,
-    right: 6,
-    height: 'auto',
-    borderRadius: 20,
-    zIndex: 20,
-    padding: 10,
-    elevation: 5,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-  },
-  searchContainer: {
-    flex: 1,
-    justifyContent: 'center',
-  },
-  textInput: {
-    height: 40,
-    borderRadius: 10,
-    paddingHorizontal: 10,
-    backgroundColor: '#eee',
-    color: '#000',
-    elevation: 1,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
-    shadowRadius: 1,
-  },
-  suggestionsList: {
-    maxHeight: 150,
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    marginTop: 5,
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
-    shadowRadius: 1,
-  },
-  suggestionItem: {
-    padding: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
-  },
-  routeOption: {
-    padding: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
-  },
-  routeOptionText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  selectedRouteText: {
-    fontSize: 30,
-    fontWeight: 'bold',
-  },
-  myAddress: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginVertical: 15,
-  },
-  addressBlock: {
-    padding: 10,
-    borderRadius: 15,
-
-    width: 110,
-    flexDirection: 'row',
-    alignItems:'center',
-    justifyContent:'center',
-    height:50,
-    maxHeight:50,
-  },
-  addressBlockA: {
-    padding: 10,
-    borderRadius: 15,
-    width: 110,
-    flexDirection: 'row',
-    alignItems:'center',
-    justifyContent:'flex-start',
-    height:50,
-    maxHeight:50,
-  },
-  addressBlockC: {
-    padding: 10,
-    borderRadius: 15,
-    width: 110,
-    flexDirection: 'row',
-    alignItems:'center',
-    justifyContent:'flex-end',
-    height:50,
-    maxHeight:50,
-  },
-  iconImg:{
-    width:45,
-    height:45,
-  },
-  addressBlockAdd: {
-    borderWidth: 1,
-    padding: 10,
-    borderRadius: 15,
-    borderColor: '#000',
-    width: 110,
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#ffbc2e',
-  },
-  myAddressText: {
-    flexDirection: 'row',
-    textAlign: 'center',
-    alignItems: 'center',
-    fontWeight: 'bold',
-    fontSize: 20,
-  },
-  routeInfoContainer: {
-    padding: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  speed: {
-    backgroundColor: '#ffbc2e',
-    width: 60,
-    height: 60,
-    borderRadius: '100%',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
-    shadowRadius: 1,
-  },
-  speedTextNumber: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#fff',
-  },
-  speedTextLetter: {
-    fontSize: 12,
-    fontWeight: 'bold',
-    color: '#fff',
-  },
-  routeInfoRowA: {
-    flexDirection: 'row',
-    textAlign: 'center',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    width: '100%',
-    paddingHorizontal: 10,
-  },
-  clearRouteButton: {
-    backgroundColor: 'red',
-    flexDirection: 'row',
-    justifyContent: 'center',
-    padding: 10,
-    borderRadius: '100%',
-    width: 40,
-    height: 40,
-  },
-  closeBtn:{
-    height:20,
-    width:20,
-  },
-
-});

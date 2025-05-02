@@ -1,9 +1,6 @@
-
 import axios from 'axios';
 import * as Location from 'expo-location';
 import  ReportData  from '@interfaces/ReportData';
-import Constants from 'expo-constants';
-
 
 
 const EXPO_PUBLIC_API_URL = process.env.EXPO_PUBLIC_API_URL;

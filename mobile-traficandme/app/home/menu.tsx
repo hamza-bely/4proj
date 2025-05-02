@@ -1,12 +1,14 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Image, useColorScheme } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
 export default function Menu() {
   const navigation = useNavigation();
-
+  const colorScheme = useColorScheme();
+  const backgroundColor = colorScheme === 'dark' ? '#222' : '#fff';
+  const isDark = colorScheme === 'dark';
+  const textColor = isDark ? '#fff' : '#000';
   const menuItems = [
-    { label: 'Signaler un incident', icon: require('@assets/images/erreur-96.png'), action: () => alert('Signaler un incident') },
     { label: 'Partager un trajet', icon: require('@assets/images/erreur-96.png'), action: () => alert('Partager un trajet') },
     { label: 'Paramètres', icon: require('@assets/images/erreur-96.png'), action: () => alert('Paramètres') },
     { label: 'Historique', icon: require('@assets/images/erreur-96.png'), action: () => alert('Historique') },
@@ -14,8 +16,15 @@ export default function Menu() {
   ];
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Menu</Text>
+    <View style={[styles.container, { backgroundColor }]}>
+
+      <View style={styles.topElement}>
+        <Text style={[styles.title, { color:textColor }]}>Menu</Text>
+        <TouchableOpacity style={styles.closeButton} onPress={() => navigation.goBack()}>
+          <Image source={require('@assets/images/close.png')} style={styles.closeButtonIcon} />
+        </TouchableOpacity>
+      </View>
+
       <View style={styles.menuList}>
         {menuItems.map((item, index) => (
           <TouchableOpacity key={index} style={styles.menuItem} onPress={item.action}>
@@ -24,9 +33,6 @@ export default function Menu() {
           </TouchableOpacity>
         ))}
       </View>
-      <TouchableOpacity style={styles.closeButton} onPress={() => navigation.goBack()}>
-        <Text style={styles.closeButtonText}>Fermer</Text>
-      </TouchableOpacity>
     </View>
   );
 }
@@ -35,12 +41,16 @@ const styles = StyleSheet.create({
   container: {
     paddingTop: 50,
     flex: 1,
-    backgroundColor: '#fff',
-    padding: 20,
     justifyContent: 'space-between',
   },
+  topElement: {
+    paddingHorizontal: 20,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
   title: {
-    fontSize: 24,
+    fontSize: 30,
     fontWeight: 'bold',
     textAlign: 'center',
     marginVertical: 20,
@@ -50,6 +60,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   menuItem: {
+    width: '100%',
     flexDirection: 'row',
     alignItems: 'center',
     padding: 15,
@@ -68,14 +79,15 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   closeButton: {
-    backgroundColor: '#ff5c5c',
+
     padding: 15,
-    borderRadius: 10,
+    borderRadius: 100,
     alignItems: 'center',
+
   },
-  closeButtonText: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: 'bold',
+  closeButtonIcon: {
+    width: 28,
+    height: 28,
+    tintColor: 'red',
   },
 });

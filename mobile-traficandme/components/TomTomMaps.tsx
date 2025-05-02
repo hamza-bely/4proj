@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, StyleSheet, ActivityIndicator, } from 'react-native';
 import { WebView } from 'react-native-webview';
 import { DeviceMotion } from 'expo-sensors';
 import { useLocation } from '@hooks/useLocation';
@@ -21,6 +21,7 @@ const reportIcons: Record<ReportType, any> = {
 };
 
 export default function TomTomMap({destination, routeOptions, selectedRoute}: TomTomMapProps) {
+  
   const webviewRef = useRef<WebView | null>(null);
   const { location, error } = useLocation();
   const [reports, setReports] = useState<ReportData[]>([]);
