@@ -1,8 +1,21 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Image, useColorScheme } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import asyncStorage from '@services/localStorage';
+import { router } from 'expo-router';
+
 
 export default function Menu() {
+  const { removeToken } = asyncStorage();
+  const logOut = () => {
+    try {
+      removeToken();
+      router.push('/start');
+    } catch (error) {
+      console.error("Une erreur s'est produite lors de la déconnexion :", error);
+    }
+  };
+  
   const navigation = useNavigation();
   const colorScheme = useColorScheme();
   const backgroundColor = colorScheme === 'dark' ? '#222' : '#fff';
@@ -13,6 +26,7 @@ export default function Menu() {
     { label: 'Paramètres', icon: require('@assets/images/erreur-96.png'), action: () => alert('Paramètres') },
     { label: 'Historique', icon: require('@assets/images/erreur-96.png'), action: () => alert('Historique') },
     { label: 'Aide', icon: require('@assets/images/erreur-96.png'), action: () => alert('Aide') },
+    { label: 'Se déconnecter', icon: require('@assets/images/logout.png'), action: () =>logOut() },
   ];
 
   return (

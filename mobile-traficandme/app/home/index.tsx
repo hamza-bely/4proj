@@ -15,7 +15,7 @@ import { fetchSuggestions, fetchRouteOption } from '@services/apiService';
 import { useLocation } from '@hooks/useLocation';
 import getInstructionIcon from '@utils/getInstructionIcon';
 import { styles } from './styles';
-
+import ReportData from '@interfaces/ReportData';
 
 export default function HomeScreen() {
   const colorScheme = useColorScheme();
@@ -38,8 +38,11 @@ export default function HomeScreen() {
   const [modalVisible, setModalVisible] = useState(false);
   const { location, error } = useLocation();
   const [userPosition, setUserPosition] = useState<{ latitude: number; longitude: number } | null>(location);
+  const [activeAlert, setActiveAlert] = useState<ReportData | null>(null);
+  const [shownAlerts, setShownAlerts] = useState<Set<string>>(new Set());
+  const [reports, setReports] = useState<ReportData[]>([]); // Ajout de l'état pour les rapports
+  const [reportIndex, setReportIndex] = useState(0); // Ajout de l'état pour l'index du rapport actuel
 
-  
   const EXPO_PUBLIC_TOMTOM_API_KEY = process.env.EXPO_PUBLIC_TOMTOM_API_KEY;
 
   useEffect(() => {
@@ -143,21 +146,21 @@ export default function HomeScreen() {
 
   const recalculateRoute = async (coords: ExpoLocation.LocationObjectCoords) => {
     if (!destination) return;
-  
+
     setLoading(true);
     try {
       const response = await fetch(
         `https://api.tomtom.com/routing/1/calculateRoute/${coords.latitude},${coords.longitude}:${destination.latitude},${destination.longitude}/json?key=${EXPO_PUBLIC_TOMTOM_API_KEY}&routeType=fastest&maxAlternatives=3&instructionsType=text&language=fr`
       );
       const data = await response.json();
-  
+
       if (data.routes.length > 0) {
         const instructionsArray: NavigationInstruction[] = data.routes[0].guidance.instructions.map((instr: any) => ({
           message: instr.message,
           distance: instr.routeOffsetInMeters,
           maneuver: instr.maneuver,
         }));
-  
+
         setRouteOptions(data.routes);
         setInstructions(instructionsArray);
         setSelectedRoute(data.routes[0]);
@@ -168,7 +171,6 @@ export default function HomeScreen() {
       setLoading(false);
     }
   };
-  
 
   const handleSelectAddress = (address: AddressSuggestion) => {
     Keyboard.dismiss();
@@ -208,6 +210,29 @@ export default function HomeScreen() {
     <TomTomMap destination={destination} routeOptions={routeOptions} selectedRoute={selectedRoute} />
   ), [destination, routeOptions, selectedRoute]);
 
+  // Ajout de l'effet pour mettre à jour l'affichage des rapports
+  useEffect(() => {
+    if (reports.length > 0 && userPosition) {
+      const interval = setInterval(() => {
+        setReportIndex((prevIndex) => (prevIndex + 1) % reports.length);
+      }, 3000);
+      return () => clearInterval(interval);
+    }
+  }, [reports, userPosition]);
+
+  useEffect(() => {
+    if (reports.length > 0) {
+      setActiveAlert(reports[reportIndex]);
+    }
+  }, [reportIndex, reports]);
+
+  const getReportDistance = (report: ReportData): number | null => {
+    if (userPosition && report) {
+      return getDistanceFromLatLonInM(userPosition.latitude, userPosition.longitude, report.latitude, report.longitude);
+    }
+    return null;
+  };
+
   return (
     <View style={styles.container}>
       <ReportModal visible={modalVisible} onClose={() => setModalVisible(false)} />
@@ -231,9 +256,7 @@ export default function HomeScreen() {
 
       {selectedRoute && instructions.length > 0 && (
         <View style={styles.roadInstructionContainer}>
-          {selectedAddress && (
-            <Text style={styles.titleDest}>{selectedAddress.address.freeformAddress}</Text>
-          )}
+          {selectedAddress && (<Text style={styles.titleDest}>{selectedAddress.address.freeformAddress}</Text>)}
 
           {currentInstruction && currentDistance > 0 && (
             <View style={styles.roadInstruction}>
@@ -247,6 +270,21 @@ export default function HomeScreen() {
                   {currentDistance} m
                 </Text>
                 <Text style={{ color: '#fff', fontSize: 18 }}>{currentInstruction}</Text>
+              </View>
+            </View>
+          )}
+
+          {activeAlert && (
+            <View style={styles.reportAlert}>
+              <Image
+                source={getInstructionIcon(activeAlert.type)} // Assurez-vous d'avoir une fonction pour obtenir l'icône du rapport
+                style={{ width: 50, height: 50, tintColor: '#ff0000', marginRight: 15 }}
+              />
+              <View>
+                <Text style={{ color: '#fff', fontSize: 24, fontWeight: 'bold' }}>
+                  {getReportDistance(activeAlert)} m
+                </Text>
+                <Text style={{ color: '#fff', fontSize: 18 }}>{activeAlert.name}</Text>
               </View>
             </View>
           )}
@@ -302,7 +340,6 @@ export default function HomeScreen() {
                 )}
               </View>
             ) : (
-        
               <View style={styles.routeInfoContainer}>
                 <View style={styles.ButtonContainer}>
                   <TouchableOpacity onPress={() => setModalVisible(true)} style={styles.iconImgContainerRouteInfo} ><Image style={styles.iconImg} source={require('@assets/images/qr-code.png')}></Image></TouchableOpacity>
@@ -328,4 +365,5 @@ export default function HomeScreen() {
     </View>
   );
 }
+
 

@@ -244,6 +244,14 @@ export const styles = StyleSheet.create({
       height:20,
       width:20,
     },
+    reportAlert: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: 'rgba(255, 0, 0, 0.8)',
+      padding: 10,
+      borderRadius: 5,
+      marginTop: 10,
+    },
   
   });
   
