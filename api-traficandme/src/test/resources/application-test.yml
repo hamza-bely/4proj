@@ -1,0 +1,26 @@
+spring:
+  application:
+    name: SupMapTestApp
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1
+    driver-class-name: org.h2.Driver
+    initialize: true
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.H2Dialect
+  sql:
+    init:
+      schema-locations: classpath:data.sql
+      data-locations: classpath:data.sql
+
+jwt:
+  secret: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
+  expiration: 86400000
+
+server:
+  port: 8081
