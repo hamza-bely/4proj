@@ -107,6 +107,15 @@ npm install
 npx expo start
 ```
 
+6. Pour lancer les tests back-end:
+```bash
+cd api-traficandme
+./mvnw test
+ou
+./mvnw -Dtest=YourTestClass test
+```
+les classes de tests sont: `UserRepositoryTest, ReportRepositoryTest, ItineraryRepositoryTest, ReportServiceTest, ItineraryServiceTest`
+
 ## Accès aux Applications
 
 - **Frontend Web** : http://localhost:5173
