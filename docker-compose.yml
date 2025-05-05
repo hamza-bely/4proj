@@ -37,7 +37,7 @@ services:
     image: postgres:15
     restart: always
     environment:
-      POSTGRES_DB: traficandmedb
+      POSTGRES_DB: postgres
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
     volumes:
