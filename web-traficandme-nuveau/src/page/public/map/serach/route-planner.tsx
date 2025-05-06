@@ -44,8 +44,8 @@ const FUEL_PRICES = {
 const TOLL_RATE_PER_KM = 0.12; // € per km
 
 const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated, startAddress: initialStartAddress }) => {
-    const [start, setStart] = useState<Coordinate>({ lat: 47.6640, lon: 2.8357 });
-    const [end, setEnd] = useState<Coordinate>({ lat: 45.7640, lon: 4.835 });
+    const [start, setStart] = useState<Coordinate>({ lat: 0, lon: 0 });
+    const [end, setEnd] = useState<Coordinate>({ lat: 0, lon:0 });
     const { t } = useTranslation();
     const { createRoute } = useRouteStore();
     const [isLoading, setIsLoading] = useState<boolean>(false);
