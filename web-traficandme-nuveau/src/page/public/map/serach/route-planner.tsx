@@ -24,24 +24,21 @@ import {
     getCoordinatesFromAddress, TransportMode
 } from "../../../../services/service/map-servie";
 
-// Fuel type constants
 type FuelType = "electric" | "gasoline" | "diesel";
 
-// Constants for consumption calculations
 const CONSUMPTION_RATES = {
-    electric: 18, // kWh per 100km
-    gasoline: 7, // liters per 100km
-    diesel: 6, // liters per 100km
+    electric: 18,
+    gasoline: 7,
+    diesel: 6,
 };
 
 const FUEL_PRICES = {
-    electric: 0.20, // € per kWh
-    gasoline: 1.85, // € per liter
-    diesel: 1.75, // € per liter
+    electric: 0.20,
+    gasoline: 1.85,
+    diesel: 1.75
 };
 
-// Average toll rate per km for highways in France (estimated)
-const TOLL_RATE_PER_KM = 0.12; // € per km
+const TOLL_RATE_PER_KM = 0.12;
 
 const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated, startAddress: initialStartAddress }) => {
     const [start, setStart] = useState<Coordinate>({ lat: 0, lon: 0 });
@@ -132,7 +129,6 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated, startAdd
         return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(amount);
     };
 
-    // Calculate fuel consumption for a given distance in meters
     const calculateFuelConsumption = (distanceMeters: number, fuelType: FuelType): { consumption: number; cost: number } => {
         const distanceKm = distanceMeters / 1000;
 
@@ -145,7 +141,6 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated, startAdd
         return { consumption, cost };
     };
 
-    // Calculate toll cost for a route
     const calculateTollCost = (distanceMeters: number, avoidTolls: boolean): number => {
         if (avoidTolls) return 0;
 
