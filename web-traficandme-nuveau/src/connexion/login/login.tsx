@@ -113,25 +113,7 @@ export default function Login({ closeModal }: { closeModal: () => void }) {
                                 </div>
                             </div>
 
-                            <div className="mt-6 grid grid-cols-2 gap-4">
-                                <a
-                                    href="#"
-                                    className="flex w-full items-center justify-center gap-3 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 shadow-xs ring-gray-300 ring-inset hover:bg-gray-50 focus-visible:ring-transparent"
-                                >
-                                    <FcGoogle />
 
-                                    <span className="text-sm/6 font-semibold">Google</span>
-                                </a>
-
-                                <a
-                                    href="#"
-                                    className="flex w-full items-center justify-center gap-3 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 shadow-xs ring-gray-300 ring-inset hover:bg-gray-50 focus-visible:ring-transparent"
-                                >
-                                    <FaFacebookSquare />
-
-                                    <span className="text-sm/6 font-semibold">Facebook</span>
-                                </a>
-                            </div>
                         </div>
             </form>
         </div>
