@@ -8,10 +8,11 @@ import {
   Alert,
   Platform,
   FlatList,
-  ActivityIndicator
+  ActivityIndicator, Modal
 } from 'react-native';
 import { X, MapPin, Search } from 'lucide-react-native';
 import Button from '@/components/Button';
+import RouteOptionsModal from '@/components/RouteOptionsModal';
 
 const styles = {
   modalContent: { padding: 16, backgroundColor: '#fff', borderRadius: 8 },
@@ -38,7 +39,9 @@ const styles = {
   suggestionsContainer: { marginTop: 4, marginBottom: 12, maxHeight: 150, borderWidth: 1, borderColor: '#ddd', borderRadius: 4 },
   suggestionItem: { padding: 12, borderBottomWidth: 1, borderBottomColor: '#eee' },
   suggestionText: { fontSize: 14 },
-  loadingContainer: { padding: 12, alignItems: 'center' }
+  loadingContainer: { padding: 12, alignItems: 'center' },
+  errorText: { color: '#e74c3c', marginTop: 4, fontSize: 12 },
+  suggestionSecondaryText: { fontSize: 12, color: '#666', marginTop: 2 }
 };
 
 const RouteModal = ({
@@ -46,9 +49,6 @@ const RouteModal = ({
                       tomtomApi,
                       api,
                       authState,
-                      setWebViewUrl,
-                      setShowWebViewMap,
-                      mapRef,
                       setRouteCoordinates,
                       setRouteInstructions,
                     }) => {
@@ -67,13 +67,14 @@ const RouteModal = ({
 
   const [startSearchTimeout, setStartSearchTimeout] = useState(null);
   const [endSearchTimeout, setEndSearchTimeout] = useState(null);
+  const [routeOptions, setRouteOptions] = useState([]);
+  const [showRouteOptionsModal, setShowRouteOptionsModal] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
-  // Utiliser la géolocalisation du navigateur pour obtenir la position actuelle
   const handleStartLocationSelect = async () => {
     try {
       setIsLoading(true);
-
-      // Utiliser la géolocalisation du navigateur/appareil si disponible
+      setErrorMessage('');
       if (navigator.geolocation && Platform.OS === 'web') {
         navigator.geolocation.getCurrentPosition(
           async (position) => {
@@ -84,7 +85,6 @@ const RouteModal = ({
 
             setStartLocation(currentPosition);
 
-            // Faire une requête de géocodage inverse pour obtenir l'adresse précise
             try {
               const response = await tomtomApi.get(`/search/2/reverseGeocode/${currentPosition.latitude},${currentPosition.longitude}.json`);
               if (response.data && response.data.addresses && response.data.addresses.length > 0) {
@@ -112,7 +112,6 @@ const RouteModal = ({
           },
           (error) => {
             console.error('Error getting position:', error);
-            // Fallback à Paris si la géolocalisation échoue
             const parisPosition = {
               latitude: 48.8566,
               longitude: 2.3522
@@ -124,7 +123,6 @@ const RouteModal = ({
           { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
         );
       } else {
-        // Sur les appareils mobiles ou si la géolocalisation n'est pas disponible
         const defaultPosition = {
           latitude: 48.8566,
           longitude: 2.3522
@@ -161,7 +159,7 @@ const RouteModal = ({
 
   // Amélioration de la recherche d'adresses
   const searchAddresses = async (text, isStart) => {
-    if (!text || text.length < 3) {
+    if (!text || text.length < 2) {
       if (isStart) {
         setStartSuggestions([]);
         setIsLoadingStartSuggestions(false);
@@ -174,15 +172,19 @@ const RouteModal = ({
 
     try {
       isStart ? setIsLoadingStartSuggestions(true) : setIsLoadingEndSuggestions(true);
+      setErrorMessage('');
 
-      // Améliorons les paramètres de recherche pour des résultats plus précis
+      // Paramètres de recherche améliorés pour des résultats plus précis
       const response = await tomtomApi.get('/search/2/search/' + encodeURIComponent(text) + '.json', {
         params: {
-          limit: 7,               // Plus de résultats
-          idxSet: 'Geo',          // Recherche géographique
+          limit: 10,              // Plus de résultats
+          idxSet: 'Addr,Str,Geo',          // Recherche géographique
           typeahead: true,        // Suggestions pendant la saisie
-          countrySet: 'FR',       // Par défaut en France (à adapter si nécessaire)
-          language: 'fr-FR'       // Langue française
+          countrySet: 'FR,BE,CH,LU,DE,ES,IT', // Élargir les pays de recherche
+          language: 'fr-FR',
+          extendedPostalCodesFor: 'Addr',
+          minFuzzyLevel: 1,
+          maxFuzzyLevel: 2
         }
       });
 
@@ -191,14 +193,14 @@ const RouteModal = ({
           id: result.id,
           address: result.address.freeformAddress,
           position: result.position,
-          // Informations supplémentaires pour avoir plus de contexte
           fullAddress: {
             street: result.address.streetName || '',
             houseNumber: result.address.streetNumber || '',
             city: result.address.municipality || '',
             postalCode: result.address.postalCode || '',
             country: result.address.country || ''
-          }
+          },
+          context: `${result.address.municipality || ''} ${result.address.postalCode || ''}`.trim()
         }));
 
         if (isStart) {
@@ -216,27 +218,28 @@ const RouteModal = ({
       } else {
         setIsLoadingEndSuggestions(false);
       }
+      setErrorMessage('Erreur lors de la recherche d\'adresses. Veuillez réessayer.');
     }
   };
 
   const handleStartAddressChange = (text) => {
     setStartAddress(text);
+    setErrorMessage('');
 
-    // Annuler la recherche précédente si elle est en cours
     if (startSearchTimeout) {
       clearTimeout(startSearchTimeout);
     }
 
-    // Définir un délai pour éviter trop d'appels API pendant la saisie
     const timeout = setTimeout(() => {
       searchAddresses(text, true);
-    }, 500);
+    }, 400);
 
     setStartSearchTimeout(timeout);
   };
 
   const handleEndAddressChange = (text) => {
     setEndAddress(text);
+    setErrorMessage('');
 
     if (endSearchTimeout) {
       clearTimeout(endSearchTimeout);
@@ -244,7 +247,7 @@ const RouteModal = ({
 
     const timeout = setTimeout(() => {
       searchAddresses(text, false);
-    }, 500);
+    }, 400);
 
     setEndSearchTimeout(timeout);
   };
@@ -274,27 +277,74 @@ const RouteModal = ({
     };
   }, [startSearchTimeout, endSearchTimeout]);
 
-  // Amélioration du calcul d'itinéraire
   const calculateRoute = async () => {
     if (!startLocation) {
-      Alert.alert('Erreur', 'Point de départ non défini. Utilisez le bouton de localisation ou recherchez une adresse.');
+      setErrorMessage('Point de départ non défini. Utilisez le bouton de localisation ou recherchez une adresse.');
       return;
     }
 
     if (!endLocation) {
-      Alert.alert('Erreur', 'Veuillez définir une destination en recherchant une adresse');
+      setErrorMessage('Veuillez définir une destination en recherchant une adresse.');
       return;
     }
 
     try {
       setIsLoading(true);
-      console.log('Calculating route from', startLocation, 'to', endLocation);
+      setErrorMessage('');
+      console.log('Calculating routes from', startLocation, 'to', endLocation);
 
-      // Préparer les coordonnées pour TomTom
       const startCoords = `${startLocation.latitude},${startLocation.longitude}`;
       const endCoords = `${endLocation.latitude},${endLocation.longitude}`;
+      const API_KEY = '9zc7scbLhpcrEFouo0xJWt0jep9qNlnv';
 
-      // Enregistrement de l'itinéraire dans la BD (comme avant)
+      // Calculer deux itinéraires : avec et sans péage
+      const requests = [
+        fetch(`https://api.tomtom.com/routing/1/calculateRoute/${startCoords}:${endCoords}/json?key=${API_KEY}&routeType=${routeMode === 'Rapide' ? 'fastest' : 'shortest'}&travelMode=car&instructionsType=text`),
+        fetch(`https://api.tomtom.com/routing/1/calculateRoute/${startCoords}:${endCoords}/json?key=${API_KEY}&routeType=${routeMode === 'Rapide' ? 'fastest' : 'shortest'}&travelMode=car&instructionsType=text`)
+      ];
+
+      console.log("requests",requests);
+
+      const responses = await Promise.all(requests);
+      const results = await Promise.all(responses.map(res => res.json()));
+      console.log("results", results[0].routes[0].summary.travelTimeInSeconds);
+
+      if (results[0]?.routes?.[0]?.summary?.travelTimeInSeconds && results[1]?.routes?.[0]?.summary?.travelTimeInSeconds) {
+        console.log('Routes calculation successful');
+
+        const travelTimeFirstRoute = results[0]?.routes?.[0]?.summary?.travelTimeInSeconds ?? 2000;
+        const travelTimeSecondRoute = results[1]?.routes?.[0]?.summary?.travelTimeInSeconds ?? 2000;
+
+        const routesData = [
+          {
+            ...results[0],
+            hasTolls: false,
+            isRecommended: travelTimeFirstRoute < travelTimeSecondRoute * 1.2 // Si le trajet sans péage est moins de 20% plus long que celui avec péage
+          },
+          {
+            ...results[1],
+            hasTolls: true,
+            isRecommended: travelTimeFirstRoute >= travelTimeSecondRoute * 1.2 // Si le trajet avec péage est plus rapide
+          }
+        ];
+
+        setRouteOptions(routesData);
+        setShowRouteOptionsModal(true);
+      } else {
+        console.error("Erreur: Une ou plusieurs routes n'ont pas de données de durée.");
+      }
+
+    } catch (error) {
+      console.error('Error calculating routes:', error);
+      setErrorMessage('Impossible de calculer les itinéraires. Veuillez vérifier vos adresses et réessayer.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const selectRoute = async (selectedRoute) => {
+    try {
+      // Sauvegarder l'itinéraire dans l'API
       const routePayload = {
         startLongitude: String(startLocation.longitude),
         startLatitude: String(startLocation.latitude),
@@ -304,7 +354,7 @@ const RouteModal = ({
         address_end: endAddress || 'Arrivée',
         user: authState.user?.id?.toString() || '0',
         mode: routeMode,
-        peage: !avoidTolls
+        peage: selectedRoute.hasTolls
       };
 
       try {
@@ -314,91 +364,53 @@ const RouteModal = ({
         console.error('Error saving route to API:', saveError);
       }
 
-      // Configurer les paramètres de l'API de routing
-      const routeType = routeMode === 'Rapide' ? 'fastest' : 'shortest';
-      const avoid = avoidTolls ? 'toll' : '';
+      const route = selectedRoute.routes[0];
 
-      try {
-        // Appel direct à l'API TomTom routing avec plus de paramètres
-        const routeResponse = await tomtomApi.get(`/routing/1/calculateRoute/${startCoords}:${endCoords}/json`, {
-          params: {
-            routeType: routeType,
-            avoid: avoid,
-            traffic: true,
-            instructionsType: 'text',
-            travelMode: 'car',
-            vehicleCommercial: false,
-            detail: 'true',
-            report: 'effectiveSettings'
-          }
-        });
-
-        console.log('Route calculation successful');
-
-        if (routeResponse.data && routeResponse.data.routes && routeResponse.data.routes.length > 0) {
-          const route = routeResponse.data.routes[0];
-
-          // Extraire les coordonnées pour dessiner la polyline
-          const routePoints = route.legs.flatMap(leg =>
-            leg.points.map(point => ({
-              latitude: point.latitude,
-              longitude: point.longitude
-            }))
-          );
-
-          // Extraire les instructions pour l'affichage
-          const instructions = route.guidance?.instructions?.map((instruction, idx) => ({
-            id: idx.toString(),
-            message: instruction.message,
-            roadName: instruction.roadName || '',
-            point: {
-              latitude: instruction.point.latitude,
-              longitude: instruction.point.longitude
-            }
-          })) || [];
-
-          const summary = route.summary;
-
-          // Mettre à jour les états avec les données de route
-          if (setRouteCoordinates) setRouteCoordinates(routePoints);
-          if (setRouteInstructions) setRouteInstructions(instructions, summary);
-
-          // Créer une URL Google Maps pour l'affichage dans la WebView
-          const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${startLocation.latitude},${startLocation.longitude}&destination=${endLocation.latitude},${endLocation.longitude}&travelmode=driving`;
-
-          console.log("Setting Google Maps URL:", googleMapsUrl);
-
-          if (setWebViewUrl) setWebViewUrl(googleMapsUrl);
-          if (setShowWebViewMap) setShowWebViewMap(true);
-
-          // Fermer la modale de route
-          setShowRouteModal(false);
-        } else {
-          throw new Error('No route data found in response');
-        }
-      } catch (routeError) {
-        console.error('Error calculating route with API:', routeError);
-
-        // Même en cas d'erreur avec l'API TomTom, tentons d'ouvrir Google Maps
-        try {
-          const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${startLocation.latitude},${startLocation.longitude}&destination=${endLocation.latitude},${endLocation.longitude}&travelmode=driving`;
-
-          if (setWebViewUrl) setWebViewUrl(googleMapsUrl);
-          if (setShowWebViewMap) setShowWebViewMap(true);
-        } catch (gmapsError) {
-          console.error('Failed to fallback to Google Maps:', gmapsError);
-        }
-
-        setShowRouteModal(false);
-      }
-    } catch (error) {
-      console.error('General error calculating route:', error);
-      Alert.alert(
-        'Erreur',
-        `Impossible de calculer l'itinéraire: ${error.message}`
+      const routePoints = route.legs.flatMap(leg =>
+        leg.points.map(point => ({
+          latitude: point.latitude,
+          longitude: point.longitude
+        }))
       );
-    } finally {
-      setIsLoading(false);
+
+      const instructions = route.guidance?.instructions?.map((instruction, idx) => ({
+        id: idx.toString(),
+        message: instruction.message,
+        roadName: instruction.roadName || '',
+        point: {
+          latitude: instruction.point.latitude,
+          longitude: instruction.point.longitude
+        }
+      })) || [];
+
+      const summary = route.summary;
+
+      // Mettre à jour les états avec les données de route
+      if (setRouteCoordinates) setRouteCoordinates(routePoints);
+      if (setRouteInstructions) setRouteInstructions(instructions, summary);
+      if (setEndLocation) setEndLocation(endLocation);
+
+      // Fermer les modales
+      setShowRouteOptionsModal(false);
+      setShowRouteModal(false);
+
+      // Zoomer sur le départ
+      zoomToStart();
+    } catch (error) {
+      console.error('Error processing selected route:', error);
+      setErrorMessage(`Erreur: ${error.message}`);
+    }
+  };
+
+// 4. Nouvelle fonction pour zoomer sur le point de départ
+  const zoomToStart = () => {
+    if (mapRef && mapRef.current && startLocation) {
+      mapRef.current.animateToRegion({
+        latitude: startLocation.latitude,
+        longitude: startLocation.longitude,
+        latitudeDelta: 0.01,
+        longitudeDelta: 0.01
+      }, 1000);
     }
   };
 
@@ -446,6 +458,7 @@ const RouteModal = ({
                   onPress={() => selectStartSuggestion(item)}
                 >
                   <Text style={styles.suggestionText}>{item.address}</Text>
+                  {item.context && <Text style={styles.suggestionSecondaryText}>{item.context}</Text>}
                 </TouchableOpacity>
               )}
               nestedScrollEnabled={true}
@@ -485,6 +498,7 @@ const RouteModal = ({
                   onPress={() => selectEndSuggestion(item)}
                 >
                   <Text style={styles.suggestionText}>{item.address}</Text>
+                  {item.context && <Text style={styles.suggestionSecondaryText}>{item.context}</Text>}
                 </TouchableOpacity>
               )}
               nestedScrollEnabled={true}
@@ -547,6 +561,10 @@ const RouteModal = ({
           </TouchableOpacity>
         </View>
 
+        {errorMessage ? (
+          <Text style={styles.errorText}>{errorMessage}</Text>
+        ) : null}
+
         <View style={styles.modalActions}>
           <Button
             title="Annuler"
@@ -562,6 +580,22 @@ const RouteModal = ({
           />
         </View>
       </View>
+      {showRouteOptionsModal && (
+        <Modal
+          visible={showRouteOptionsModal}
+          animationType="slide"
+          transparent={true}
+          onRequestClose={() => setShowRouteOptionsModal(false)}
+        >
+          <View style={styles.modalContainer}>
+            <RouteOptionsModal
+              routes={routeOptions}
+              onSelectRoute={selectRoute}
+              onClose={() => setShowRouteOptionsModal(false)}
+            />
+          </View>
+        </Modal>
+      )}
     </ScrollView>
   );
 };

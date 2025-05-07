@@ -10,10 +10,9 @@ import {
   TextInput,
   Platform,
   KeyboardAvoidingView,
-  FlatList, ActivityIndicator
+  FlatList,
 } from 'react-native';
 import MapView, { Marker, Polyline } from 'react-native-maps';
-import { WebView } from 'react-native-webview';
 import { useLocation } from '@/contexts/LocationContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { api, tomtomApi, reverseGeocode } from '@/services/api';
@@ -23,13 +22,11 @@ import ReportMarker from '@/components/ReportMarker';
 import { AlertCircle, Navigation, X, ThumbsUp, ThumbsDown, ChevronUp, ChevronDown } from 'lucide-react-native';
 import RouteModal from '@/components/RouteModal';
 
-const TOMTOM_API_KEY = '9zc7scbLhpcrEFouo0xJWt0jep9qNlnv';
 
 export default function MapScreen() {
   const { state: locationState, getCurrentLocation } = useLocation();
   const { state: authState } = useAuth();
   const mapRef = useRef(null);
-  const webViewRef = useRef(null);
 
   const [isLoading, setIsLoading] = useState(false);
   const [reports, setReports] = useState([]);
@@ -39,6 +36,7 @@ export default function MapScreen() {
   const [reportType, setReportType] = useState('ACCIDENTS');
   const [reportLocation, setReportLocation] = useState(null);
   const [reportAddress, setReportAddress] = useState('');
+  const [routeError, setRouteError] = useState(null);
 
   const [showRouteModal, setShowRouteModal] = useState(false);
   const [startLocation, setStartLocation] = useState(null);
@@ -46,12 +44,39 @@ export default function MapScreen() {
   const [startAddress, setStartAddress] = useState('');
 
   const [showWebViewMap, setShowWebViewMap] = useState(false);
-  const [webViewUrl, setWebViewUrl] = useState('');
 
   const [routeCoordinates, setRouteCoordinates] = useState([]);
   const [routeInstructions, setRouteInstructions] = useState([]);
   const [routeSummary, setRouteSummary] = useState(null);
   const [showInstructions, setShowInstructions] = useState(false);
+
+  const zoomToRoute = (coordinates) => {
+    if (!coordinates || coordinates.length === 0 || !mapRef.current) return;
+
+    // Calculer les limites de la carte
+    let minLat = coordinates[0].latitude;
+    let maxLat = coordinates[0].latitude;
+    let minLng = coordinates[0].longitude;
+    let maxLng = coordinates[0].longitude;
+
+    coordinates.forEach(coord => {
+      minLat = Math.min(minLat, coord.latitude);
+      maxLat = Math.max(maxLat, coord.latitude);
+      minLng = Math.min(minLng, coord.longitude);
+      maxLng = Math.max(maxLng, coord.longitude);
+    });
+
+    // Ajouter un peu de marge
+    const latDelta = (maxLat - minLat) * 1.2;
+    const lngDelta = (maxLng - minLng) * 1.2;
+
+    mapRef.current.animateToRegion({
+      latitude: (minLat + maxLat) / 2,
+      longitude: (minLng + maxLng) / 2,
+      latitudeDelta: Math.max(latDelta, 0.01),
+      longitudeDelta: Math.max(lngDelta, 0.01),
+    }, 1000);
+  };
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -117,7 +142,6 @@ export default function MapScreen() {
   const handleAddReport = async () => {
     try {
       if (!reportLocation) {
-        // Si on est sur mobile et qu'on n'a pas sélectionné d'emplacement, utiliser la position actuelle
         if (Platform.OS !== 'web' && locationState.location) {
           setReportLocation({
             latitude: locationState.location.coords.latitude,
@@ -214,9 +238,14 @@ export default function MapScreen() {
   };
 
   const handleRouteInstructions = (instructions, summary) => {
+    console.log("Received instructions:", instructions);
     setRouteInstructions(instructions);
     setRouteSummary(summary);
     setShowInstructions(true);
+
+    if (routeCoordinates && routeCoordinates.length > 0) {
+      zoomToRoute(routeCoordinates);
+    }
   };
 
   const formatDuration = (seconds) => {
@@ -269,34 +298,19 @@ export default function MapScreen() {
   if (locationState.loading || isLoading) {
     return <LoadingIndicator message="Chargement de la carte..." />;
   }
+  
 
   return (
     <View style={styles.container}>
       {showWebViewMap ? (
-        <View style={styles.webViewContainer}>
-          <View style={styles.webViewHeader}>
-            <Text style={styles.webViewTitle}>Itinéraire</Text>
-            <TouchableOpacity
-              style={styles.closeButton}
-              onPress={() => setShowWebViewMap(false)}
-            >
-              <X size={24} color="#333" />
-            </TouchableOpacity>
-          </View>
-          <WebView
-            ref={webViewRef}
-            source={{ uri: webViewUrl }}
-            style={styles.webView}
-            javaScriptEnabled={true}
-            domStorageEnabled={true}
-            geolocationEnabled={true} // Activer la géolocalisation dans la WebView
-            userAgent={Platform.OS === 'android' ? 'Mozilla/5.0 (Linux; Android 10; Android SDK built for x86) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.120 Mobile Safari/537.36' : undefined} // User agent pour Android
-            onError={(e) => console.error('WebView error:', e)}
-            onHttpError={(e) => console.error('WebView HTTP error:', e)}
-            onLoad={() => console.log('WebView loaded successfully')}
-            renderLoading={() => <ActivityIndicator size="large" color="#3498db" />}
-            startInLoadingState={true}
-          />
+        <View style={styles.errorNotification}>
+          <Text style={styles.errorNotificationText}>{routeError}</Text>
+          <TouchableOpacity
+            style={styles.errorNotificationButton}
+            onPress={() => setRouteError(null)}
+          >
+            <X size={18} color="#fff" />
+          </TouchableOpacity>
         </View>
       ) : (
         <>
@@ -370,7 +384,18 @@ export default function MapScreen() {
             )}
           </MapView>
 
-          {routeInstructions.length > 0 && showInstructions && (
+
+            <TouchableOpacity
+              style={styles.showInstructionsButton}
+              onPress={() => setShowInstructions(true)}
+            >
+              <ChevronUp size={24} color="white" />
+              <Text style={styles.showInstructionsText}>Voir les instructions</Text>
+            </TouchableOpacity>
+
+
+
+          {showInstructions && routeInstructions && routeInstructions.length > 0 && (
             <View style={styles.instructionsPanel}>
               <View style={styles.instructionsHeader}>
                 <Text style={styles.instructionsTitle}>Instructions de conduite</Text>
@@ -413,22 +438,11 @@ export default function MapScreen() {
             </View>
           )}
 
-          {/* Bouton pour afficher/masquer les instructions */}
-          {routeInstructions.length > 0 && !showInstructions && (
-            <TouchableOpacity
-              style={styles.showInstructionsButton}
-              onPress={() => setShowInstructions(true)}
-            >
-              <ChevronUp size={24} color="white" />
-              <Text style={styles.showInstructionsText}>Voir les instructions</Text>
-            </TouchableOpacity>
-          )}
 
           <View style={styles.actionsContainer}>
             <TouchableOpacity
               style={[styles.actionButton, styles.reportButton]}
               onPress={() => {
-                // Réinitialiser le formulaire de signalement
                 setReportType('ACCIDENTS');
                 if (locationState.location) {
                   setReportLocation({
@@ -519,8 +533,6 @@ export default function MapScreen() {
           {renderDebugInfo()}
         </>
       )}
-
-      {/* Add Report Modal */}
       <Modal
         visible={showReportModal}
         animationType="slide"
@@ -608,7 +620,6 @@ export default function MapScreen() {
                 tomtomApi={tomtomApi}
                 api={api}
                 authState={authState}
-                setWebViewUrl={setWebViewUrl}
                 setShowWebViewMap={setShowWebViewMap}
                 mapRef={mapRef}
                 setRouteCoordinates={setRouteCoordinates}
@@ -616,6 +627,8 @@ export default function MapScreen() {
                 setEndLocation={setEndLocation}
               />
             </ScrollView>
+
+
           </KeyboardAvoidingView>
         </View>
       </Modal>
@@ -891,5 +904,116 @@ const styles = StyleSheet.create({
     marginLeft: 4,
     color: '#555',
     fontFamily: 'Inter-Regular',
+  },
+  errorNotification: {
+    position: 'absolute',
+    top: 20,
+    left: 20,
+    right: 20,
+    backgroundColor: '#e74c3c',
+    borderRadius: 8,
+    padding: 10,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 3,
+    elevation: 5,
+  },
+  errorNotificationText: {
+    color: '#fff',
+    flex: 1,
+    marginRight: 10,
+    fontFamily: 'Inter-Medium',
+  },
+  errorNotificationButton: {
+    padding: 5,
+  },
+  instructionsPanel: {
+    backgroundColor: '#fff',
+    padding: 16,
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+    maxHeight: '60%',
+  },
+  instructionsHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  instructionsTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  instructionsCloseButton: {
+    padding: 6,
+  },
+  routeSummary: {
+    marginBottom: 10,
+    backgroundColor: '#f5f5f5',
+    padding: 10,
+    borderRadius: 8,
+  },
+  routeSummaryText: {
+    fontSize: 14,
+    color: '#444',
+  },
+  instructionsList: {
+    marginTop: 8,
+  },
+  instructionItem: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: 10,
+  },
+  instructionNumber: {
+    width: 26,
+    height: 26,
+    borderRadius: 13,
+    backgroundColor: '#007aff',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 10,
+  },
+  instructionNumberText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 12,
+  },
+  instructionText: {
+    flex: 1,
+    fontSize: 14,
+    color: '#333',
+  },
+  showInstructionsButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#007aff',
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 25,
+    alignSelf: 'center',
+    marginVertical: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  showInstructionsText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: '600',
+    marginLeft: 8,
   },
 });
