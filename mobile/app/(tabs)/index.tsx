@@ -101,16 +101,14 @@ export default function MapScreen() {
         const commonParams = `key=${API_KEY}&routeType=${routeMode === 'Rapide' ? 'fastest' : 'shortest'}&travelMode=car&instructionsType=text&language=fr-FR`;
 
         const requests = [
-          fetch(`${baseURL}?${commonParams}`), // avec péages
-          fetch(`${baseURL}?${commonParams}&avoid=tollRoads`) // sans péages
+          fetch(`${baseURL}?${commonParams}`),
+          fetch(`${baseURL}?${commonParams}&avoid=tollRoads`)
         ];
 
         const responses = await Promise.all(requests);
         const data = await Promise.all(responses.map(res => res.json()));
 
         const [routeWithToll, routeWithoutToll] = data;
-
-        // Tu peux choisir ici celle que tu veux afficher, exemple : avec péages
         const route = routeWithToll.routes[0];
 
         const coordinates = route.legs.flatMap(leg =>
@@ -448,8 +446,6 @@ export default function MapScreen() {
       setRefreshing(false);
     }
   };
-
-
 
   const clearRoute = () => {
     setRouteCoordinates([]);
@@ -1153,15 +1149,12 @@ const styles = StyleSheet.create({
     shadowRadius: 3,
     elevation: 3,
   },
-
   refreshButton: {
     backgroundColor: '#4A90E2',
   },
-
   clearButton: {
     backgroundColor: '#D0021B',
   },
-
   routeActionButtonText: {
     color: '#fff',
     fontSize: 14,

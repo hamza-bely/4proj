@@ -33,13 +33,11 @@ export default function ProfileScreen() {
     try {
       setIsLoading(true);
 
-      // Fetch user reports
       const reportsResponse = await api.get('/api/reports/get-all-by-user');
       if (reportsResponse.data.data) {
         setReports(reportsResponse.data.data);
       }
 
-      // Fetch user saved routes
       const routesResponse = await api.get('/api/traffic/user');
       if (routesResponse.data.data) {
         setSavedRoutes(routesResponse.data.data);
@@ -97,20 +95,6 @@ export default function ProfileScreen() {
       ]
     );
   };
-
-  const handleDeleteReport = async (id: number) => {
-    try {
-      const response = await api.delete(`/api/reports/${id}/delete-definitive`);
-      if (response.status === 200) {
-        setReports(reports.filter(report => report.id !== id));
-        Alert.alert('Succès', 'Signalement supprimé avec succès');
-      }
-    } catch (error) {
-      console.error('Error deleting report:', error);
-      Alert.alert('Erreur', 'Impossible de supprimer le signalement');
-    }
-  };
-
   const handleDeleteRoute = async (id: number) => {
     try {
       const response = await api.delete(`/api/traffic/${id}/delete-for-an-user`);
@@ -125,7 +109,6 @@ export default function ProfileScreen() {
   };
 
   const handleSelectRoute = (id: number) => {
-    // Logic to select and view route on map
     Alert.alert('Information', 'Fonctionnalité de visualisation de l\'itinéraire en développement');
   };
 
