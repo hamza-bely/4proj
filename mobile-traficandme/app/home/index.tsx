@@ -40,8 +40,8 @@ export default function HomeScreen() {
   const [userPosition, setUserPosition] = useState<{ latitude: number; longitude: number } | null>(location);
   const [activeAlert, setActiveAlert] = useState<ReportData | null>(null);
   const [shownAlerts, setShownAlerts] = useState<Set<string>>(new Set());
-  const [reports, setReports] = useState<ReportData[]>([]); // Ajout de l'état pour les rapports
-  const [reportIndex, setReportIndex] = useState(0); // Ajout de l'état pour l'index du rapport actuel
+  const [reports, setReports] = useState<ReportData[]>([]);
+  const [reportIndex, setReportIndex] = useState(0);
 
   const EXPO_PUBLIC_TOMTOM_API_KEY = process.env.EXPO_PUBLIC_TOMTOM_API_KEY;
 
@@ -210,7 +210,7 @@ export default function HomeScreen() {
     <TomTomMap destination={destination} routeOptions={routeOptions} selectedRoute={selectedRoute} />
   ), [destination, routeOptions, selectedRoute]);
 
-  // Ajout de l'effet pour mettre à jour l'affichage des rapports
+
   useEffect(() => {
     if (reports.length > 0 && userPosition) {
       const interval = setInterval(() => {
@@ -277,14 +277,14 @@ export default function HomeScreen() {
           {activeAlert && (
             <View style={styles.reportAlert}>
               <Image
-                source={getInstructionIcon(activeAlert.type)} // Assurez-vous d'avoir une fonction pour obtenir l'icône du rapport
+                source={getInstructionIcon(activeAlert.type)}
                 style={{ width: 50, height: 50, tintColor: '#ff0000', marginRight: 15 }}
               />
               <View>
                 <Text style={{ color: '#fff', fontSize: 24, fontWeight: 'bold' }}>
                   {getReportDistance(activeAlert)} m
                 </Text>
-                <Text style={{ color: '#fff', fontSize: 18 }}>{activeAlert.name}</Text>
+                <Text style={{ color: '#fff', fontSize: 18 }}>{activeAlert.type}</Text>
               </View>
             </View>
           )}
