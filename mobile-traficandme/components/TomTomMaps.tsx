@@ -129,7 +129,7 @@ export default function TomTomMap({destination, routeOptions, selectedRoute}: To
         });
         map.addControl(new tt.FullscreenControl());
 
-        // Set up user marker placeholder
+
         let userCoords = defaultCoords;
         let userMarker = null;
         let userIconInner = null;
