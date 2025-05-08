@@ -21,10 +21,10 @@ INSERT INTO report (
       ('10 boulevard Haussmann', CURRENT_TIMESTAMP, 1, 43.2965, 5, 5.3698, 'PENDING', 'TRAFFIC', CURRENT_TIMESTAMP, 'alice.johnson@example.com'),
       ('22 chemin des Lilas', CURRENT_TIMESTAMP, 3, 50.6292, 8, 3.0573, 'PENDING', 'OBSTACLES', CURRENT_TIMESTAMP, 'bob.miller@example.com'),
       ('7 rue des Peupliers', CURRENT_TIMESTAMP, 0, 44.8378, 0, -0.5792, 'AVAILABLE', 'ACCIDENTS', CURRENT_TIMESTAMP, 'carol.davis@example.com');
-DELETE FROM traffic;
-DROP TABLE IF EXISTS traffic;
+DELETE FROM itinerary;
+DROP TABLE IF EXISTS itinerary;
 
-CREATE TABLE traffic (
+CREATE TABLE itinerary (
                          id BIGINT AUTO_INCREMENT PRIMARY KEY,
                          address_end VARCHAR(255),
                          address_start VARCHAR(255),
@@ -40,7 +40,7 @@ CREATE TABLE traffic (
                          user_name VARCHAR(100)
 );
 
-INSERT INTO traffic (
+INSERT INTO itinerary (
     address_end, address_start, create_date, end_latitude, end_longitude, is_peage,
     mode, start_latitude, start_longitude, status, update_date, user_name
 ) VALUES

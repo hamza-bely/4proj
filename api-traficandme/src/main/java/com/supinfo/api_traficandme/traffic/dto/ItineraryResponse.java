@@ -1,10 +1,10 @@
-package com.supinfo.api_traficandme.itinerary.dto;
+package com.supinfo.api_traficandme.traffic.dto;
 
 import com.supinfo.api_traficandme.common.ModeCirculation;
 import lombok.Data;
 
 @Data
-public class TrafficResponse {
+public class ItineraryResponse {
     private String startLongitude;
     private String startLatitude;
     private String endLongitude;

@@ -10,7 +10,7 @@ import com.supinfo.api_traficandme.reports.service.ReportService;
 import com.supinfo.api_traficandme.statistiques.dto.SummaryStatistic;
 import com.supinfo.api_traficandme.statistiques.dto.ReportData;
 import com.supinfo.api_traficandme.statistiques.dto.RouteData;
-import com.supinfo.api_traficandme.itinerary.service.TrafficService;
+import com.supinfo.api_traficandme.traffic.service.ItineraryService;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -21,20 +21,20 @@ import java.util.List;
 public class StatisticService {
 
     private final AdminService adminService;
-    private final TrafficService trafficService;
+    private final ItineraryService itineraryService;
     private final ReportService reportService;
     private final CalendarRepository calendarRepository;
 
-    public StatisticService(AdminService adminService, TrafficService trafficService,
+    public StatisticService(AdminService adminService, ItineraryService itineraryService,
                             ReportService reportService, CalendarRepository calendarRepository) {
         this.adminService = adminService;
-        this.trafficService = trafficService;
+        this.itineraryService = itineraryService;
         this.reportService = reportService;
         this.calendarRepository = calendarRepository;
     }
 
     public SummaryStatistic StatAdmin(){
-        long routeSearches = trafficService.getTotalTraffic();
+        long routeSearches = itineraryService.getTotalTraffic();
         long activeUser = adminService.countUsersByStatus(StatusUser.ACTIVE);
         long trafficInfo = reportService.getTotalReports();
         long deletedUser = adminService.countUsersByStatus(StatusUser.DELETED);
@@ -50,7 +50,7 @@ public class StatisticService {
     }
 
     public List<RouteData> getRouteStatistics() {
-        return trafficService.getRouteData();
+        return itineraryService.getRouteData();
     }
 
     public List<ReportData> getReportStatistics() {

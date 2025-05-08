@@ -1,11 +1,11 @@
-package com.supinfo.api_traficandme.itinerary.service;
+package com.supinfo.api_traficandme.traffic.service;
 
+import com.supinfo.api_traficandme.traffic.entity.Itinerary;
 import com.supinfo.api_traficandme.user.dto.UserResponse;
 import com.supinfo.api_traficandme.statistiques.dto.RouteData;
-import com.supinfo.api_traficandme.itinerary.dto.StatusTraffic;
-import com.supinfo.api_traficandme.itinerary.dto.TrafficRequest;
-import com.supinfo.api_traficandme.itinerary.repository.TrafficRepository;
-import com.supinfo.api_traficandme.itinerary.entity.Traffic;
+import com.supinfo.api_traficandme.traffic.dto.StatusTraffic;
+import com.supinfo.api_traficandme.traffic.dto.ItineraryRequest;
+import com.supinfo.api_traficandme.traffic.repository.ItineraryRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -13,14 +13,14 @@ import java.util.stream.Collectors;
 
 @Service
 
-public class TrafficService {
-    private final TrafficRepository trafficRepository;
+public class ItineraryService {
+    private final ItineraryRepository itineraryRepository;
 
-    public TrafficService(TrafficRepository trafficRepository) {
-        this.trafficRepository = trafficRepository;
+    public ItineraryService(ItineraryRepository itineraryRepository) {
+        this.itineraryRepository = itineraryRepository;
     }
 
-    public Traffic createTraffic(TrafficRequest request, UserResponse connectedUser) throws Exception {
+    public Itinerary createTraffic(ItineraryRequest request, UserResponse connectedUser) throws Exception {
 
         if (request.getStartLongitude() == null || request.getStartLongitude().isBlank()) {
             throw new IllegalArgumentException("Start longitude is required.");
@@ -41,7 +41,7 @@ public class TrafficService {
             throw new IllegalArgumentException("Authenticated user is required.");
         }
 
-        int userTrafficCount = trafficRepository.countByUser(connectedUser.email());
+        int userTrafficCount = itineraryRepository.countByUser(connectedUser.email());
         if (userTrafficCount >= 10) {
             throw new IllegalStateException("You have reached the maximum number of 10 saved routes. Please delete one before creating a new one.");
         }
@@ -55,7 +55,7 @@ public class TrafficService {
             throw new Exception("Traffic record already exists for this route and user");
         }
 
-        Traffic stop = new Traffic();
+        Itinerary stop = new Itinerary();
         stop.setStartLongitude(request.getStartLongitude());
         stop.setStartLatitude(request.getStartLatitude());
         stop.setEndLongitude(request.getEndLongitude());
@@ -68,55 +68,55 @@ public class TrafficService {
         stop.setCreateDate(new Date());
         stop.setUpdateDate(new Date());
 
-        return trafficRepository.save(stop);
+        return itineraryRepository.save(stop);
     }
 
-    public List<Traffic> getAllTraffic() {
-        return trafficRepository.findAll();
+    public List<Itinerary> getAllTraffic() {
+        return itineraryRepository.findAll();
     }
 
-    public List<Traffic> getAllTrafficByUser(UserResponse userConnected) {
-        return  trafficRepository.findAll().stream()
+    public List<Itinerary> getAllTrafficByUser(UserResponse userConnected) {
+        return  itineraryRepository.findAll().stream()
                 .filter(report -> report.getUser().equals(userConnected.email()))
                 .collect(Collectors.toList());
     }
 
-    public Traffic deleteTrafficForAnUser(Integer idTraffic) throws Exception {
+    public Itinerary deleteTrafficForAnUser(Integer idTraffic) throws Exception {
 
-        Optional<Traffic> optionalTraffic = trafficRepository.findById(idTraffic);
+        Optional<Itinerary> optionalTraffic = itineraryRepository.findById(idTraffic);
 
         if (optionalTraffic.isEmpty()) {
             throw new Exception("No traffic found for this user.");
         }
 
-        Traffic traffic = optionalTraffic.get();
-        traffic.setStatus(StatusTraffic.DELETED);
-        traffic.setUser("Anonymous");
-        traffic.setUpdateDate(new Date());
+        Itinerary itinerary = optionalTraffic.get();
+        itinerary.setStatus(StatusTraffic.DELETED);
+        itinerary.setUser("Anonymous");
+        itinerary.setUpdateDate(new Date());
 
-        return trafficRepository.save(traffic);
+        return itineraryRepository.save(itinerary);
     }
 
     public Boolean deleteDefinitiveTrafficForAnAdmin(Integer id){
-        Optional<Traffic> traffic = trafficRepository.findById(id);
+        Optional<Itinerary> traffic = itineraryRepository.findById(id);
         if(traffic.isPresent()){
-            trafficRepository.delete(traffic.get());
+            itineraryRepository.delete(traffic.get());
             return true;
         }
         return false;
     }
 
     public boolean isTrafficExists(String startLongitude, String startLatitude, String endLongitude, String endLatitude, String user) {
-        return trafficRepository.existsByStartLongitudeAndStartLatitudeAndEndLongitudeAndEndLatitudeAndUser(
+        return itineraryRepository.existsByStartLongitudeAndStartLatitudeAndEndLongitudeAndEndLatitudeAndUser(
                 startLongitude, startLatitude, endLongitude, endLatitude, user);
     }
 
     public long getTotalTraffic() {
-        return trafficRepository.count();
+        return itineraryRepository.count();
     }
 
     public List<RouteData> getRouteData() {
-        List<Object[]> results = trafficRepository.countByMode();
+        List<Object[]> results = itineraryRepository.countByMode();
         List<RouteData> routeDataList = new ArrayList<>();
 
         for (Object[] result : results) {

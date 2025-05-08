@@ -8,7 +8,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
+@EnableScheduling
 @SpringBootApplication(exclude = SecurityAutoConfiguration.class)
 public class ApiTrafficAndMeApplication {
 
@@ -25,18 +27,13 @@ public class ApiTrafficAndMeApplication {
 				System.out.println("Admin added.");
 			}
 
-			if (userService.getOneUserByEmail("admin2@traficandme.com") == null) {
-				userService.createUser(new UserRequest(null,"Admin", "User", "admin2@traficandme.com", "AdminPass123!", "ADMIN","ACTIVE"));
-				System.out.println("Admin added.");
-			}
-
 			//create user
 			if (userService.getOneUserByEmail("hamza.bely@traficandme.com") == null) {
 				userService.createUser(new UserRequest(null,"Hamza", "Bely", "hamza.bely@traficandme.com", "UserPass123!", "USER","ACTIVE"));
 				System.out.println("User added.");
 			}
 
-			//create second admin user
+			//create moderator user
 			if (userService.getOneUserByEmail("moderator.@traficandme.com") == null) {
 				userService.createUser(new UserRequest(null,"Moderator", "User", "moderator.@traficandme.com", "ModeratorPass123!", "MODERATOR","ACTIVE"));
 				System.out.println("User added.");

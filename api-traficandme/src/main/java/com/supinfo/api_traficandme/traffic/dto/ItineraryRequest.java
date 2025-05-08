@@ -1,11 +1,11 @@
-package com.supinfo.api_traficandme.itinerary.dto;
+package com.supinfo.api_traficandme.traffic.dto;
 
 import com.supinfo.api_traficandme.common.ModeCirculation;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
-public class TrafficRequest {
+public class ItineraryRequest {
     @NotNull
     private String startLongitude;
     @NotNull

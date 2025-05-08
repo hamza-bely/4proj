@@ -1,7 +1,7 @@
-package com.supinfo.api_traficandme.itinerary.entity;
+package com.supinfo.api_traficandme.traffic.entity;
 
 import com.supinfo.api_traficandme.common.ModeCirculation;
-import com.supinfo.api_traficandme.itinerary.dto.StatusTraffic;
+import com.supinfo.api_traficandme.traffic.dto.StatusTraffic;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,12 +11,12 @@ import lombok.NoArgsConstructor;
 import java.util.Date;
 
 @Entity
-@Table(name = "traffic")
+@Table(name = "itinerary")
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class Traffic {
+public class Itinerary {
     @Id
     @GeneratedValue
     private int id;

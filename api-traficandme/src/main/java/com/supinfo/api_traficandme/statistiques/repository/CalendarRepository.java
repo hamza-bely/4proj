@@ -17,7 +17,7 @@ public interface CalendarRepository extends JpaRepository<ParamCalendar, LocalDa
             "    COUNT(DISTINCT trafic.id) AS trafficCount, " +
             "    COUNT(DISTINCT report.id) AS reportCount " +
             "FROM calendar_stats cal " +
-            "LEFT JOIN traffic trafic " +
+            "LEFT JOIN Itinerary trafic " +
             "    ON EXTRACT(DAY FROM trafic.create_date) = EXTRACT(DAY FROM cal.calendar_date) " +
             "LEFT JOIN report report " +
             "    ON EXTRACT(DAY FROM report.create_date) = EXTRACT(DAY FROM cal.calendar_date) " +
@@ -30,7 +30,7 @@ public interface CalendarRepository extends JpaRepository<ParamCalendar, LocalDa
             "    COUNT(DISTINCT trafic.id) AS trafficCount, " +
             "    COUNT(DISTINCT report.id) AS reportCount " +
             "FROM calendar_stats cal " +
-            "LEFT JOIN traffic trafic " +
+            "LEFT JOIN Itinerary trafic " +
             "    ON EXTRACT(DAY FROM trafic.create_date) = EXTRACT(DAY FROM cal.calendar_date) " +
             "LEFT JOIN report report " +
             "    ON EXTRACT(DAY FROM report.create_date) = EXTRACT(DAY FROM cal.calendar_date) " +
@@ -43,7 +43,7 @@ public interface CalendarRepository extends JpaRepository<ParamCalendar, LocalDa
             "    COUNT(DISTINCT trafic.id) AS trafficCount, " +
             "    COUNT(DISTINCT report.id) AS reportCount " +
             "FROM calendar_stats cal " +
-            "LEFT JOIN traffic trafic " +
+            "LEFT JOIN Itinerary trafic " +
             "    ON EXTRACT(DAY FROM trafic.create_date) = EXTRACT(DAY FROM cal.calendar_date) " +
             "LEFT JOIN report report " +
             "    ON EXTRACT(DAY FROM report.create_date) = EXTRACT(DAY FROM cal.calendar_date) " +
@@ -56,7 +56,7 @@ public interface CalendarRepository extends JpaRepository<ParamCalendar, LocalDa
             "    COUNT(DISTINCT trafic.id) AS trafficCount, " +
             "    COUNT(DISTINCT report.id) AS reportCount " +
             "FROM calendar_stats cal " +
-            "LEFT JOIN traffic trafic " +
+            "LEFT JOIN Itinerary trafic " +
             "    ON DATE(trafic.create_date) = cal.calendar_date " +
             "LEFT JOIN report report " +
             "    ON DATE(report.create_date) = cal.calendar_date " +
