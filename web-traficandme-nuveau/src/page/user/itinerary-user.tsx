@@ -94,7 +94,6 @@ export default function ItineraryUser() {
         return modeMappings[mode as keyof typeof modeMappings] || mode;
     };
 
-    // Render card view for route (mobile)
     const RouteCard = ({ route }: { route: SavedRoute }) => (
         <div className="bg-white shadow rounded-lg mb-4 p-4 border border-gray-200">
             <div className="flex justify-between items-start mb-2">
@@ -166,14 +165,12 @@ export default function ItineraryUser() {
                 <p className="text-gray-500">{t('routes.noRoutes')}</p>
             ) : (
                 <>
-                    {/* Mobile view - Cards */}
                     <div className="md:hidden">
                         {routeUser.map((route) => (
                             <RouteCard key={route.id} route={route} />
                         ))}
                     </div>
 
-                    {/* Tablet and Desktop view - Table */}
                     <div className="hidden md:block overflow-x-auto">
                         <table className="min-w-full divide-y divide-gray-200 table-fixed">
                             <thead className="bg-gray-50">

@@ -9,7 +9,7 @@ interface ModalDeleteUserProps {
 }
 
 export default function ModalDeleteUser({ closeModal, userId }: ModalDeleteUserProps) {
-    const { t } = useTranslation(); // Hook pour les traductions
+    const { t } = useTranslation();
     const [inputValue, setInputValue] = useState("");
     const {  deleteUserForAnUser } = useUserStore();
     const isConfirmed = inputValue.trim().toUpperCase() === "CONFIRME";

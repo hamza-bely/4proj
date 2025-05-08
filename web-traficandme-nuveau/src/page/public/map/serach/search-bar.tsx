@@ -12,10 +12,7 @@ type SearchResult = {
   address: string;
 };
 
-/*interface SearchProps {
-  onSearchResultSelect: (position: { lat: number; lon: number }, address: string) => void;
-  initialValue: string;
-}*/
+
 
 const Search: React.FC<any> = ({ onSearchResultSelect,initialValue = ""  }) => {
   const { t } = useTranslation();

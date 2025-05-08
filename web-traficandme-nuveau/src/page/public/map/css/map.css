@@ -61,7 +61,7 @@
     align-items: center;
 }
 
-/* Ajoutez ces styles à votre fichier map.css */
+
 
 .route-marker {
     width: 25px;
@@ -73,11 +73,11 @@
 }
 
 .start-marker {
-    background-color: #4CAF50; /* Vert pour le départ */
+    background-color: #4CAF50;
 }
 
 .end-marker {
-    background-color: #F44336; /* Rouge pour l'arrivée */
+    background-color: #F44336;
 }
 
 .marker-inner {

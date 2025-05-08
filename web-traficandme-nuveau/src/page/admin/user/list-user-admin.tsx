@@ -8,7 +8,7 @@ import { Dialog } from "../../../assets/kit-ui/dialog";
 import { ToastContainer, toast } from "react-toastify";
 import ConfirmDialog from "../../../components/dialog/dialog.tsx";
 
-// Définir les utilisateurs protégés
+
 const PROTECTED_USERS = ["admin@traficandme.com"];
 
 export default function ListUserAdmin() {
@@ -34,7 +34,7 @@ export default function ListUserAdmin() {
     }, [fetchUsers]);
 
     const handleUpdateClick = (id: number) => {
-        // Vérifier si l'utilisateur est protégé avant de permettre la modification
+
         const user = users.find(u => u.id === id);
         if (user && PROTECTED_USERS.includes(user.email)) {
             toast.error(t("user-admin.protected_user", "Cet utilisateur est protégé et ne peut pas être modifié"));
@@ -45,7 +45,7 @@ export default function ListUserAdmin() {
     };
 
     const handleDeleteClick = (userId: number, permanent: boolean = false) => {
-        // Vérifier si l'utilisateur est protégé avant de permettre la suppression
+
         const user = users.find(u => u.id === userId);
         if (user && PROTECTED_USERS.includes(user.email)) {
             toast.error(t("user-admin.protected_user", "Cet utilisateur est protégé et ne peut pas être supprimé"));
@@ -59,7 +59,7 @@ export default function ListUserAdmin() {
 
     const confirmDelete = async () => {
         if (selectedUserId !== null) {
-            // Double vérification pour s'assurer que l'utilisateur n'est pas protégé
+
             if (selectedUserEmail && PROTECTED_USERS.includes(selectedUserEmail)) {
                 toast.error(t("user-admin.protected_user", "Cet utilisateur est protégé et ne peut pas être supprimé"));
                 setIsConfirmDeleteOpen(false);
@@ -148,7 +148,7 @@ export default function ListUserAdmin() {
                 </div>
             </div>
 
-            {/* Table for larger screens */}
+
             <div className="hidden md:block overflow-x-auto">
                 <div className="inline-block min-w-full py-2 align-middle">
                     <table className="min-w-full divide-y divide-gray-300">
@@ -247,7 +247,7 @@ export default function ListUserAdmin() {
                 </div>
             </div>
 
-            {/* Card view for mobile screens */}
+
             <div className="md:hidden">
                 {isLoading ? (
                     <div className="flex justify-center p-4">

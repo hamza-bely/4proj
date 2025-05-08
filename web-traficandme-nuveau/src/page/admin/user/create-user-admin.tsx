@@ -4,7 +4,7 @@ import useUserStore from "../../../services/store/user-store.tsx";
 import { UserCreateRequest } from "../../../services/model/user.tsx";
 
 export default function CreateUserAdmin({ setIsOpenCreate }: { setIsOpenCreate: (open: boolean) => void }) {
-    const { t } = useTranslation(); // ← hook de traduction
+    const { t } = useTranslation();
     const { createUser } = useUserStore();
 
     const defaultUserData: UserCreateRequest = {

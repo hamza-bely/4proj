@@ -17,9 +17,9 @@ export default function Home() {
         const interval = setInterval(() => {
             index = (index + 1) % colors.length;
             setBgColor(colors[index]);
-        }, 5000); // toutes les 5 secondes
+        }, 5000);
 
-        return () => clearInterval(interval); // clear au démontage
+        return () => clearInterval(interval);
     }, []);
     return (
         <div className="bg-white">
