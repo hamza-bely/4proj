@@ -58,7 +58,6 @@ export default function ReportsUser() {
         return statusMappings[status as keyof typeof statusMappings] || status;
     };
 
-    // Mobile view card component
     const ReportCard = ({ report }: { report: Report }) => (
         <div className="bg-white shadow rounded-lg mb-4 p-4 border border-gray-200">
             <div className="flex justify-between items-start mb-3">
@@ -116,14 +115,12 @@ export default function ReportsUser() {
                 <p className="text-gray-500">{t('reports.noReports')}</p>
             ) : (
                 <>
-                    {/* Mobile view - Cards */}
                     <div className="md:hidden">
                         {filteredReports.map((report) => (
                             <ReportCard key={report.id} report={report} />
                         ))}
                     </div>
 
-                    {/* Tablet and Desktop view - Table */}
                     <div className="hidden md:block overflow-x-auto">
                         <table className="min-w-full divide-y divide-gray-200">
                             <thead className="bg-gray-50">

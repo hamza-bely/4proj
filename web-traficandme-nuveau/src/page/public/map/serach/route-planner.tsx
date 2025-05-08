@@ -132,10 +132,8 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated, startAdd
     const calculateFuelConsumption = (distanceMeters: number, fuelType: FuelType): { consumption: number; cost: number } => {
         const distanceKm = distanceMeters / 1000;
 
-        // Calculate consumption based on fuel type
         const consumption = (distanceKm * CONSUMPTION_RATES[fuelType]) / 100;
 
-        // Calculate cost
         const cost = consumption * FUEL_PRICES[fuelType];
 
         return { consumption, cost };
@@ -144,8 +142,7 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated, startAdd
     const calculateTollCost = (distanceMeters: number, avoidTolls: boolean): number => {
         if (avoidTolls) return 0;
 
-        // Estimate highway distance as a percentage of total distance
-        // For routes with tolls, assume 80% is on highways with tolls
+
         const highwayDistanceKm = (distanceMeters / 1000) * 0.8;
         return highwayDistanceKm * TOLL_RATE_PER_KM;
     };
@@ -165,7 +162,7 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated, startAdd
         setShowCostDetails(false);
 
         try {
-            // Use our new service function with translations
+
             const routeNameTranslations = {
                 fastest: t("map.fastest"),
                 shortest: t("map.shortest"),
@@ -177,7 +174,7 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated, startAdd
             if (validRoutes.length > 0) {
                 setRouteOptions(validRoutes);
                 setSelectedRouteId(validRoutes[0].id);
-                onRouteCalculated(JSON.stringify(validRoutes[0].coordinates)); // Display first route
+                onRouteCalculated(JSON.stringify(validRoutes[0].coordinates));
                 setShowResults(true);
             } else {
                 toast.error(t("map.no-routes"));
@@ -258,7 +255,6 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated, startAdd
                 return;
             }
 
-            // Calculate fuel and toll costs
             const { consumption, cost: fuelCost } = calculateFuelConsumption(selectedRoute.distance, fuelType);
             const tollCost = calculateTollCost(selectedRoute.distance, selectedRoute.avoidTolls);
 
@@ -286,11 +282,10 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated, startAdd
                 }
             };
 
-            // Convert data to JSON string
             const qrCodeDataStr = JSON.stringify(qrData);
             setQrCodeData(qrCodeDataStr);
 
-            // Show modal
+
             setShowQRCode(true);
         } catch (error) {
             console.error(t("error.qr-generation"), error);
@@ -311,7 +306,6 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated, startAdd
 
     const handleFuelTypeChange = (type: FuelType) => {
         setFuelType(type);
-        // No need to recalculate routes, just update the cost information
     };
 
     const toggleInstructions = () => {
@@ -473,7 +467,6 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated, startAdd
                 </>
             ) : (
                 <div className="route-options">
-                    {/* Show route options only when instructions and cost details are not displayed */}
                     {!showInstructions && !showCostDetails && (
                         <div className="space-y-2">
                             {routeOptions.map((route) => {
@@ -596,7 +589,6 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated, startAdd
                 </div>
             )}
 
-            {/* QR Code Modal */}
             {showQRCode && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
                     <div className="bg-white rounded-lg p-6 w-96 max-w-lg">

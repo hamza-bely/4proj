@@ -95,7 +95,7 @@ const Map: React.FC = () => {
         }
     }, [apiKey]);
 
-    // Display route on map as a memoized function
+
     const displayRouteOnMap = useCallback((routeCoordinates: Array<[number, number]>, mapInstance: tt.Map) => {
         if (!mapInstance || !routeCoordinates.length) return;
 
@@ -106,7 +106,7 @@ const Map: React.FC = () => {
             mapInstance.removeSource('route');
         }
 
-        // Add new route source
+
         mapInstance.addSource('route', {
             type: 'geojson',
             data: {
@@ -119,7 +119,7 @@ const Map: React.FC = () => {
             }
         });
 
-        // Add route outline (white border)
+
         mapInstance.addLayer({
             id: 'route-outline',
             type: 'line',
@@ -134,7 +134,7 @@ const Map: React.FC = () => {
             }
         });
 
-        // Add route line
+
         mapInstance.addLayer({
             id: 'route',
             type: 'line',
@@ -149,7 +149,7 @@ const Map: React.FC = () => {
             }
         });
 
-        // Fit map to route bounds
+
         const bounds = new tt.LngLatBounds();
         routeCoordinates.forEach(coord => {
             bounds.extend(coord);
@@ -162,11 +162,11 @@ const Map: React.FC = () => {
 
 
 
-        // Add start and end markers
+
         const startPoint = routeCoordinates[0];
         const endPoint = routeCoordinates[routeCoordinates.length - 1];
 
-        // Create marker elements
+
         const startElement = document.createElement('div');
         startElement.className = 'route-marker start-marker';
         startElement.innerHTML = '<div class="marker-inner"></div>';
@@ -175,7 +175,7 @@ const Map: React.FC = () => {
         endElement.className = 'route-marker end-marker';
         endElement.innerHTML = '<div class="marker-inner"></div>';
 
-        // Add markers to map
+
         new tt.Marker({ element: startElement })
             .setLngLat(startPoint)
             .addTo(mapInstance);
@@ -185,17 +185,17 @@ const Map: React.FC = () => {
             .addTo(mapInstance);
     }, []);
 
-    // Setup map and intervals
+
     useEffect(() => {
         if (!mapElement.current) return;
 
-        // Clear existing map and intervals before creating new ones
+
         if (map) map.remove();
 
         intervalRefs.current.forEach(interval => clearInterval(interval));
         intervalRefs.current = [];
 
-        // Determine map center and zoom
+
         let center: [number, number];
         let zoom: number;
 
@@ -210,7 +210,7 @@ const Map: React.FC = () => {
             zoom = DEFAULT_ZOOM;
         }
 
-        // Create map instance
+
         const mapInstance = tt.map({
             key: apiKey,
             container: mapElement.current,
@@ -220,9 +220,9 @@ const Map: React.FC = () => {
 
         setMap(mapInstance);
 
-        // Set up map when loaded
+
         mapInstance.on("load", () => {
-            // Enable traffic layer
+
             enableTrafficLayer(mapInstance);
 
             if (startLat && startLon && endLat && endLon) {

@@ -144,12 +144,7 @@ export const tomtomInjectedFunctions = `
         }
     };
 
-    /**
-   * Ajoute un marker « report » sur la carte avec une icône custom.
-   * @param {number} lng Longitude du signalement
-   * @param {number} lat Latitude du signalement
-   * @param {string} iconUrl URL publique de l'icône (ex. via Image.resolveAssetSource)
-   */
+
     window.addReportMarker = function(lng, lat, iconUrl) {
     const el = document.createElement('img');
     el.src = iconUrl;
