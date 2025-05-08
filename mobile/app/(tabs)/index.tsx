@@ -338,6 +338,7 @@ export default function MapScreen() {
   const handleLikeReport = async (id) => {
     try {
       await api.post(`/api/reports/${id}/like`);
+      setSelectedReport(null);
       fetchReports();
     } catch (error) {
       console.error('Error liking report:', error);
@@ -348,6 +349,7 @@ export default function MapScreen() {
   const handleDislikeReport = async (id) => {
     try {
       await api.post(`/api/reports/${id}/dislike`);
+      setSelectedReport(null);
       fetchReports();
     } catch (error) {
       console.error('Error disliking report:', error);
