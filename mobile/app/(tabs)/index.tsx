@@ -17,6 +17,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import { api, tomtomApi, reverseGeocode } from '@/services/api';
 import LoadingIndicator from '@/components/LoadingIndicator';
 import Button from '@/components/Button';
+import { router } from 'expo-router';
+
 import ReportMarker from '@/components/ReportMarker';
 import {
   AlertCircle,
@@ -72,10 +74,9 @@ export default function MapScreen() {
       }, 1000);
     }
   };
+  const { startLat, startLng, endLat, endLng } = params || {};
 
   useEffect(() => {
-    const { startLat, startLng, endLat, endLng } = params || {};
-
     if (startLat && startLng && endLat && endLng) {
       const start = {
         latitude: parseFloat(startLat as string),
@@ -85,9 +86,12 @@ export default function MapScreen() {
         latitude: parseFloat(endLat as string),
         longitude: parseFloat(endLng as string),
       };
-      fetchAndDisplayRoute(start, end);
+      fetchAndDisplayRoute(start, end).finally(() => {
+        router.replace('/(tabs)');
+      });
     }
-  }, [params?.startLat, params?.startLng, params?.endLat, params?.endLng]);
+  }, [startLat, startLng, endLat, endLng]);
+
 
   const fetchAndDisplayRoute = async (start, end) => {
     try {
@@ -133,6 +137,9 @@ export default function MapScreen() {
         setRouteCoordinates(coordinates);
         setRouteInstructions(instructions);
         setRouteSummary(summary);
+        setTimeout(() => {
+          setShowInstructions(true);
+        }, 1000);
 
         zoomToStart(coordinates[0]);
 
@@ -408,8 +415,8 @@ export default function MapScreen() {
         const startCoords = `${updatedStartLocation.latitude},${updatedStartLocation.longitude}`;
         const endCoords = `${lastCoord.latitude},${lastCoord.longitude}`;
         const API_KEY = process.env.EXPO_PUBLIC_TOMTOM_API_KEY;
-        const routeMode = 'Rapide'; // ou selon ton état
-        const vehicleType = 'car';  // ou selon ton choix
+        const routeMode = 'Rapide';
+        const vehicleType = 'car';
 
         const url = `https://api.tomtom.com/routing/1/calculateRoute/${startCoords}:${endCoords}/json?key=${API_KEY}&routeType=${routeMode === 'Rapide' ? 'fastest' : 'shortest'}&travelMode=${vehicleType}&instructionsType=text&language=fr-FR`;
 
@@ -457,6 +464,7 @@ export default function MapScreen() {
     setDestination(null);
     setDestinationAddress('');
 
+    router.replace('/(tabs)');
     if (startLocation) {
       mapRef.current?.animateCamera(
         {

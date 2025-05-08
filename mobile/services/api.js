@@ -4,6 +4,7 @@ export const API_URL = process.env.EXPO_PUBLIC_API_URL;
 export const TOMTOM_API_KEY = process.env.EXPO_PUBLIC_TOMTOM_API_KEY;
 export const TOMTOM_API_URL = process.env.EXPO_PUBLIC_TOMTOM_API_URL;
 
+console.log(TOMTOM_API_KEY)
 export const api = axios.create({
   baseURL: API_URL,
   timeout: 15000,
