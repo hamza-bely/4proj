@@ -1,190 +1,211 @@
-// Nouveau composant à ajouter
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
-import { Clock, DollarSign, Navigation } from 'lucide-react-native';
+import { Clock, DollarSign, MapPin, X } from 'lucide-react-native';
+import Button from '@/components/Button';
+
+const formatDuration = (seconds) => {
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+
+  if (hours > 0) {
+    return `${hours}h ${minutes}min`;
+  }
+  return `${minutes} min`;
+};
+
+const formatDistance = (meters) => {
+  if (meters >= 1000) {
+    return `${(meters / 1000).toFixed(1)} km`;
+  }
+  return `${meters} m`;
+};
 
 const RouteOptionsModal = ({ routes, onSelectRoute, onClose }) => {
-  console.log("routes",routes[0].routes );
-  const formatDuration = (seconds) => {
-    const hours = Math.floor(seconds / 3600);
-    const minutes = Math.floor((seconds % 3600) / 60);
-
-    if (hours > 0) {
-      return `${hours} h ${minutes} min`;
-    } else {
-      return `${minutes} min`;
-    }
-  };
-
-  // Formatage de la distance en km
-  const formatDistance = (meters) => {
-    if (meters < 1000) {
-      return `${meters} m`;
-    } else {
-      return `${(meters / 1000).toFixed(1)} km`;
-    }
-  };
+  if (!routes || routes.length === 0) {
+    return (
+      <View style={styles.modalContent}>
+        <View style={styles.modalHeader}>
+          <Text style={styles.modalTitle}>Options d'itinéraire</Text>
+          <TouchableOpacity onPress={onClose}>
+            <X size={24} color="#333" />
+          </TouchableOpacity>
+        </View>
+        <Text style={styles.noRoutesText}>Aucun itinéraire disponible</Text>
+        <Button title="Fermer" onPress={onClose} />
+      </View>
+    );
+  }
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Itinéraires disponibles</Text>
+    <View style={styles.modalContent}>
+      <View style={styles.modalHeader}>
+        <Text style={styles.modalTitle}>Options d'itinéraire</Text>
         <TouchableOpacity onPress={onClose}>
-          <Text style={styles.closeButton}>Fermer</Text>
+          <X size={24} color="#333" />
         </TouchableOpacity>
       </View>
 
-      <ScrollView style={styles.routesList}>
-        {routes.map((route, index) => (
-          <TouchableOpacity
-            key={index}
-            style={styles.routeItem}
-            onPress={() => onSelectRoute(route)}
-          >
-            <View style={styles.routeHeader}>
-              <View style={styles.routeType}>
-                <Navigation size={20} color="#3498db" />
-                <Text style={styles.routeTypeText}>
-                  {route.hasTolls ? 'Avec péage' : 'Sans péage'}
-                </Text>
-              </View>
+      <ScrollView style={styles.routesContainer}>
+        {routes.map((route, index) => {
+          const routeData = route.routes[0];
+          const summary = routeData.summary;
+
+          return (
+            <TouchableOpacity
+              key={index}
+              style={[
+                styles.routeOption,
+                route.isRecommended && styles.recommendedRoute
+              ]}
+              onPress={() => onSelectRoute(route)}
+            >
               {route.isRecommended && (
                 <View style={styles.recommendedBadge}>
                   <Text style={styles.recommendedText}>Recommandé</Text>
                 </View>
               )}
-            </View>
 
-            <View style={styles.routeDetails}>
-              <View style={styles.detailItem}>
-                <Clock size={16} color="#555" />
-                <Text style={styles.detailText}>
-                  {formatDuration(routes[0].routes[0].summary.travelTimeInSeconds)}
+              <View style={styles.routeHeader}>
+                <Text style={styles.routeTitle}>
+                  {index === 0 ? "Itinéraire" : "Alternative " + index}
+                  {route.hasTolls ? " (avec péage)" : " (sans péage)"}
                 </Text>
               </View>
 
-              <View style={styles.detailItem}>
-                <Navigation size={16} color="#555" />
-                <Text style={styles.detailText}>
-                  {formatDistance(routes[0].routes[0].summary.lengthInMeters)}
-                </Text>
-              </View>
-
-              {route.hasTolls && (
-                <View style={styles.detailItem}>
-                  <DollarSign size={16} color="#555" />
-                  <Text style={styles.detailText}>Péages</Text>
+              <View style={styles.routeDetails}>
+                <View style={styles.routeDetail}>
+                  <Clock size={16} color="#3498db" />
+                  <Text style={styles.routeDetailText}>
+                    {formatDuration(summary.travelTimeInSeconds)}
+                  </Text>
                 </View>
-              )}
-            </View>
 
-            {routes[0].routes[0].summary.trafficDelayInSeconds > 60 && (
-              <View style={styles.trafficWarning}>
-                <Text style={styles.trafficWarningText}>
-                  +{formatDuration(routes[0].routes[0].summary.trafficDelayInSeconds)} de retard dû au trafic
-                </Text>
+                <View style={styles.routeDetail}>
+                  <MapPin size={16} color="#3498db" />
+                  <Text style={styles.routeDetailText}>
+                    {formatDistance(summary.lengthInMeters)}
+                  </Text>
+                </View>
+
+                {route.hasTolls && (
+                  <View style={styles.routeDetail}>
+                    <DollarSign size={16} color="#3498db" />
+                    <Text style={styles.routeDetailText}>Péages inclus</Text>
+                  </View>
+                )}
               </View>
-            )}
-          </TouchableOpacity>
-        ))}
+
+              <Button
+                title="Sélectionner cet itinéraire"
+                onPress={() => onSelectRoute(route)}
+                style={styles.selectButton}
+              />
+            </TouchableOpacity>
+          );
+        })}
       </ScrollView>
+
+      <View style={styles.modalActions}>
+        <Button
+          title="Annuler"
+          variant="outline"
+          onPress={onClose}
+          style={styles.modalButton}
+        />
+      </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  modalContent: {
     backgroundColor: 'white',
     borderRadius: 12,
-    padding: 16,
+    padding: 24,
+    width: '90%',
+    maxWidth: 500,
+    alignSelf: 'center',
     maxHeight: '80%',
-    width: '100%',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
-    shadowRadius: 3.84,
+    shadowRadius: 4,
     elevation: 5,
   },
-  header: {
+  modalHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingBottom: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    marginBottom: 16,
   },
-  title: {
-    fontSize: 18,
+  modalTitle: {
+    fontSize: 20,
     fontWeight: 'bold',
-    color: '#333',
   },
-  closeButton: {
-    color: '#3498db',
-    fontSize: 16,
+  routesContainer: {
+    maxHeight: 400,
   },
-  routesList: {
-    marginTop: 12,
-  },
-  routeItem: {
-    padding: 16,
-    backgroundColor: '#f8f9fa',
+  routeOption: {
+    backgroundColor: '#f5f5f5',
     borderRadius: 8,
-    marginBottom: 12,
-    borderLeftWidth: 4,
-    borderLeftColor: '#3498db',
+    padding: 16,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: '#ddd',
   },
-  routeHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  routeType: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  routeTypeText: {
-    marginLeft: 8,
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
+  recommendedRoute: {
+    borderColor: '#3498db',
+    borderWidth: 2,
   },
   recommendedBadge: {
-    backgroundColor: '#27ae60',
-    paddingHorizontal: 8,
+    position: 'absolute',
+    top: -10,
+    right: 10,
+    backgroundColor: '#3498db',
     paddingVertical: 4,
+    paddingHorizontal: 8,
     borderRadius: 12,
   },
   recommendedText: {
     color: 'white',
+    fontWeight: 'bold',
     fontSize: 12,
-    fontWeight: '600',
+  },
+  routeHeader: {
+    marginBottom: 12,
+  },
+  routeTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
   },
   routeDetails: {
     flexDirection: 'row',
-    alignItems: 'center',
     flexWrap: 'wrap',
+    marginBottom: 16,
   },
-  detailItem: {
+  routeDetail: {
     flexDirection: 'row',
     alignItems: 'center',
     marginRight: 16,
     marginBottom: 8,
   },
-  detailText: {
+  routeDetailText: {
     marginLeft: 6,
     color: '#555',
-    fontSize: 14,
   },
-  trafficWarning: {
+  selectButton: {
     marginTop: 8,
-    backgroundColor: '#ffebee',
-    padding: 8,
-    borderRadius: 4,
   },
-  trafficWarningText: {
-    color: '#e53935',
-    fontSize: 12,
+  modalActions: {
+    marginTop: 16,
+  },
+  modalButton: {
+    width: '100%',
+  },
+  noRoutesText: {
+    textAlign: 'center',
+    marginVertical: 24,
+    color: '#555',
   },
 });
 

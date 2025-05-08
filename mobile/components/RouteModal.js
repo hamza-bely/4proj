@@ -4,15 +4,15 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  ScrollView,
   Alert,
-  Platform,
   FlatList,
-  ActivityIndicator, Modal
+  ActivityIndicator,
+  Modal
 } from 'react-native';
-import { X, MapPin, Search } from 'lucide-react-native';
+import { X, MapPin, Search, Car, Bus } from 'lucide-react-native';
 import Button from '@/components/Button';
 import RouteOptionsModal from '@/components/RouteOptionsModal';
+import { KeyboardAvoidingView, Platform } from 'react-native';
 
 const styles = {
   modalContent: { padding: 16, backgroundColor: '#fff', borderRadius: 8 },
@@ -30,12 +30,11 @@ const styles = {
   modalActions: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 20 },
   modalButton: { flex: 1, marginHorizontal: 4 },
   tollOptionContainer: { marginVertical: 12 },
-  checkboxContainer: { flexDirection: 'row', alignItems: 'center', marginTop: 8 },
-  checkbox: { width: 20, height: 20, borderWidth: 1, borderColor: '#ddd', borderRadius: 4, marginRight: 8, justifyContent: 'center', alignItems: 'center' },
-  checkboxActive: { borderColor: '#3498db' },
-  checkboxInner: { width: 12, height: 12, backgroundColor: '#3498db', borderRadius: 2 },
-  checkboxLabel: { fontSize: 16 },
-
+  vehicleTypeContainer: { flexDirection: 'row', justifyContent: 'space-between', marginVertical: 12 },
+  vehicleButton: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', padding: 12, borderWidth: 1, borderColor: '#ddd', marginHorizontal: 4, borderRadius: 4 },
+  vehicleButtonActive: { backgroundColor: '#3498db', borderColor: '#3498db' },
+  vehicleText: { color: '#333', marginLeft: 8 },
+  vehicleTextActive: { color: '#fff' },
   suggestionsContainer: { marginTop: 4, marginBottom: 12, maxHeight: 150, borderWidth: 1, borderColor: '#ddd', borderRadius: 4 },
   suggestionItem: { padding: 12, borderBottomWidth: 1, borderBottomColor: '#eee' },
   suggestionText: { fontSize: 14 },
@@ -51,20 +50,20 @@ const RouteModal = ({
                       authState,
                       setRouteCoordinates,
                       setRouteInstructions,
+                      mapRef
                     }) => {
   const [startAddress, setStartAddress] = useState('');
   const [endAddress, setEndAddress] = useState('');
   const [startLocation, setStartLocation] = useState(null);
   const [endLocation, setEndLocation] = useState(null);
   const [routeMode, setRouteMode] = useState('Rapide');
-  const [avoidTolls, setAvoidTolls] = useState(false);
+  const [vehicleType, setVehicleType] = useState('car');
   const [isLoading, setIsLoading] = useState(false);
 
   const [startSuggestions, setStartSuggestions] = useState([]);
   const [endSuggestions, setEndSuggestions] = useState([]);
   const [isLoadingStartSuggestions, setIsLoadingStartSuggestions] = useState(false);
   const [isLoadingEndSuggestions, setIsLoadingEndSuggestions] = useState(false);
-
   const [startSearchTimeout, setStartSearchTimeout] = useState(null);
   const [endSearchTimeout, setEndSearchTimeout] = useState(null);
   const [routeOptions, setRouteOptions] = useState([]);
@@ -89,7 +88,6 @@ const RouteModal = ({
               const response = await tomtomApi.get(`/search/2/reverseGeocode/${currentPosition.latitude},${currentPosition.longitude}.json`);
               if (response.data && response.data.addresses && response.data.addresses.length > 0) {
                 const address = response.data.addresses[0].address;
-                // Format plus détaillé pour l'adresse
                 const formattedAddress = [
                   address.streetNumber || '',
                   address.street || '',
@@ -157,7 +155,6 @@ const RouteModal = ({
     }
   };
 
-  // Amélioration de la recherche d'adresses
   const searchAddresses = async (text, isStart) => {
     if (!text || text.length < 2) {
       if (isStart) {
@@ -174,13 +171,12 @@ const RouteModal = ({
       isStart ? setIsLoadingStartSuggestions(true) : setIsLoadingEndSuggestions(true);
       setErrorMessage('');
 
-      // Paramètres de recherche améliorés pour des résultats plus précis
       const response = await tomtomApi.get('/search/2/search/' + encodeURIComponent(text) + '.json', {
         params: {
-          limit: 10,              // Plus de résultats
-          idxSet: 'Addr,Str,Geo',          // Recherche géographique
-          typeahead: true,        // Suggestions pendant la saisie
-          countrySet: 'FR,BE,CH,LU,DE,ES,IT', // Élargir les pays de recherche
+          limit: 10,
+          idxSet: 'Addr,Str,Geo',
+          typeahead: true,
+          countrySet: 'FR,BE,CH,LU,DE,ES,IT',
           language: 'fr-FR',
           extendedPostalCodesFor: 'Addr',
           minFuzzyLevel: 1,
@@ -291,47 +287,41 @@ const RouteModal = ({
     try {
       setIsLoading(true);
       setErrorMessage('');
-      console.log('Calculating routes from', startLocation, 'to', endLocation);
 
       const startCoords = `${startLocation.latitude},${startLocation.longitude}`;
       const endCoords = `${endLocation.latitude},${endLocation.longitude}`;
-      const API_KEY = '9zc7scbLhpcrEFouo0xJWt0jep9qNlnv';
+      const API_KEY = process.env.TOMTOM_API_KEY;
+      console.log(API_KEY)
 
-      // Calculer deux itinéraires : avec et sans péage
       const requests = [
-        fetch(`https://api.tomtom.com/routing/1/calculateRoute/${startCoords}:${endCoords}/json?key=${API_KEY}&routeType=${routeMode === 'Rapide' ? 'fastest' : 'shortest'}&travelMode=car&instructionsType=text`),
-        fetch(`https://api.tomtom.com/routing/1/calculateRoute/${startCoords}:${endCoords}/json?key=${API_KEY}&routeType=${routeMode === 'Rapide' ? 'fastest' : 'shortest'}&travelMode=car&instructionsType=text`)
+        fetch(`https://api.tomtom.com/routing/1/calculateRoute/${startCoords}:${endCoords}/json?key=${API_KEY}&routeType=${routeMode === 'Rapide' ? 'fastest' : 'shortest'}&travelMode=${vehicleType}&instructionsType=text`),
+        fetch(`https://api.tomtom.com/routing/1/calculateRoute/${startCoords}:${endCoords}/json?key=${API_KEY}&routeType=${routeMode === 'Rapide' ? 'fastest' : 'shortest'}&travelMode=${vehicleType}&instructionsType=text&avoid=tollRoads`)
       ];
-
-      console.log("requests",requests);
 
       const responses = await Promise.all(requests);
       const results = await Promise.all(responses.map(res => res.json()));
-      console.log("results", results[0].routes[0].summary.travelTimeInSeconds);
 
       if (results[0]?.routes?.[0]?.summary?.travelTimeInSeconds && results[1]?.routes?.[0]?.summary?.travelTimeInSeconds) {
-        console.log('Routes calculation successful');
-
         const travelTimeFirstRoute = results[0]?.routes?.[0]?.summary?.travelTimeInSeconds ?? 2000;
         const travelTimeSecondRoute = results[1]?.routes?.[0]?.summary?.travelTimeInSeconds ?? 2000;
 
         const routesData = [
           {
             ...results[0],
-            hasTolls: false,
-            isRecommended: travelTimeFirstRoute < travelTimeSecondRoute * 1.2 // Si le trajet sans péage est moins de 20% plus long que celui avec péage
+            hasTolls: true,
+            isRecommended: travelTimeFirstRoute < travelTimeSecondRoute * 1.2
           },
           {
             ...results[1],
-            hasTolls: true,
-            isRecommended: travelTimeFirstRoute >= travelTimeSecondRoute * 1.2 // Si le trajet avec péage est plus rapide
+            hasTolls: false,
+            isRecommended: travelTimeFirstRoute >= travelTimeSecondRoute * 1.2
           }
         ];
 
         setRouteOptions(routesData);
         setShowRouteOptionsModal(true);
       } else {
-        console.error("Erreur: Une ou plusieurs routes n'ont pas de données de durée.");
+        setErrorMessage("Erreur: Une ou plusieurs routes n'ont pas de données de durée.");
       }
 
     } catch (error) {
@@ -344,7 +334,6 @@ const RouteModal = ({
 
   const selectRoute = async (selectedRoute) => {
     try {
-      // Sauvegarder l'itinéraire dans l'API
       const routePayload = {
         startLongitude: String(startLocation.longitude),
         startLatitude: String(startLocation.latitude),
@@ -354,12 +343,12 @@ const RouteModal = ({
         address_end: endAddress || 'Arrivée',
         user: authState.user?.id?.toString() || '0',
         mode: routeMode,
+        vehicleType: vehicleType,
         peage: selectedRoute.hasTolls
       };
 
       try {
         await api.post('/api/traffic/create', routePayload);
-        console.log('Route saved successfully');
       } catch (saveError) {
         console.error('Error saving route to API:', saveError);
       }
@@ -385,37 +374,38 @@ const RouteModal = ({
 
       const summary = route.summary;
 
-      // Mettre à jour les états avec les données de route
       if (setRouteCoordinates) setRouteCoordinates(routePoints);
       if (setRouteInstructions) setRouteInstructions(instructions, summary);
-      if (setEndLocation) setEndLocation(endLocation);
 
-      // Fermer les modales
       setShowRouteOptionsModal(false);
       setShowRouteModal(false);
 
-      // Zoomer sur le départ
-      zoomToStart();
+      zoomToRoute();
     } catch (error) {
       console.error('Error processing selected route:', error);
       setErrorMessage(`Erreur: ${error.message}`);
     }
   };
 
-// 4. Nouvelle fonction pour zoomer sur le point de départ
-  const zoomToStart = () => {
+  const zoomToRoute = () => {
     if (mapRef && mapRef.current && startLocation) {
-      mapRef.current.animateToRegion({
-        latitude: startLocation.latitude,
-        longitude: startLocation.longitude,
-        latitudeDelta: 0.01,
-        longitudeDelta: 0.01
-      }, 1000);
+      mapRef.current.animateCamera(
+        {
+          center: {
+            latitude: startLocation.latitude,
+            longitude: startLocation.longitude,
+          },
+          pitch: 0,
+          zoom: 17,
+          altitude: 200,
+        },
+        { duration: 1000 }
+      );
     }
   };
 
   return (
-    <ScrollView>
+    <KeyboardAvoidingView>
       <View style={styles.modalContent}>
         <View style={styles.modalHeader}>
           <Text style={styles.modalTitle}>Planifier un itinéraire</Text>
@@ -442,7 +432,6 @@ const RouteModal = ({
           </TouchableOpacity>
         </View>
 
-        {/* Suggestions pour l'adresse de départ */}
         {isLoadingStartSuggestions ? (
           <View style={styles.loadingContainer}>
             <ActivityIndicator size="small" color="#3498db" />
@@ -482,7 +471,6 @@ const RouteModal = ({
           </TouchableOpacity>
         </View>
 
-        {/* Suggestions pour l'adresse de destination */}
         {isLoadingEndSuggestions ? (
           <View style={styles.loadingContainer}>
             <ActivityIndicator size="small" color="#3498db" />
@@ -506,58 +494,34 @@ const RouteModal = ({
           </View>
         ) : null}
 
-        <Text style={styles.inputLabel}>Mode de trajet</Text>
-        <View style={styles.optionsContainer}>
+        <Text style={styles.inputLabel}>Type de véhicule</Text>
+        <View style={styles.vehicleTypeContainer}>
           <TouchableOpacity
             style={[
-              styles.optionButton,
-              routeMode === 'Rapide' && styles.optionButtonActive,
+              styles.vehicleButton,
+              vehicleType === 'car' && styles.vehicleButtonActive
             ]}
-            onPress={() => setRouteMode('Rapide')}
+            onPress={() => setVehicleType('car')}
           >
-            <Text
-              style={[
-                styles.optionText,
-                routeMode === 'Rapide' && styles.optionTextActive,
-              ]}
-            >
-              Le plus rapide
-            </Text>
+            <Car size={18} color={vehicleType === 'car' ? '#fff' : '#333'} />
+            <Text style={[
+              styles.vehicleText,
+              vehicleType === 'car' && styles.vehicleTextActive
+            ]}>Voiture</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={[
-              styles.optionButton,
-              routeMode === 'Court' && styles.optionButtonActive,
+              styles.vehicleButton,
+              vehicleType === 'bus' && styles.vehicleButtonActive
             ]}
-            onPress={() => setRouteMode('Court')}
+            onPress={() => setVehicleType('bus')}
           >
-            <Text
-              style={[
-                styles.optionText,
-                routeMode === 'Court' && styles.optionTextActive,
-              ]}
-            >
-              Le plus court
-            </Text>
-          </TouchableOpacity>
-        </View>
-
-        <View style={styles.tollOptionContainer}>
-          <Text style={styles.inputLabel}>Options</Text>
-          <TouchableOpacity
-            style={styles.checkboxContainer}
-            onPress={() => setAvoidTolls(!avoidTolls)}
-          >
-            <View
-              style={[
-                styles.checkbox,
-                avoidTolls && styles.checkboxActive,
-              ]}
-            >
-              {avoidTolls && <View style={styles.checkboxInner} />}
-            </View>
-            <Text style={styles.checkboxLabel}>Éviter les péages</Text>
+            <Bus size={18} color={vehicleType === 'bus' ? '#fff' : '#333'} />
+            <Text style={[
+              styles.vehicleText,
+              vehicleType === 'bus' && styles.vehicleTextActive
+            ]}>Bus</Text>
           </TouchableOpacity>
         </View>
 
@@ -587,7 +551,7 @@ const RouteModal = ({
           transparent={true}
           onRequestClose={() => setShowRouteOptionsModal(false)}
         >
-          <View style={styles.modalContainer}>
+          <View style={{flex: 1, justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.5)'}}>
             <RouteOptionsModal
               routes={routeOptions}
               onSelectRoute={selectRoute}
@@ -596,7 +560,7 @@ const RouteModal = ({
           </View>
         </Modal>
       )}
-    </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 

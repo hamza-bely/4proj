@@ -16,16 +16,16 @@ const ReportMarker: React.FC<ReportMarkerProps> = ({ coordinate, type, id, onPre
   const getMarkerImage = () => {
     switch (type) {
       case 'ACCIDENTS':
-        return require('@/assets/icons/accidents.jpg');
+        return require('@/assets/icons/accidents.png');
       case 'TRAFFIC':
-        return require('@/assets/icons/traffic.jpg');
+        return require('@/assets/icons/traffic.png');
       case 'ROADS_CLOSED':
-        return require('@/assets/icons/roads_closed.jpg');
+        return require('@/assets/icons/roads_closed.png');
       case 'POLICE_CHECKS':
-        return require('@/assets/icons/police.jpg');
+        return require('@/assets/icons/police.png');
       case 'OBSTACLES':
       default:
-        return require('@/assets/icons/obstacles.jpg');
+        return require('@/assets/icons/obstacles.png');
     }
   };
 
@@ -35,7 +35,9 @@ const ReportMarker: React.FC<ReportMarkerProps> = ({ coordinate, type, id, onPre
       onPress={() => onPress(id)}
     >
       <View style={styles.markerContainer}>
-        <Image source={getMarkerImage()} style={styles.markerImage} />
+        <Image
+          style={[styles.markerImage, { width: 52, height: 52 }]}
+          source={getMarkerImage()}  />
       </View>
     </Marker>
   );

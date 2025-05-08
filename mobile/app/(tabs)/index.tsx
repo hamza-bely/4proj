@@ -1,33 +1,32 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
-  StyleSheet,
   Text,
   TouchableOpacity,
   Modal,
   Alert,
-  ScrollView,
   TextInput,
   Platform,
+  StyleSheet,
   KeyboardAvoidingView,
-  FlatList,
+  ScrollView,
 } from 'react-native';
-import MapView, { Marker, Polyline } from 'react-native-maps';
+import MapView, { Callout, Marker, Polyline } from 'react-native-maps';
 import { useLocation } from '@/contexts/LocationContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { api, tomtomApi, reverseGeocode } from '@/services/api';
 import LoadingIndicator from '@/components/LoadingIndicator';
 import Button from '@/components/Button';
 import ReportMarker from '@/components/ReportMarker';
-import { AlertCircle, Navigation, X, ThumbsUp, ThumbsDown, ChevronUp, ChevronDown } from 'lucide-react-native';
+import { AlertCircle, Navigation, X, ThumbsUp, ThumbsDown, ChevronDown, ChevronUp, RefreshCw, Trash2 } from 'lucide-react-native';
 import RouteModal from '@/components/RouteModal';
-
+import * as Location from 'expo-location';
+import { MaterialIcons } from '@expo/vector-icons';
 
 export default function MapScreen() {
   const { state: locationState, getCurrentLocation } = useLocation();
   const { state: authState } = useAuth();
   const mapRef = useRef(null);
-
   const [isLoading, setIsLoading] = useState(false);
   const [reports, setReports] = useState([]);
   const [selectedReport, setSelectedReport] = useState(null);
@@ -36,24 +35,88 @@ export default function MapScreen() {
   const [reportType, setReportType] = useState('ACCIDENTS');
   const [reportLocation, setReportLocation] = useState(null);
   const [reportAddress, setReportAddress] = useState('');
-  const [routeError, setRouteError] = useState(null);
 
   const [showRouteModal, setShowRouteModal] = useState(false);
   const [startLocation, setStartLocation] = useState(null);
-  const [endLocation, setEndLocation] = useState(null);
   const [startAddress, setStartAddress] = useState('');
 
-  const [showWebViewMap, setShowWebViewMap] = useState(false);
+  // Ajout de l'état pour stocker la destination
+  const [destination, setDestination] = useState(null);
+  const [destinationAddress, setDestinationAddress] = useState('');
 
   const [routeCoordinates, setRouteCoordinates] = useState([]);
   const [routeInstructions, setRouteInstructions] = useState([]);
   const [routeSummary, setRouteSummary] = useState(null);
   const [showInstructions, setShowInstructions] = useState(false);
+  const [geoEnabled, setGeoEnabled] = useState(false);
+
+  // État pour le rafraîchissement du trajet
+  const [refreshing, setRefreshing] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      const { status } = await Location.getForegroundPermissionsAsync();
+      setGeoEnabled(status === 'granted');
+    })();
+  }, []);
+
+  useEffect(() => {
+    const startWatching = async () => {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') return;
+
+      const watcher = await Location.watchPositionAsync(
+        {
+          accuracy: Location.Accuracy.High,
+          timeInterval: 5000,
+          distanceInterval: 10,
+        },
+        (loc) => {
+          setStartLocation({
+            latitude: loc.coords.latitude,
+            longitude: loc.coords.longitude,
+          });
+        }
+      );
+
+      return () => watcher.remove();
+    };
+
+    startWatching();
+  }, []);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      fetchReports();
+      initializeLocation();
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  const zoomToCurrentLocation = async () => {
+    const { status } = await Location.requestForegroundPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert('Erreur', 'Permission de localisation refusée');
+      return;
+    }
+
+    const location = await Location.getCurrentPositionAsync({});
+    const { latitude, longitude } = location.coords;
+
+    mapRef.current?.animateCamera(
+      {
+        center: { latitude, longitude },
+        pitch: 0,
+        zoom: 17,
+      },
+      { duration: 1000 }
+    );
+  };
 
   const zoomToRoute = (coordinates) => {
     if (!coordinates || coordinates.length === 0 || !mapRef.current) return;
 
-    // Calculer les limites de la carte
     let minLat = coordinates[0].latitude;
     let maxLat = coordinates[0].latitude;
     let minLng = coordinates[0].longitude;
@@ -66,7 +129,6 @@ export default function MapScreen() {
       maxLng = Math.max(maxLng, coord.longitude);
     });
 
-    // Ajouter un peu de marge
     const latDelta = (maxLat - minLat) * 1.2;
     const lngDelta = (maxLng - minLng) * 1.2;
 
@@ -77,15 +139,6 @@ export default function MapScreen() {
       longitudeDelta: Math.max(lngDelta, 0.01),
     }, 1000);
   };
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      fetchReports();
-      initializeLocation();
-    }, 300);
-
-    return () => clearTimeout(timer);
-  }, []);
 
   const initializeLocation = async () => {
     try {
@@ -112,11 +165,7 @@ export default function MapScreen() {
   const fetchReports = async () => {
     try {
       setIsLoading(true);
-      console.log('Fetching reports from:', `${api.defaults.baseURL}/api/reports/get-all`);
-
       const response = await api.get('/api/reports/get-all');
-      console.log('Reports API response:', response);
-
       if (response.data && response.data.data) {
         setReports(response.data.data);
       } else {
@@ -180,8 +229,7 @@ export default function MapScreen() {
         address: reportAddress || 'Adresse inconnue',
       };
 
-      const response = await api.post('/api/reports/create', payload);
-      console.log('Report creation response:', response);
+      await api.post('/api/reports/create', payload);
 
       setShowReportModal(false);
       setReportType('ACCIDENTS');
@@ -200,7 +248,6 @@ export default function MapScreen() {
 
   const handleLikeReport = async (id) => {
     try {
-      console.log('Liking report ID:', id);
       await api.post(`/api/reports/${id}/like`);
       fetchReports();
     } catch (error) {
@@ -211,7 +258,6 @@ export default function MapScreen() {
 
   const handleDislikeReport = async (id) => {
     try {
-      console.log('Disliking report ID:', id);
       await api.post(`/api/reports/${id}/dislike`);
       fetchReports();
     } catch (error) {
@@ -223,7 +269,6 @@ export default function MapScreen() {
   const handleMapPress = async (event) => {
     if (showReportModal) {
       const { coordinate } = event.nativeEvent;
-      console.log('Selected coordinate for report:', coordinate);
       setReportLocation(coordinate);
 
       try {
@@ -237,302 +282,407 @@ export default function MapScreen() {
     }
   };
 
-  const handleRouteInstructions = (instructions, summary) => {
-    console.log("Received instructions:", instructions);
+  const handleRouteInstructions = (instructions, summary, dest = null) => {
     setRouteInstructions(instructions);
     setRouteSummary(summary);
     setShowInstructions(true);
+
+    // Stocker la destination si fournie
+    if (dest) {
+      setDestination(dest.location);
+      setDestinationAddress(dest.address);
+    }
 
     if (routeCoordinates && routeCoordinates.length > 0) {
       zoomToRoute(routeCoordinates);
     }
   };
 
-  const formatDuration = (seconds) => {
+  // Nouvelle fonction pour rafraîchir le trajet
+  const refreshRoute = async () => {
+    if (!startLocation || !destination) {
+      Alert.alert('Erreur', 'Position de départ ou destination manquante');
+      return;
+    }
+
+    try {
+      setRefreshing(true);
+
+      // Récupérer la position actuelle mise à jour
+      const currentLocation = await getCurrentLocation();
+      if (currentLocation) {
+        const updatedStartLocation = {
+          latitude: currentLocation.coords.latitude,
+          longitude: currentLocation.coords.longitude,
+        };
+        setStartLocation(updatedStartLocation);
+
+        // Appeler l'API pour calculer le nouveau trajet
+        const response = await tomtomApi.post(
+          `/routing/1/calculateRoute/json`,
+          {
+            locations: [
+              { lat: updatedStartLocation.latitude, lon: updatedStartLocation.longitude },
+              { lat: destination.latitude, lon: destination.longitude },
+            ],
+            options: {
+              traffic: true,
+              instructionsType: 'text',
+            },
+          }
+        );
+
+        if (response.data && response.data.routes && response.data.routes.length > 0) {
+          const route = response.data.routes[0];
+          const legs = route.legs || [];
+          const points = route.legs.flatMap(leg => leg.points || []);
+
+          // Extraire les coordonnées
+          const coordinates = points.map(point => ({
+            latitude: point.latitude,
+            longitude: point.longitude,
+          }));
+
+          setRouteCoordinates(coordinates);
+
+          // Extraire les instructions
+          const instructions = legs.flatMap(leg =>
+            leg.maneuvers?.map(maneuver => ({
+              message: maneuver.instruction || 'Continuer',
+              distance: maneuver.travelTimeInSeconds,
+            })) || []
+          );
+
+          setRouteInstructions(instructions);
+          setRouteSummary(route.summary);
+
+          // Afficher l'itinéraire
+          zoomToRoute(coordinates);
+
+          Alert.alert('Succès', 'Trajet mis à jour avec succès');
+        }
+      }
+    } catch (error) {
+      console.error('Error refreshing route:', error);
+      Alert.alert('Erreur', `Impossible de mettre à jour le trajet: ${error.message}`);
+    } finally {
+      setRefreshing(false);
+    }
+  };
+
+  // Nouvelle fonction pour supprimer le trajet
+  const clearRoute = () => {
+    setRouteCoordinates([]);
+    setRouteInstructions([]);
+    setRouteSummary(null);
+    setShowInstructions(false);
+    setDestination(null);
+    setDestinationAddress('');
+
+    // Zoom sur la position actuelle
+    if (startLocation) {
+      mapRef.current?.animateCamera(
+        {
+          center: startLocation,
+          pitch: 0,
+          zoom: 17,
+        },
+        { duration: 1000 }
+      );
+    }
+
+    Alert.alert('Trajet supprimé', 'L\'itinéraire a été effacé');
+  };
+
+  const formatTime = (seconds) => {
     const hours = Math.floor(seconds / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);
 
     if (hours > 0) {
-      return `${hours} h ${minutes} min`;
-    } else {
-      return `${minutes} min`;
+      return `${hours}h ${minutes}min`;
     }
+    return `${minutes} min`;
   };
 
   const formatDistance = (meters) => {
-    if (meters < 1000) {
-      return `${meters} m`;
-    } else {
+    if (meters >= 1000) {
       return `${(meters / 1000).toFixed(1)} km`;
     }
-  };
-
-  const renderDebugInfo = () => {
-    if (__DEV__) {
-      return (
-        <View style={styles.debugContainer}>
-          <Text style={styles.debugText}>
-            Current: {locationState.location ?
-            `${locationState.location.coords.latitude.toFixed(6)}, ${locationState.location.coords.longitude.toFixed(6)}` :
-            'Not available'}
-          </Text>
-          <Text style={styles.debugText}>
-            Start: {startLocation ?
-            `${startLocation.latitude.toFixed(6)}, ${startLocation.longitude.toFixed(6)}` :
-            'Not set'}
-          </Text>
-          <Text style={styles.debugText}>
-            End: {endLocation ?
-            `${endLocation.latitude.toFixed(6)}, ${endLocation.longitude.toFixed(6)}` :
-            'Not set'}
-          </Text>
-          <Text style={styles.debugText}>
-            Route: {routeCoordinates.length} points
-          </Text>
-        </View>
-      );
-    }
-    return null;
+    return `${meters} m`;
   };
 
   if (locationState.loading || isLoading) {
     return <LoadingIndicator message="Chargement de la carte..." />;
   }
-  
 
   return (
     <View style={styles.container}>
-      {showWebViewMap ? (
-        <View style={styles.errorNotification}>
-          <Text style={styles.errorNotificationText}>{routeError}</Text>
-          <TouchableOpacity
-            style={styles.errorNotificationButton}
-            onPress={() => setRouteError(null)}
-          >
-            <X size={18} color="#fff" />
-          </TouchableOpacity>
-        </View>
-      ) : (
-        <>
-          <MapView
-            ref={mapRef}
-            style={styles.map}
-            initialRegion={{
-              latitude: locationState.location?.coords.latitude || 48.8566,
-              longitude: locationState.location?.coords.longitude || 2.3522,
-              latitudeDelta: 0.0922,
-              longitudeDelta: 0.0421,
+      <MapView
+        ref={mapRef}
+        style={styles.map}
+        initialRegion={{
+          latitude: locationState.location?.coords.latitude || 48.8566,
+          longitude: locationState.location?.coords.longitude || 2.3522,
+          latitudeDelta: 0.0922,
+          longitudeDelta: 0.0421,
+        }}
+        onPress={handleMapPress}
+      >
+        {reports.map((report) => (
+          <ReportMarker
+            key={report.id}
+            id={report.id}
+            coordinate={{
+              latitude: report.latitude,
+              longitude: report.longitude,
             }}
-            onPress={handleMapPress}
-          >
-            {locationState.location && (
-              <Marker
-                coordinate={{
-                  latitude: locationState.location.coords.latitude,
-                  longitude: locationState.location.coords.longitude,
+            type={report.type}
+            onPress={handleReportMarkerPress}
+          />
+        ))}
+
+        {reportLocation && showReportModal && (
+          <Marker
+            coordinate={reportLocation}
+            title="Emplacement du signalement"
+            pinColor="#e74c3c"
+          />
+        )}
+
+        {startLocation && (
+          <Marker coordinate={startLocation}>
+            <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+              <View
+                style={{
+                  width: 25,
+                  height: 25,
+                  borderRadius: 25,
+                  backgroundColor: '#3498db',
                 }}
-                title="Ma position"
-                pinColor="#3498db"
-              />
-            )}
-
-            {reports.map((report) => (
-              <ReportMarker
-                key={report.id}
-                id={report.id}
-                coordinate={{
-                  latitude: report.latitude,
-                  longitude: report.longitude,
-                }}
-                type={report.type}
-                onPress={handleReportMarkerPress}
-              />
-            ))}
-
-            {reportLocation && showReportModal && (
-              <Marker
-                coordinate={reportLocation}
-                title="Emplacement du signalement"
-                pinColor="#e74c3c"
-              />
-            )}
-
-            {startLocation && (
-              <Marker
-                coordinate={startLocation}
-                title="Départ"
-                pinColor="#27ae60"
-              />
-            )}
-
-            {endLocation && (
-              <Marker
-                coordinate={endLocation}
-                title="Arrivée"
-                pinColor="#e74c3c"
-              />
-            )}
-
-            {routeCoordinates.length > 0 && (
-              <Polyline
-                coordinates={routeCoordinates}
-                strokeWidth={5}
-                strokeColor="#3498db"
-                lineCap="round"
-                lineJoin="round"
-              />
-            )}
-          </MapView>
-
-
-            <TouchableOpacity
-              style={styles.showInstructionsButton}
-              onPress={() => setShowInstructions(true)}
-            >
-              <ChevronUp size={24} color="white" />
-              <Text style={styles.showInstructionsText}>Voir les instructions</Text>
-            </TouchableOpacity>
-
-
-
-          {showInstructions && routeInstructions && routeInstructions.length > 0 && (
-            <View style={styles.instructionsPanel}>
-              <View style={styles.instructionsHeader}>
-                <Text style={styles.instructionsTitle}>Instructions de conduite</Text>
-                <TouchableOpacity
-                  style={styles.instructionsCloseButton}
-                  onPress={() => setShowInstructions(false)}
-                >
-                  <X size={20} color="#333" />
-                </TouchableOpacity>
-              </View>
-
-              {/* Résumé de l'itinéraire */}
-              {routeSummary && (
-                <View style={styles.routeSummary}>
-                  <Text style={styles.routeSummaryText}>
-                    Distance: {formatDistance(routeSummary.lengthInMeters)} |
-                    Durée: {formatDuration(routeSummary.travelTimeInSeconds)}
-                    {routeSummary.trafficDelayInSeconds > 60 &&
-                      ` (dont ${formatDuration(routeSummary.trafficDelayInSeconds)} de retard dû au trafic)`}
-                  </Text>
-                </View>
-              )}
-
-              <FlatList
-                data={routeInstructions}
-                keyExtractor={(item) => `instruction-${item.id}`}
-                renderItem={({ item, index }) => (
-                  <View style={styles.instructionItem}>
-                    <View style={styles.instructionNumber}>
-                      <Text style={styles.instructionNumberText}>{index + 1}</Text>
-                    </View>
-                    <Text style={styles.instructionText}>
-                      {item.message}
-                      {item.roadName ? ` (${item.roadName})` : ''}
-                    </Text>
-                  </View>
-                )}
-                style={styles.instructionsList}
               />
             </View>
-          )}
+            <Callout tooltip>
+              <View
+                style={{
+                  backgroundColor: 'white',
+                  padding: 6,
+                  borderRadius: 6,
+                  borderColor: '#3498db',
+                  borderWidth: 1,
+                }}
+              >
+                <Text style={{ color: '#3498db', fontWeight: 'bold' }}>Je suis là</Text>
+              </View>
+            </Callout>
+          </Marker>
+        )}
 
+        {routeCoordinates.length > 0 && (
+          <>
+            <Polyline
+              coordinates={routeCoordinates}
+              strokeWidth={5}
+              strokeColor="#3498db"
+              lineCap="round"
+              lineJoin="round"
+            />
+            <Marker coordinate={routeCoordinates[0]}>
+              <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+                <View
+                  style={{
+                    width: 25,
+                    height: 25,
+                    borderRadius: 25,
+                    backgroundColor: '#3498db',
+                  }}
+                />
+              </View>
+            </Marker>
 
-          <View style={styles.actionsContainer}>
-            <TouchableOpacity
-              style={[styles.actionButton, styles.reportButton]}
-              onPress={() => {
-                setReportType('ACCIDENTS');
-                if (locationState.location) {
-                  setReportLocation({
-                    latitude: locationState.location.coords.latitude,
-                    longitude: locationState.location.coords.longitude,
-                  });
+            <Marker coordinate={routeCoordinates[routeCoordinates.length - 1]}>
+              <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+                <View
+                  style={{
+                    width: 25,
+                    height: 25,
+                    borderRadius: 25,
+                    backgroundColor: '#ff0000',
+                  }}
+                />
+              </View>
+            </Marker>
+          </>
+        )}
+      </MapView>
 
-                  reverseGeocode(
-                    locationState.location.coords.latitude,
-                    locationState.location.coords.longitude
-                  ).then(result => {
-                    if (result.addresses && result.addresses.length > 0) {
-                      setReportAddress(result.addresses[0].address.freeformAddress);
-                    }
-                  }).catch(err => console.error('Error geocoding for report:', err));
-                }
-                setShowReportModal(true);
-              }}
-            >
-              <AlertCircle size={24} color="white" />
-              <Text style={styles.actionText}>Signaler</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={[styles.actionButton, styles.routeButton]}
-              onPress={() => {
-                if (locationState.location && !startLocation) {
-                  setStartLocation({
-                    latitude: locationState.location.coords.latitude,
-                    longitude: locationState.location.coords.longitude,
-                  });
-
-                  reverseGeocode(
-                    locationState.location.coords.latitude,
-                    locationState.location.coords.longitude
-                  ).then(result => {
-                    if (result.addresses && result.addresses.length > 0) {
-                      setStartAddress(result.addresses[0].address.freeformAddress);
-                    }
-                  }).catch(err => console.error('Error geocoding for route start:', err));
-                }
-                setShowRouteModal(true);
-              }}
-            >
-              <Navigation size={24} color="white" />
-              <Text style={styles.actionText}>Itinéraire</Text>
+      {showInstructions && routeInstructions.length > 0 && (
+        <View style={styles.instructionsContainer}>
+          <View style={styles.instructionsHeader}>
+            <Text style={styles.instructionsTitle}>Instructions</Text>
+            <TouchableOpacity onPress={() => setShowInstructions(false)}>
+              <X size={20} color="#333" />
             </TouchableOpacity>
           </View>
-          {selectedReport && (
-            <View style={styles.reportInfoContainer}>
-              <View style={styles.reportInfoHeader}>
-                <Text style={styles.reportInfoTitle}>
-                  {selectedReport.type === 'ACCIDENTS' && 'Accident'}
-                  {selectedReport.type === 'TRAFFIC' && 'Trafic'}
-                  {selectedReport.type === 'ROADS_CLOSED' && 'Route fermée'}
-                  {selectedReport.type === 'POLICE_CHECKS' && 'Contrôle police'}
-                  {selectedReport.type === 'OBSTACLES' && 'Obstacle'}
-                </Text>
-                <TouchableOpacity
-                  onPress={() => setSelectedReport(null)}
-                >
-                  <X size={20} color="#333" />
-                </TouchableOpacity>
-              </View>
 
-              <Text style={styles.reportInfoAddress}>{selectedReport.address}</Text>
-
-              <View style={styles.reportActions}>
-                <TouchableOpacity
-                  style={styles.reportActionButton}
-                  onPress={() => handleLikeReport(selectedReport.id)}
-                >
-                  <ThumbsUp size={18} color="#3498db" />
-                  <Text style={styles.reportActionText}>{selectedReport.likeCount || 0}</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  style={styles.reportActionButton}
-                  onPress={() => handleDislikeReport(selectedReport.id)}
-                >
-                  <ThumbsDown size={18} color="#e74c3c" />
-                  <Text style={styles.reportActionText}>{selectedReport.dislikeCount || 0}</Text>
-                </TouchableOpacity>
-              </View>
+          {routeSummary && (
+            <View style={styles.routeSummary}>
+              <Text style={styles.routeSummaryTitle}>
+                {formatDistance(routeSummary.lengthInMeters)} · {formatTime(routeSummary.travelTimeInSeconds)}
+              </Text>
+              {destinationAddress && (
+                <Text style={styles.destinationText}>Destination: {destinationAddress}</Text>
+              )}
             </View>
           )}
 
-          {renderDebugInfo()}
-        </>
+          <ScrollView style={styles.instructionsList}>
+            {routeInstructions.map((instruction, index) => (
+              <View key={index} style={styles.instructionItem}>
+                <View style={styles.instructionNumber}>
+                  <Text style={styles.instructionNumberText}>{index + 1}</Text>
+                </View>
+                <Text style={styles.instructionText}>{instruction.message}</Text>
+              </View>
+            ))}
+          </ScrollView>
+
+          <View style={styles.routeActionButtons}>
+            <TouchableOpacity
+              style={[styles.routeActionButton, styles.refreshButton]}
+              onPress={refreshRoute}
+              disabled={refreshing}
+            >
+              <RefreshCw size={20} color="#fff" />
+              <Text style={styles.routeActionButtonText}>
+                {refreshing ? 'Mise à jour...' : 'Rafraîchir'}
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.routeActionButton, styles.clearButton]}
+              onPress={clearRoute}
+            >
+              <Trash2 size={20} color="#fff" />
+              <Text style={styles.routeActionButtonText}>Supprimer</Text>
+            </TouchableOpacity>
+          </View>
+
+          <TouchableOpacity
+            style={styles.collapseButton}
+            onPress={() => setShowInstructions(false)}
+          >
+            <ChevronUp size={20} color="#fff" />
+            <Text style={styles.collapseButtonText}>Fermer</Text>
+          </TouchableOpacity>
+        </View>
       )}
+
+      <TouchableOpacity
+        onPress={zoomToCurrentLocation}
+        style={styles.locationButton}
+      >
+        <MaterialIcons name="my-location" size={28} color="#fff" />
+      </TouchableOpacity>
+
+      <View style={styles.actionsContainer}>
+        {!showInstructions && routeInstructions.length > 0 && routeCoordinates.length > 0 &&  (
+          <TouchableOpacity
+            style={[styles.actionButton, styles.instructionsButton]}
+            onPress={() => setShowInstructions(true)}>
+            <AlertCircle size={24} color="white" />
+            <Text style={styles.actionText}>Instruction</Text>
+          </TouchableOpacity>
+        )}
+
+        <TouchableOpacity
+          style={[styles.actionButton, styles.reportButton]}
+          onPress={() => {
+            setReportType('ACCIDENTS');
+            if (locationState.location) {
+              setReportLocation({
+                latitude: locationState.location.coords.latitude,
+                longitude: locationState.location.coords.longitude,
+              });
+
+              reverseGeocode(
+                locationState.location.coords.latitude,
+                locationState.location.coords.longitude
+              ).then(result => {
+                if (result.addresses && result.addresses.length > 0) {
+                  setReportAddress(result.addresses[0].address.freeformAddress);
+                }
+              }).catch(err => console.error('Error geocoding for report:', err));
+            }
+            setShowReportModal(true);
+          }}
+        >
+          <AlertCircle size={24} color="white" />
+          <Text style={styles.actionText}>Signaler</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.actionButton, styles.routeButton]}
+          onPress={() => {
+            if (locationState.location && !startLocation) {
+              setStartLocation({
+                latitude: locationState.location.coords.latitude,
+                longitude: locationState.location.coords.longitude,
+              });
+
+              reverseGeocode(
+                locationState.location.coords.latitude,
+                locationState.location.coords.longitude
+              ).then(result => {
+                if (result.addresses && result.addresses.length > 0) {
+                  setStartAddress(result.addresses[0].address.freeformAddress);
+                }
+              }).catch(err => console.error('Error geocoding for route start:', err));
+            }
+            setShowRouteModal(true);
+          }}
+        >
+          <Navigation size={24} color="white" />
+          <Text style={styles.actionText}>Itinéraire</Text>
+        </TouchableOpacity>
+      </View>
+
+      {selectedReport && (
+        <View style={styles.reportInfoContainer}>
+          <View style={styles.reportInfoHeader}>
+            <Text style={styles.reportInfoTitle}>
+              {selectedReport.type === 'ACCIDENTS' && 'Accident'}
+              {selectedReport.type === 'TRAFFIC' && 'Trafic'}
+              {selectedReport.type === 'ROADS_CLOSED' && 'Route fermée'}
+              {selectedReport.type === 'POLICE_CHECKS' && 'Contrôle police'}
+              {selectedReport.type === 'OBSTACLES' && 'Obstacle'}
+            </Text>
+            <TouchableOpacity onPress={() => setSelectedReport(null)}>
+              <X size={20} color="#333" />
+            </TouchableOpacity>
+          </View>
+
+          <Text style={styles.reportInfoAddress}>{selectedReport.address}</Text>
+
+          <View style={styles.reportActions}>
+            <TouchableOpacity
+              style={styles.reportActionButton}
+              onPress={() => handleLikeReport(selectedReport.id)}
+            >
+              <ThumbsUp size={18} color="#3498db" />
+              <Text style={styles.reportActionText}>{selectedReport.likeCount || 0}</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.reportActionButton}
+              onPress={() => handleDislikeReport(selectedReport.id)}
+            >
+              <ThumbsDown size={18} color="#e74c3c" />
+              <Text style={styles.reportActionText}>{selectedReport.dislikeCount || 0}</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      )}
+
       <Modal
         visible={showReportModal}
         animationType="slide"
@@ -543,9 +693,7 @@ export default function MapScreen() {
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>Ajouter un signalement</Text>
-              <TouchableOpacity
-                onPress={() => setShowReportModal(false)}
-              >
+              <TouchableOpacity onPress={() => setShowReportModal(false)}>
                 <X size={24} color="#333" />
               </TouchableOpacity>
             </View>
@@ -583,7 +731,14 @@ export default function MapScreen() {
               value={reportAddress}
               onChangeText={setReportAddress}
               placeholder="Adresse du signalement"
+              editable={false}
             />
+
+            {!geoEnabled && (
+              <Text style={{ color: 'red' }}>
+                Activez la géolocalisation pour saisir une adresse.
+              </Text>
+            )}
 
             <View style={styles.modalActions}>
               <Button
@@ -602,7 +757,6 @@ export default function MapScreen() {
         </View>
       </Modal>
 
-      {/* Route Planning Modal */}
       <Modal
         visible={showRouteModal}
         animationType="slide"
@@ -614,28 +768,21 @@ export default function MapScreen() {
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
             style={{ width: '100%' }}
           >
-            <ScrollView>
-              <RouteModal
-                setShowRouteModal={setShowRouteModal}
-                tomtomApi={tomtomApi}
-                api={api}
-                authState={authState}
-                setShowWebViewMap={setShowWebViewMap}
-                mapRef={mapRef}
-                setRouteCoordinates={setRouteCoordinates}
-                setRouteInstructions={handleRouteInstructions}
-                setEndLocation={setEndLocation}
-              />
-            </ScrollView>
-
-
+            <RouteModal
+              setShowRouteModal={setShowRouteModal}
+              tomtomApi={tomtomApi}
+              api={api}
+              authState={authState}
+              mapRef={mapRef}
+              setRouteCoordinates={setRouteCoordinates}
+              setRouteInstructions={handleRouteInstructions}
+            />
           </KeyboardAvoidingView>
         </View>
       </Modal>
     </View>
   );
 }
-
 
 const styles = StyleSheet.create({
   container: {
@@ -671,6 +818,9 @@ const styles = StyleSheet.create({
   },
   routeButton: {
     backgroundColor: '#3498db',
+  },
+  instructionsButton: {
+    backgroundColor: '#27ae60',
   },
   actionText: {
     color: 'white',
@@ -759,107 +909,6 @@ const styles = StyleSheet.create({
     flex: 1,
     marginHorizontal: 8,
   },
-  locationInputContainer: {
-    flexDirection: 'row',
-    marginBottom: 16,
-  },
-  locationInput: {
-    flex: 1,
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    padding: 12,
-    fontSize: 16,
-    backgroundColor: '#f9f9f9',
-    fontFamily: 'Inter-Regular',
-  },
-  locationButton: {
-    padding: 12,
-    backgroundColor: '#f1f1f1',
-    borderRadius: 8,
-    marginLeft: 8,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  optionsContainer: {
-    flexDirection: 'row',
-    marginBottom: 16,
-  },
-  optionButton: {
-    flex: 1,
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-    backgroundColor: '#f1f1f1',
-    marginRight: 8,
-    alignItems: 'center',
-  },
-  optionButtonActive: {
-    backgroundColor: '#3498db',
-  },
-  optionText: {
-    color: '#555',
-    fontFamily: 'Inter-Medium',
-  },
-  optionTextActive: {
-    color: 'white',
-  },
-  tollOptionContainer: {
-    marginBottom: 16,
-  },
-  checkboxContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  checkbox: {
-    width: 20,
-    height: 20,
-    borderRadius: 4,
-    borderWidth: 2,
-    borderColor: '#3498db',
-    marginRight: 8,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  checkboxActive: {
-    backgroundColor: '#3498db',
-  },
-  checkboxInner: {
-    width: 10,
-    height: 10,
-    backgroundColor: 'white',
-    borderRadius: 2,
-  },
-  checkboxLabel: {
-    fontSize: 16,
-    color: '#333',
-    fontFamily: 'Inter-Regular',
-  },
-  webViewContainer: {
-    flex: 1,
-    backgroundColor: 'white',
-  },
-  webView: {
-    flex: 1,
-  },
-  webViewHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
-  },
-  webViewTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
-    fontFamily: 'Inter-Bold',
-  },
-  closeButton: {
-    padding: 8,
-  },
   reportInfoContainer: {
     position: 'absolute',
     bottom: 80,
@@ -905,87 +954,79 @@ const styles = StyleSheet.create({
     color: '#555',
     fontFamily: 'Inter-Regular',
   },
-  errorNotification: {
+  locationButton: {
     position: 'absolute',
-    top: 20,
-    left: 20,
+    bottom: 100,
     right: 20,
-    backgroundColor: '#e74c3c',
-    borderRadius: 8,
-    padding: 10,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    backgroundColor: '#3498db',
+    padding: 12,
+    borderRadius: 30,
+    elevation: 4,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
+    shadowOpacity: 0.2,
     shadowRadius: 3,
-    elevation: 5,
   },
-  errorNotificationText: {
-    color: '#fff',
-    flex: 1,
-    marginRight: 10,
-    fontFamily: 'Inter-Medium',
-  },
-  errorNotificationButton: {
-    padding: 5,
-  },
-  instructionsPanel: {
-    backgroundColor: '#fff',
+  instructionsContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: 'white',
+    borderBottomLeftRadius: 15,
+    borderBottomRightRadius: 15,
     padding: 16,
-    borderTopLeftRadius: 16,
-    borderTopRightRadius: 16,
+    maxHeight: '40%',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: -2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
-    maxHeight: '60%',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 5,
   },
   instructionsHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: 10,
   },
   instructionsTitle: {
     fontSize: 18,
     fontWeight: 'bold',
     color: '#333',
   },
-  instructionsCloseButton: {
-    padding: 6,
-  },
   routeSummary: {
-    marginBottom: 10,
+    marginBottom: 12,
     backgroundColor: '#f5f5f5',
     padding: 10,
     borderRadius: 8,
   },
-  routeSummaryText: {
-    fontSize: 14,
-    color: '#444',
+  routeSummaryTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#333',
   },
   instructionsList: {
-    marginTop: 8,
+    maxHeight: 200,
   },
   instructionItem: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    marginBottom: 10,
+    marginBottom: 12,
+    paddingVertical: 6,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f0f0f0',
   },
   instructionNumber: {
-    width: 26,
-    height: 26,
-    borderRadius: 13,
-    backgroundColor: '#007aff',
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: '#3498db',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 10,
   },
   instructionNumberText: {
-    color: '#fff',
+    color: 'white',
     fontWeight: 'bold',
     fontSize: 12,
   },
@@ -993,27 +1034,21 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 14,
     color: '#333',
+    lineHeight: 20,
   },
-  showInstructionsButton: {
+  collapseButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#007aff',
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-    borderRadius: 25,
+    backgroundColor: '#3498db',
+    padding: 8,
+    borderRadius: 20,
     alignSelf: 'center',
-    marginVertical: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 3,
+    marginTop: 10,
   },
-  showInstructionsText: {
+  collapseButtonText: {
     color: 'white',
-    fontSize: 16,
+    marginLeft: 5,
     fontWeight: '600',
-    marginLeft: 8,
   },
 });
