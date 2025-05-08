@@ -349,7 +349,10 @@ const RouteModal = ({
       try {
         await api.post('/api/traffic/create', routePayload);
       } catch (saveError) {
-        console.error('Error saving route to API:', saveError);
+        const message =
+          saveError.response?.data?.message || 'Erreur inconnue lors de l’enregistrement de la route.';
+        console.error('Erreur API:', message);
+        Alert.alert('Erreur', "Vous avez atteint le nombre maximum de 10 itinéraires enregistrés. Veuillez en supprimer un avant d'en créer un nouveau.");
       }
 
       const route = selectedRoute.routes[0];

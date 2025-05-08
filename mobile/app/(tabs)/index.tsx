@@ -438,7 +438,6 @@ export default function MapScreen() {
           setRouteCoordinates(coordinates);
           setRouteInstructions(instructions);
           setRouteSummary(route.summary);
-          zoomToRoute(coordinates);
           Alert.alert('Succès', 'Trajet mis à jour avec succès');
         }
       }

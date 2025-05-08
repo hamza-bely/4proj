@@ -66,11 +66,13 @@ export default function ProfileScreen() {
         firstName,
         lastName,
         email,
+        role: user.role,
       });
 
       setShowEditModal(false);
       Alert.alert('Succès', 'Profil mis à jour avec succès');
     } catch (error) {
+      console.log(error.response)
       console.error('Error updating profile:', error);
       Alert.alert('Erreur', 'Impossible de mettre à jour votre profil');
     } finally {
@@ -149,9 +151,7 @@ export default function ProfileScreen() {
             onPress={() => setShowEditModal(true)}
             style={styles.editButton}
           />
-          <TouchableOpacity style={styles.logoutButton} onPress={handleSignOut}>
-            <LogOut size={20} color="#e74c3c" />
-          </TouchableOpacity>
+
         </View>
       </View>
 
