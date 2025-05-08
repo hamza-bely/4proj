@@ -56,7 +56,7 @@ export default function ListReportAdmin() {
         return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
     };
 
-    // Card component for mobile view
+
     const ReportCard = ({ report }: { report: any }) => (
         <div className="bg-white shadow rounded-lg mb-4 p-4 border border-gray-200">
             <div className="flex justify-between items-center mb-3">
@@ -169,14 +169,14 @@ export default function ListReportAdmin() {
                 </div>
             ) : (
                 <>
-                    {/* Mobile view - Cards */}
+
                     <div className="lg:hidden mt-4">
                         {filteredReports.map((report) => (
                             <ReportCard key={report.id} report={report} />
                         ))}
                     </div>
 
-                    {/* Desktop view - Table */}
+
                     <div className="hidden lg:block mt-8 flow-root">
                         <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
                             <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">

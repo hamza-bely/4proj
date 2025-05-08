@@ -97,7 +97,7 @@ export default function ListRouteAdmin() {
                 </div>
             </div>
 
-            {/* Table for larger screens */}
+
             <div className="mt-4 hidden md:block overflow-x-auto">
                 <div className="inline-block min-w-full py-2 align-middle">
                     <table className="min-w-full divide-y divide-gray-300">

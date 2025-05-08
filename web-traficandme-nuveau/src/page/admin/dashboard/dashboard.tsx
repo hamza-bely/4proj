@@ -49,7 +49,7 @@ const Dashboard: React.FC = () => {
     const [loading, setLoading] = useState<boolean>(true);
     const [timeRange, setTimeRange] = useState<string>('WEEK');
     const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
-    // Mock errors pendant 1s pour l'exemple
+
     useEffect(() => {
         setTimeout(() => {
             setErrorData([
@@ -62,25 +62,25 @@ const Dashboard: React.FC = () => {
             setLoading(false);
         }, 1000);
     }, [timeRange]);
-    // Statistiques globales
+
     useEffect(() => {
         fetchSumOfMapStatistic()
             .then(setMapData)
             .catch(err => console.error('Erreur fetchSumOfMapStatistic', err));
     }, []);
-    // Rapports par type
+
     useEffect(() => {
         fetchReportsByTypeStatistics()
             .then(res => setReportData(res.data))
             .catch(err => console.error('Erreur fetchReportsByTypeStatistics', err));
     }, []);
-    // Itinéraires par mode
+
     useEffect(() => {
         fetchRoutesByModeStatistics()
             .then(res => setItineraryData(res.data))
             .catch(err => console.error('Erreur fetchRoutesByModeStatistics', err));
     }, []);
-    // API usage par période
+
     useEffect(() => {
         if (!timeRange) return;
         setLoading(true);
@@ -167,7 +167,7 @@ const Dashboard: React.FC = () => {
                         </LineChart>
                     </ResponsiveContainer>
                 </div>
-                {/* Itinéraires par mode */}
+
                 <div className="bg-white p-4 rounded-lg shadow">
                     <h2 className="text-lg font-semibold mb-4">{t('dashboard.itinerarySearchTypes')}</h2>
                     <ResponsiveContainer width="100%" height={300}>
@@ -191,7 +191,7 @@ const Dashboard: React.FC = () => {
                         </PieChart>
                     </ResponsiveContainer>
                 </div>
-                {/* Rapports par type */}
+
                 <div className="bg-white p-4 rounded-lg shadow">
                     <h2 className="text-lg font-semibold mb-4">{t('dashboard.reportTypes')}</h2>
                     <ResponsiveContainer width="100%" height={300}>
@@ -215,7 +215,7 @@ const Dashboard: React.FC = () => {
                         </PieChart>
                     </ResponsiveContainer>
                 </div>
-                {/* Erreurs API */}
+
                 <div className="bg-white p-4 rounded-lg shadow">
                     <h2 className="text-lg font-semibold mb-4">{t('dashboard.apiErrorTypes')}</h2>
                     <ResponsiveContainer width="100%" height={300}>
