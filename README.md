@@ -101,11 +101,33 @@ cd api-traficandme
 ```
 
 5. Pour lancer l'application mobile :
+
 ```bash
-cd mobile-traficandme
+cd mobile
 npm install
 npx expo start
 ```
+
+Vous avez deux options pour lancer l’application sur un appareil :
+
+📱  Option 1 : Utiliser Expo Go
+Installez l'application Expo Go sur votre smartphone :
+
+Expo Go sur Android
+
+Expo Go sur iOS
+
+Lancez la commande npx expo start
+
+Scannez le QR code affiché dans le terminal ou dans la page web avec l'application Expo Go
+
+💻 Option 2 : Utiliser un émulateur avec Android Studio
+Installez Android Studio : https://developer.android.com/studio
+
+Créez un appareil virtuel (émulateur) via le AVD Manager
+
+Lancez npx expo start, puis appuyez sur la touche "a" dans le terminal pour ouvrir l’application sur l’émulateur Android
+
 
 6. Pour lancer les tests back-end:
 ```bash
