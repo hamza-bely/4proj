@@ -14,23 +14,34 @@ export default function ScanScreen() {
 
   const handleBarCodeScanned = ({ data }: { data: string }) => {
     try {
+      const parsed = JSON.parse(data);
+
+      const qrFormatted = {
+        startLat: parsed.start?.lat,
+        startLng: parsed.start?.lon,
+        endLat: parsed.end?.lat,
+        endLng: parsed.end?.lon,
+        startAddress: parsed.start?.address,
+        endAddress: parsed.end?.address,
+        distance: `${(parsed.route?.distance / 1000).toFixed(1)} km`,
+        duration: `${Math.floor(parsed.route?.duration / 60)} min`,
+        fuelCost: `${parsed.route?.fuelCost?.toFixed(2)} €`,
+        tollCost: `${parsed.route?.tollCost?.toFixed(2)} €`,
+        type: `${parsed.type} €`,
+        avoidTolls : `${parsed.avoidTolls} €`
+      };
+
+      setQrData(qrFormatted);
       setScanned(true);
-      // Try to parse the QR code data as JSON
-      const parsedData = JSON.parse(data);
-      setQrData(parsedData);
       setShowModal(true);
     } catch (error) {
-      Alert.alert(
-        'QR Code Invalide',
-        'Le QR code n\'est pas au format attendu pour un itinéraire.'
-      );
+      Alert.alert('QR Code Invalide', 'Format invalide.');
       setScanned(false);
     }
   };
 
   const handleUseRoute = () => {
     if (qrData && qrData.startLat && qrData.startLng && qrData.endLat && qrData.endLng) {
-      // Navigate to map with route data
       router.push({
         pathname: '/(tabs)',
         params: {
@@ -40,6 +51,7 @@ export default function ScanScreen() {
           endLng: qrData.endLng,
           startAddress: qrData.startAddress || '',
           endAddress: qrData.endAddress || '',
+          type: qrData.type || ''
         },
       });
     }
@@ -48,12 +60,10 @@ export default function ScanScreen() {
   };
 
   if (!permission) {
-    // Camera permissions are still loading
     return <View />;
   }
 
   if (!permission.granted) {
-    // Camera permissions are not granted yet
     return (
       <View style={styles.container}>
         <Text style={styles.permissionText}>
@@ -64,7 +74,6 @@ export default function ScanScreen() {
     );
   }
 
-  // If web, show a message since camera might not work well on web
   if (Platform.OS === 'web') {
     return (
       <View style={styles.container}>
@@ -153,6 +162,19 @@ export default function ScanScreen() {
                 <>
                   <Text style={styles.infoLabel}>Distance:</Text>
                   <Text style={styles.infoText}>{qrData.distance}</Text>
+                </>
+              )}
+              {qrData?.type && (
+                <>
+                  <Text style={styles.infoLabel}>Type:</Text>
+                  <Text style={styles.infoText}>{qrData.type}</Text>
+                </>
+              )}
+
+              {qrData?.avoidTolls && (
+                <>
+                  <Text style={styles.infoLabel}>Peage:</Text>
+                  <Text style={styles.infoText}>{qrData.avoidTolls}</Text>
                 </>
               )}
               

@@ -256,8 +256,6 @@ export default function ProfileScreen() {
           </>
         )}
       </ScrollView>
-
-      {/* Nouveau bouton de déconnexion */}
       <View style={styles.logoutContainer}>
         <Button
           title="Déconnexion"
@@ -268,7 +266,6 @@ export default function ProfileScreen() {
         />
       </View>
 
-      {/* Edit Profile Modal */}
       <Modal
         visible={showEditModal}
         animationType="slide"
@@ -412,7 +409,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     padding: 16,
-    paddingBottom: 80, // Ajout de padding pour éviter que le contenu soit caché par le bouton de déconnexion
+    paddingBottom: 80,
   },
   loader: {
     marginTop: 20,
@@ -427,7 +424,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontFamily: 'Inter-Regular',
   },
-  // Styles pour le nouveau bouton de déconnexion
   logoutContainer: {
     position: 'absolute',
     bottom: 20,

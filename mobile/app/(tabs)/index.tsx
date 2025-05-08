@@ -18,10 +18,22 @@ import { api, tomtomApi, reverseGeocode } from '@/services/api';
 import LoadingIndicator from '@/components/LoadingIndicator';
 import Button from '@/components/Button';
 import ReportMarker from '@/components/ReportMarker';
-import { AlertCircle, Navigation, X, ThumbsUp, ThumbsDown, ChevronDown, ChevronUp, RefreshCw, Trash2 } from 'lucide-react-native';
+import {
+  AlertCircle,
+  Navigation,
+  X,
+  ThumbsUp,
+  ThumbsDown,
+  ChevronDown,
+  ChevronUp,
+  RefreshCw,
+  Trash2,
+  Pencil
+} from 'lucide-react-native';
 import RouteModal from '@/components/RouteModal';
 import * as Location from 'expo-location';
 import { MaterialIcons } from '@expo/vector-icons';
+import { useLocalSearchParams } from 'expo-router';
 
 export default function MapScreen() {
   const { state: locationState, getCurrentLocation } = useLocation();
@@ -39,8 +51,6 @@ export default function MapScreen() {
   const [showRouteModal, setShowRouteModal] = useState(false);
   const [startLocation, setStartLocation] = useState(null);
   const [startAddress, setStartAddress] = useState('');
-
-  // Ajout de l'état pour stocker la destination
   const [destination, setDestination] = useState(null);
   const [destinationAddress, setDestinationAddress] = useState('');
 
@@ -49,9 +59,91 @@ export default function MapScreen() {
   const [routeSummary, setRouteSummary] = useState(null);
   const [showInstructions, setShowInstructions] = useState(false);
   const [geoEnabled, setGeoEnabled] = useState(false);
-
-  // État pour le rafraîchissement du trajet
   const [refreshing, setRefreshing] = useState(false);
+  const params = useLocalSearchParams();
+
+  const zoomToStart = (startPoint) => {
+    if (mapRef?.current && startPoint) {
+      mapRef.current.animateToRegion({
+        latitude: startPoint.latitude,
+        longitude: startPoint.longitude,
+        latitudeDelta: 0.01,
+        longitudeDelta: 0.01,
+      }, 1000);
+    }
+  };
+
+  useEffect(() => {
+    const { startLat, startLng, endLat, endLng } = params || {};
+
+    if (startLat && startLng && endLat && endLng) {
+      const start = {
+        latitude: parseFloat(startLat as string),
+        longitude: parseFloat(startLng as string),
+      };
+      const end = {
+        latitude: parseFloat(endLat as string),
+        longitude: parseFloat(endLng as string),
+      };
+      fetchAndDisplayRoute(start, end);
+    }
+  }, [params?.startLat, params?.startLng, params?.endLat, params?.endLng]);
+
+
+  const fetchAndDisplayRoute = async (start, end) => {
+    try {
+      if (start && end ) {
+        const startCoords = `${start.latitude},${start.longitude}`;
+        const endCoords = `${end.latitude},${end.longitude}`;
+        const API_KEY = process.env.EXPO_PUBLIC_TOMTOM_API_KEY;
+        const routeMode = "Rapide"
+
+        const baseURL = `https://api.tomtom.com/routing/1/calculateRoute/${startCoords}:${endCoords}/json`;
+        const commonParams = `key=${API_KEY}&routeType=${routeMode === 'Rapide' ? 'fastest' : 'shortest'}&travelMode=car&instructionsType=text&language=fr-FR`;
+
+        const requests = [
+          fetch(`${baseURL}?${commonParams}`), // avec péages
+          fetch(`${baseURL}?${commonParams}&avoid=tollRoads`) // sans péages
+        ];
+
+        const responses = await Promise.all(requests);
+        const data = await Promise.all(responses.map(res => res.json()));
+
+        const [routeWithToll, routeWithoutToll] = data;
+
+        // Tu peux choisir ici celle que tu veux afficher, exemple : avec péages
+        const route = routeWithToll.routes[0];
+
+        const coordinates = route.legs.flatMap(leg =>
+          leg.points.map(point => ({
+            latitude: point.latitude,
+            longitude: point.longitude
+          }))
+        );
+
+        const instructions = route.guidance?.instructions?.map((instruction, idx) => ({
+          id: idx.toString(),
+          message: instruction.message,
+          roadName: instruction.roadName || '',
+          point: {
+            latitude: instruction.point.latitude,
+            longitude: instruction.point.longitude
+          }
+        })) || [];
+
+        const summary = route.summary;
+
+        setRouteCoordinates(coordinates);
+        setRouteInstructions(instructions);
+        setRouteSummary(summary);
+
+        zoomToStart(coordinates[0]);
+
+      }
+      }catch(error){
+      }
+
+  };
 
   useEffect(() => {
     (async () => {
@@ -286,8 +378,6 @@ export default function MapScreen() {
     setRouteInstructions(instructions);
     setRouteSummary(summary);
     setShowInstructions(true);
-
-    // Stocker la destination si fournie
     if (dest) {
       setDestination(dest.location);
       setDestinationAddress(dest.address);
@@ -298,7 +388,6 @@ export default function MapScreen() {
     }
   };
 
-  // Nouvelle fonction pour rafraîchir le trajet
   const refreshRoute = async () => {
     if (!startLocation || !destination) {
       Alert.alert('Erreur', 'Position de départ ou destination manquante');
@@ -307,8 +396,6 @@ export default function MapScreen() {
 
     try {
       setRefreshing(true);
-
-      // Récupérer la position actuelle mise à jour
       const currentLocation = await getCurrentLocation();
       if (currentLocation) {
         const updatedStartLocation = {
@@ -317,7 +404,6 @@ export default function MapScreen() {
         };
         setStartLocation(updatedStartLocation);
 
-        // Appeler l'API pour calculer le nouveau trajet
         const response = await tomtomApi.post(
           `/routing/1/calculateRoute/json`,
           {
@@ -370,7 +456,6 @@ export default function MapScreen() {
     }
   };
 
-  // Nouvelle fonction pour supprimer le trajet
   const clearRoute = () => {
     setRouteCoordinates([]);
     setRouteInstructions([]);
@@ -379,7 +464,6 @@ export default function MapScreen() {
     setDestination(null);
     setDestinationAddress('');
 
-    // Zoom sur la position actuelle
     if (startLocation) {
       mapRef.current?.animateCamera(
         {
@@ -517,8 +601,10 @@ export default function MapScreen() {
 
       {showInstructions && routeInstructions.length > 0 && (
         <View style={styles.instructionsContainer}>
-          <View style={styles.instructionsHeader}>
-            <Text style={styles.instructionsTitle}>Instructions</Text>
+          <View style={styles.iconActions}>
+            <TouchableOpacity onPress={() => console.log('Edit pressed')}>
+              <Pencil size={18} color="#333" style={{ marginRight: 8 }} />
+            </TouchableOpacity>
             <TouchableOpacity onPress={() => setShowInstructions(false)}>
               <X size={20} color="#333" />
             </TouchableOpacity>
@@ -1050,5 +1136,9 @@ const styles = StyleSheet.create({
     color: 'white',
     marginLeft: 5,
     fontWeight: '600',
+  },
+  iconActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
 });

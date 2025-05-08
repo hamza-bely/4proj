@@ -290,12 +290,11 @@ const RouteModal = ({
 
       const startCoords = `${startLocation.latitude},${startLocation.longitude}`;
       const endCoords = `${endLocation.latitude},${endLocation.longitude}`;
-      const API_KEY = process.env.TOMTOM_API_KEY;
-      console.log(API_KEY)
+      const API_KEY = process.env.EXPO_PUBLIC_TOMTOM_API_KEY;
 
       const requests = [
-        fetch(`https://api.tomtom.com/routing/1/calculateRoute/${startCoords}:${endCoords}/json?key=${API_KEY}&routeType=${routeMode === 'Rapide' ? 'fastest' : 'shortest'}&travelMode=${vehicleType}&instructionsType=text`),
-        fetch(`https://api.tomtom.com/routing/1/calculateRoute/${startCoords}:${endCoords}/json?key=${API_KEY}&routeType=${routeMode === 'Rapide' ? 'fastest' : 'shortest'}&travelMode=${vehicleType}&instructionsType=text&avoid=tollRoads`)
+        fetch(`https://api.tomtom.com/routing/1/calculateRoute/${startCoords}:${endCoords}/json?key=${API_KEY}&routeType=${routeMode === 'Rapide' ? 'fastest' : 'shortest'}&travelMode=${vehicleType}&instructionsType=text&language=fr-FR`),
+        fetch(`https://api.tomtom.com/routing/1/calculateRoute/${startCoords}:${endCoords}/json?key=${API_KEY}&routeType=${routeMode === 'Rapide' ? 'fastest' : 'shortest'}&travelMode=${vehicleType}&instructionsType=text&avoid=tollRoads&language=fr-FR`)
       ];
 
       const responses = await Promise.all(requests);

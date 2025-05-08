@@ -1,8 +1,8 @@
 import axios from 'axios';
 
-export const API_URL = process.env.API_URL;
-export const TOMTOM_API_KEY = process.env.TOMTOM_API_KEY;
-export const TOMTOM_API_URL = process.env.TOMTOM_API_URL;
+export const API_URL = process.env.EXPO_PUBLIC_API_URL;
+export const TOMTOM_API_KEY = process.env.EXPO_PUBLIC_TOMTOM_API_KEY;
+export const TOMTOM_API_URL = process.env.EXPO_PUBLIC_TOMTOM_API_URL;
 
 export const api = axios.create({
   baseURL: API_URL,
@@ -14,6 +14,7 @@ export const tomtomApi = axios.create({
   timeout: 15000,
   params: {
     key: TOMTOM_API_KEY,
+    language: 'fr-FR'
   },
 });
 
