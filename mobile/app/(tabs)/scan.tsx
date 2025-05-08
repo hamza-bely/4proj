@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, Button as RNButton, Alert, Modal, TouchableOpacity, Platform, Image } from 'react-native';
 import { router } from 'expo-router';
-import { CameraView, CameraType, useCameraPermissions } from 'expo-camera';
-import { useAuth } from '@/contexts/AuthContext';
+import { CameraView, useCameraPermissions } from 'expo-camera';
 import { Scan, X } from 'lucide-react-native';
 
 export default function ScanScreen() {
@@ -10,7 +9,6 @@ export default function ScanScreen() {
   const [scanned, setScanned] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [qrData, setQrData] = useState<any>(null);
-  const { state: authState } = useAuth();
 
   const handleBarCodeScanned = ({ data }: { data: string }) => {
     try {
@@ -27,8 +25,6 @@ export default function ScanScreen() {
         duration: `${Math.floor(parsed.route?.duration / 60)} min`,
         fuelCost: `${parsed.route?.fuelCost?.toFixed(2)} €`,
         tollCost: `${parsed.route?.tollCost?.toFixed(2)} €`,
-        type: `${parsed.type} €`,
-        avoidTolls : `${parsed.avoidTolls} €`
       };
 
       setQrData(qrFormatted);
@@ -51,7 +47,6 @@ export default function ScanScreen() {
           endLng: qrData.endLng,
           startAddress: qrData.startAddress || '',
           endAddress: qrData.endAddress || '',
-          type: qrData.type || ''
         },
       });
     }
@@ -164,20 +159,6 @@ export default function ScanScreen() {
                   <Text style={styles.infoText}>{qrData.distance}</Text>
                 </>
               )}
-              {qrData?.type && (
-                <>
-                  <Text style={styles.infoLabel}>Type:</Text>
-                  <Text style={styles.infoText}>{qrData.type}</Text>
-                </>
-              )}
-
-              {qrData?.avoidTolls && (
-                <>
-                  <Text style={styles.infoLabel}>Peage:</Text>
-                  <Text style={styles.infoText}>{qrData.avoidTolls}</Text>
-                </>
-              )}
-              
               {qrData?.duration && (
                 <>
                   <Text style={styles.infoLabel}>Durée estimée:</Text>

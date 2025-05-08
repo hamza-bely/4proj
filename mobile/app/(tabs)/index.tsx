@@ -89,7 +89,6 @@ export default function MapScreen() {
     }
   }, [params?.startLat, params?.startLng, params?.endLat, params?.endLng]);
 
-
   const fetchAndDisplayRoute = async (start, end) => {
     try {
       if (start && end ) {
@@ -389,7 +388,7 @@ export default function MapScreen() {
   };
 
   const refreshRoute = async () => {
-    if (!startLocation || !destination) {
+    if (!startLocation || !routeCoordinates || routeCoordinates.length === 0) {
       Alert.alert('Erreur', 'Position de départ ou destination manquante');
       return;
     }
@@ -404,57 +403,54 @@ export default function MapScreen() {
         };
         setStartLocation(updatedStartLocation);
 
-        const response = await tomtomApi.post(
-          `/routing/1/calculateRoute/json`,
-          {
-            locations: [
-              { lat: updatedStartLocation.latitude, lon: updatedStartLocation.longitude },
-              { lat: destination.latitude, lon: destination.longitude },
-            ],
-            options: {
-              traffic: true,
-              instructionsType: 'text',
-            },
-          }
-        );
+        const lastCoord = routeCoordinates[routeCoordinates.length - 1];
 
-        if (response.data && response.data.routes && response.data.routes.length > 0) {
-          const route = response.data.routes[0];
-          const legs = route.legs || [];
-          const points = route.legs.flatMap(leg => leg.points || []);
+        const startCoords = `${updatedStartLocation.latitude},${updatedStartLocation.longitude}`;
+        const endCoords = `${lastCoord.latitude},${lastCoord.longitude}`;
+        const API_KEY = process.env.EXPO_PUBLIC_TOMTOM_API_KEY;
+        const routeMode = 'Rapide'; // ou selon ton état
+        const vehicleType = 'car';  // ou selon ton choix
 
-          // Extraire les coordonnées
-          const coordinates = points.map(point => ({
-            latitude: point.latitude,
-            longitude: point.longitude,
-          }));
+        const url = `https://api.tomtom.com/routing/1/calculateRoute/${startCoords}:${endCoords}/json?key=${API_KEY}&routeType=${routeMode === 'Rapide' ? 'fastest' : 'shortest'}&travelMode=${vehicleType}&instructionsType=text&language=fr-FR`;
 
-          setRouteCoordinates(coordinates);
+        const response = await fetch(url);
+        const data = await response.json();
 
-          // Extraire les instructions
-          const instructions = legs.flatMap(leg =>
-            leg.maneuvers?.map(maneuver => ({
-              message: maneuver.instruction || 'Continuer',
-              distance: maneuver.travelTimeInSeconds,
-            })) || []
+        if (data.routes && data.routes.length > 0) {
+          const route = data.routes[0];
+          const coordinates = route.legs.flatMap(leg =>
+            leg.points.map(point => ({
+              latitude: point.latitude,
+              longitude: point.longitude
+            }))
           );
 
+          const instructions = route.guidance?.instructions?.map((instruction, idx) => ({
+            id: idx.toString(),
+            message: instruction.message,
+            roadName: instruction.roadName || '',
+            point: {
+              latitude: instruction.point.latitude,
+              longitude: instruction.point.longitude
+            }
+          })) || [];
+
+          setRouteCoordinates(coordinates);
           setRouteInstructions(instructions);
           setRouteSummary(route.summary);
-
-          // Afficher l'itinéraire
           zoomToRoute(coordinates);
-
           Alert.alert('Succès', 'Trajet mis à jour avec succès');
         }
       }
     } catch (error) {
-      console.error('Error refreshing route:', error);
+      console.error('Erreur lors de la mise à jour du trajet :', error);
       Alert.alert('Erreur', `Impossible de mettre à jour le trajet: ${error.message}`);
     } finally {
       setRefreshing(false);
     }
   };
+
+
 
   const clearRoute = () => {
     setRouteCoordinates([]);
@@ -602,9 +598,6 @@ export default function MapScreen() {
       {showInstructions && routeInstructions.length > 0 && (
         <View style={styles.instructionsContainer}>
           <View style={styles.iconActions}>
-            <TouchableOpacity onPress={() => console.log('Edit pressed')}>
-              <Pencil size={18} color="#333" style={{ marginRight: 8 }} />
-            </TouchableOpacity>
             <TouchableOpacity onPress={() => setShowInstructions(false)}>
               <X size={20} color="#333" />
             </TouchableOpacity>
@@ -912,7 +905,7 @@ const styles = StyleSheet.create({
     color: 'white',
     marginLeft: 8,
     fontWeight: '600',
-    fontSize: 16,
+    fontSize: 12,
     fontFamily: 'Inter-Medium',
   },
   modalContainer: {
@@ -1140,5 +1133,40 @@ const styles = StyleSheet.create({
   iconActions: {
     flexDirection: 'row',
     alignItems: 'center',
+  },
+  routeActionButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    marginTop: 10,
+    paddingHorizontal: 16,
+  },
+
+  routeActionButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    borderRadius: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 3,
+  },
+
+  refreshButton: {
+    backgroundColor: '#4A90E2',
+  },
+
+  clearButton: {
+    backgroundColor: '#D0021B',
+  },
+
+  routeActionButtonText: {
+    color: '#fff',
+    fontSize: 14,
+    marginLeft: 8,
+    fontWeight: '500',
   },
 });
