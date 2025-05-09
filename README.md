@@ -137,6 +137,7 @@ ou
 ./mvnw -Dtest=YourTestClass test
 ```
 les classes de tests sont: `UserRepositoryTest, ReportRepositoryTest, ItineraryRepositoryTest, ReportServiceTest, ItineraryServiceTest`
+## Lancement des tests
 
 ## Accès aux Applications
 
