@@ -97,6 +97,7 @@ npm run dev
 4. Pour lancer l'API :
 ```bash
 cd api-traficandme
+./mvnw clean install
 ./mvnw spring-boot:run
 ```
 
