@@ -110,6 +110,16 @@ export const fetchRoutesByModeStatistics = async (): Promise<any> => {
     }
 };
 
+export const fetchTrafficDataFromTomTomApi = async (): Promise<any> => {
+    try {
+        const response = await axios.get<any>(`${API_URL}real_traffic/trafficData`, { headers: getAuthHeaders() });
+        return response.data;
+    } catch (error: any) {
+        toast.error(await translateMessage(error.response.data.message || "An error has occurred"));
+        throw error;
+    }
+};
+
 export const fetchApiStatisticsPerTime = async (period: string): Promise<any> => {
     try {
         const response = await axios.get<any>(`${API_URL}admin/users/search-statistics`, { headers: getAuthHeaders(),params: { period } });

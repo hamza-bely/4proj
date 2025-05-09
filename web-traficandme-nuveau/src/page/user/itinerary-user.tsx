@@ -94,6 +94,19 @@ export default function ItineraryUser() {
         return modeMappings[mode as keyof typeof modeMappings] || mode;
     };
 
+    function getStatusInfo(status: string): { label: string; color: string; icon: string } {
+        switch (status) {
+          case 'TRAFFIC_LIKELY':
+            return { label: 'Trafic trouvé', color: 'bg-red-600', icon: '🚦' };
+          case 'TRAFFIC_POSSIBLE':
+            return { label: 'Trafic possible', color: 'bg-yellow-500', icon: '⚠️' };
+          case 'TRAFFIC_NONE':
+            return { label: 'Trafic fluide', color: 'bg-green-600', icon: '✅' };
+          default:
+            return { label: 'Statut inconnu', color: 'bg-gray-500', icon: '❓' };
+        }
+      }
+
     const RouteCard = ({ route }: { route: SavedRoute }) => (
         <div className="bg-white shadow rounded-lg mb-4 p-4 border border-gray-200">
             <div className="flex justify-between items-start mb-2">
@@ -193,6 +206,9 @@ export default function ItineraryUser() {
                                 <th className="w-3/12 px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     {t('routes.end')}
                                 </th>
+                                <th className="w-3/12 px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Etat
+                                </th>
                                 <th className="w-2/12 px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     {t('common.actions')}
                                 </th>
@@ -228,6 +244,17 @@ export default function ItineraryUser() {
                                         <div className="min-h-12">
                                             {route.address_end || `${route.endLatitude}, ${route.endLongitude}`}
                                         </div>
+                                    </td>
+                                    <td className="px-3 py-4 text-sm">
+                                    {route.itineraryStatus && (() => {
+                                        const statusInfo = getStatusInfo(route.itineraryStatus);
+                                        return (
+                                        <span className={`inline-flex items-center px-2 py-1 rounded text-white font-medium ${statusInfo.color}`}>
+                                            <span className="mr-1">{statusInfo.icon}</span>
+                                            {statusInfo.label}
+                                        </span>
+                                        );
+                                    })()}
                                     </td>
                                     <td className="px-3 py-4 text-sm font-medium">
                                         <div className="flex flex-col lg:flex-row lg:space-x-4 space-y-2 lg:space-y-0">

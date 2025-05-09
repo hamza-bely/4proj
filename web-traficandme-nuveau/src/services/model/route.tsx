@@ -13,4 +13,14 @@ export interface Route {
     id: number;
     peage: boolean
     status : string
+    itineraryStatus: string
 }
+
+export interface ItineraryItem {
+    id: number;
+    address_start: string;
+    address_end: string;
+    averageSpeed: number;
+    congestionCount: number;
+    itineraryPointCount: number;
+  }

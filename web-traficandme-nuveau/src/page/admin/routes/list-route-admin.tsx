@@ -46,7 +46,19 @@ export default function ListRouteAdmin() {
             console.error("Erreur lors de la suppression de la route", error);
         }
     };
-
+    function getStatusInfo(status: string): { label: string; color: string; icon: string } {
+        switch (status) {
+          case 'TRAFFIC_LIKELY':
+            return { label: 'Trafic trouvé', color: 'bg-red-600', icon: '🚦' };
+          case 'TRAFFIC_POSSIBLE':
+            return { label: 'Trafic possible', color: 'bg-yellow-500', icon: '⚠️' };
+          case 'TRAFFIC_NONE':
+            return { label: 'Trafic fluide', color: 'bg-green-600', icon: '✅' };
+          default:
+            return { label: 'Statut inconnu', color: 'bg-gray-500', icon: '❓' };
+        }
+      }
+      
     const filteredRoutes = routes.filter((route) => {
         const searchTermLower = searchTerm.toLowerCase();
         return (
@@ -125,6 +137,9 @@ export default function ListRouteAdmin() {
                                 {t("route-admin.address_end", "Arrivée")}
                             </th>
                             <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                                Etat
+                            </th>
+                            <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
                                 {t("route-admin.createDate", "Date de création")}
                             </th>
                             <th scope="col" className="relative py-3.5 pr-4 pl-3 sm:pr-3">
@@ -168,6 +183,17 @@ export default function ListRouteAdmin() {
                                     </td>
                                     <td className="px-3 py-4 text-sm text-gray-500 max-w-xs truncate">
                                         {route.address_end || `${route.endLatitude}, ${route.endLongitude}`}
+                                    </td>
+                                    <td className="px-3 py-4 text-sm">
+                                    {route.itineraryStatus && (() => {
+                                        const statusInfo = getStatusInfo(route.itineraryStatus);
+                                        return (
+                                        <span className={`inline-flex items-center px-2 py-1 rounded text-white font-medium ${statusInfo.color}`}>
+                                            <span className="mr-1">{statusInfo.icon}</span>
+                                            {statusInfo.label}
+                                        </span>
+                                        );
+                                    })()}
                                     </td>
                                     <td className="px-3 py-4 text-sm text-gray-500">
                                         {new Date(route.createDate).toLocaleString()}
