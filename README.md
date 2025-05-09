@@ -128,17 +128,15 @@ Créez un appareil virtuel (émulateur) via le AVD Manager
 
 Lancez npx expo start, puis appuyez sur la touche "a" dans le terminal pour ouvrir l’application sur l’émulateur Android
 
-
-6. Pour lancer les tests back-end:
+## Lancement des tests
+**Pour lancer les tests back-end:**
 ```bash
 cd api-traficandme
 ./mvnw test
 ou
 ./mvnw -Dtest=YourTestClass test
 ```
-les classes de tests sont: `UserRepositoryTest, ReportRepositoryTest, ItineraryRepositoryTest, ReportServiceTest, ItineraryServiceTest`
-## Lancement des tests
-
+**les classes de tests sont:** `UserRepositoryTest, ReportRepositoryTest, ItineraryRepositoryTest, ReportServiceTest, ItineraryServiceTest`
 ## Accès aux Applications
 
 - **Frontend Web** : http://localhost:5173
@@ -175,7 +173,7 @@ Le tableau ci-dessous présente l'état d'avancement des fonctionnalités par pl
 | **Déploiement** (50 pts)          | Architecture                                   | 30     | ✅   | ❌     | ⚠️  |
 |                                   | Containérisation                               | 20     | ✅   | ❌     | ⚠️  |
 | **Fonctionnalités** (150 pts)     |                                                |        |      |        |     |
-| Authentification utilisateur      | OAuth                                          | 5      | ❌   | ❌    | ✅  |
+| Authentification utilisateur      | OAuth                                          | 5      | ❌   | ❌    | ⚠️  |
 |                                   | Connexion standard                             | 5      | ✅   | ✅    | ✅  |
 | Carte                             | Affichage carte                                | 10     | ✅   | ✅    | ✅  |
 |                                   | Choix itinéraires                              | 30     | ✅   | ✅    | ✅  |
@@ -186,15 +184,15 @@ Le tableau ci-dessous présente l'état d'avancement des fonctionnalités par pl
 |                                   | Instructions de conduite                       | 20     | ❌   | ✅    | ⚠️  |
 |                                   | Géolocalisation et visualisation transport     | 10     | ✅   | ❌    | ✅  |
 | Signalements                      | Signalement d'incidents                        | 20     | ✅   | ✅    | ✅  |
-| Alertes                           | Gestion des alertes                            | 40     | ❌   | ❌    | ⚠️  |
+| Alertes                           | Gestion des alertes                            | 40     | ❌   | ❌    | ✅  |
 |                                   | Vérification à l'approche                      | 15     | ❌   | ❌    | ❌  |
 |                                   | Recalcul d'itinéraire                          | 25     | ✅   | ⚠️    | ✅  |
-| Partage                           | Partage vers téléphone + QR                    | 10     | ❌   | ❌    | ❌  |
+| Partage                           | Partage vers téléphone + QR                    | 10     | ❌   | ❌    |   |
 | Sécurité                          | Chiffrement & sécurité des communications      | 20     | ✅   | ❌    | ✅  |
 |                                   | Protection XSS/CSRF/SQLi                       | 10     | ✅   | ❌    | ✅  |
 | Données                           | Stockage & gestion des données                 | 30     | ✅   | ❌    | ✅  |
-|                                   | Analyse & stats de trafic                      | 20     | ✅   | ❌    | ⚠️  |
-|                                   | Prédiction des embouteillages                  | 20     | ✅   | ❌    | ⚠️  |
+|                                   | Analyse & stats de trafic                      | 20     | ✅   | ❌    | ✅  |
+|                                   | Prédiction des embouteillages                  | 20     | ✅   | ❌    | ✅  |
 
 Légende :
 - ✅ Fonctionnalité implémentée
