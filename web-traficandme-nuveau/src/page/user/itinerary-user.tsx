@@ -4,6 +4,7 @@ import Spinner from "../../components/sniper/sniper.tsx";
 import { useNavigate } from 'react-router-dom';
 import useRouteStore from "../../services/store/route-store.tsx";
 import { LuTrash2, LuMap } from "react-icons/lu";
+import {AddressCell} from "./address-cell.tsx";
 
 export interface SavedRoute {
     startLongitude: string;
@@ -235,16 +236,23 @@ export default function ItineraryUser() {
                                     <td className="px-3 py-4 whitespace-nowrap text-sm text-gray-500">
                                         {formatDate(route.createDate)}
                                     </td>
-                                    <td className="px-3 py-4 text-sm text-gray-500 break-words">
+                                    <td className="px-3 py-4 text-sm text-gray-500">
                                         <div className="min-h-12">
-                                            {route.address_start || `${route.startLatitude}, ${route.startLongitude}`}
+                                            <AddressCell
+                                                address={route.address_start}
+                                                fallback={`${route.startLatitude}, ${route.startLongitude}`}
+                                            />
                                         </div>
                                     </td>
-                                    <td className="px-3 py-4 text-sm text-gray-500 break-words">
+                                    <td className="px-3 py-4 text-sm text-gray-500">
                                         <div className="min-h-12">
-                                            {route.address_end || `${route.endLatitude}, ${route.endLongitude}`}
+                                            <AddressCell
+                                                address={route.address_end}
+                                                fallback={`${route.endLatitude}, ${route.endLongitude}`}
+                                            />
                                         </div>
                                     </td>
+
                                     <td className="px-3 py-4 text-sm">
                                     {route.itineraryStatus && (() => {
                                         const statusInfo = getStatusInfo(route.itineraryStatus);
