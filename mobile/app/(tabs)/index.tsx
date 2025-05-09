@@ -869,13 +869,9 @@ export default function MapScreen() {
             </View>
 
             <Text style={styles.inputLabel}>Adresse</Text>
-            <TextInput
-              style={styles.input}
-              value={reportAddress}
-              onChangeText={setReportAddress}
-              placeholder="Adresse du signalement"
-              editable={false}
-            />
+            <Text style={styles.input}>
+              {reportAddress || 'Adresse du signalement'}
+            </Text>
 
             {!geoEnabled && (
               <Text style={{ color: 'red' }}>
