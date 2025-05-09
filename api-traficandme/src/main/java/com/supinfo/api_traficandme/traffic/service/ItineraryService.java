@@ -15,9 +15,10 @@ import java.util.stream.Collectors;
 
 public class ItineraryService {
     private final ItineraryRepository itineraryRepository;
-
-    public ItineraryService(ItineraryRepository itineraryRepository) {
+    private final TrafficPredictionService trafficService;
+    public ItineraryService(ItineraryRepository itineraryRepository, TrafficPredictionService trafficService) {
         this.itineraryRepository = itineraryRepository;
+        this.trafficService = trafficService;
     }
 
     public Itinerary createTraffic(ItineraryRequest request, UserResponse connectedUser) throws Exception {
@@ -72,13 +73,17 @@ public class ItineraryService {
     }
 
     public List<Itinerary> getAllTraffic() {
-        return itineraryRepository.findAll();
+        List<Itinerary> itineraries = itineraryRepository.findAll();
+        trafficService.enrichItinerariesWithTrafficStatus(itineraries);
+        return itineraries;
     }
 
     public List<Itinerary> getAllTrafficByUser(UserResponse userConnected) {
-        return  itineraryRepository.findAll().stream()
+        List<Itinerary> itineraries = itineraryRepository.findAll().stream()
                 .filter(report -> report.getUser().equals(userConnected.email()))
                 .collect(Collectors.toList());
+        trafficService.enrichItinerariesWithTrafficStatus(itineraries);
+        return  itineraries;
     }
 
     public Itinerary deleteTrafficForAnUser(Integer idTraffic) throws Exception {

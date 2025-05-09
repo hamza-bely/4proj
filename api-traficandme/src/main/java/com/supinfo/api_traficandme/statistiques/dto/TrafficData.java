@@ -4,6 +4,7 @@ import lombok.Data;
 
 @Data
 public class TrafficData {
+    private int id;
     private String address_start;
     private String address_end;
     private double averageSpeed;

@@ -1,5 +1,6 @@
 package com.supinfo.api_traficandme.traffic.repository;
 
+import com.supinfo.api_traficandme.traffic.dto.TrafficResponse;
 import com.supinfo.api_traficandme.traffic.entity.Itinerary;
 import com.supinfo.api_traficandme.traffic.entity.RealTimeTraffic;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -19,7 +20,7 @@ public interface RealTimeTrafficRepository extends JpaRepository<RealTimeTraffic
 
     @Query("""
             SELECT it.address_start, it.address_end, AVG(t.currentSpeed), COUNT(t), \
-                    COUNT(CASE WHEN t.congested = true THEN 1 ELSE 0 END)\
+                    COUNT(CASE WHEN t.congested = true THEN 1 ELSE null END), it.id \
                         FROM RealTimeTraffic t \
             INNER JOIN Itinerary it ON it.id = t.itinerary.id
             GROUP BY it.id, it.address_start, it.address_end""")

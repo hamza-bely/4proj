@@ -32,10 +32,35 @@ public class TrafficSchedulerService {
         this.historyRepository = historyRepository;
         this.itineraryRepository = itineraryRepository;
     }
+    //@Scheduled(fixedRate = 590000)
+    public void archiveDailyTraffic(List<RealTimeTraffic> oldTrafficData) {
+        //List<RealTimeTraffic> realTimeList = trafficRepository.findAll();
+        List<TrafficHistory> historyList = new ArrayList<>();
 
-    @Scheduled(fixedRate = 600000)
+        for (RealTimeTraffic realTime : oldTrafficData) {
+            TrafficHistory history = getTrafficHistory(realTime);
+
+            historyList.add(history);
+        }
+
+        historyRepository.saveAll(historyList);
+        System.out.println("Dump successfully complete at "+new Date()+" Archives size was : " + historyList.size());
+        trafficRepository.deleteAll();
+    }
+
+
+    @Scheduled(fixedRate = 300000)
     public void fetchTrafficDataFixedRate() {
         List<Itinerary> itineraries = itineraryRepository.findAll();
+        List<RealTimeTraffic> oldTrafficData = trafficRepository.findAll();
+
+        if (itineraries.isEmpty()) {
+            System.out.println("No itineraries found.");
+            return;
+        }
+
+        archiveDailyTraffic(oldTrafficData);
+
         for (Itinerary itinerary : itineraries) {
             fetchAndStoreTrafficForItinerary(itinerary);
         }
@@ -107,22 +132,6 @@ public class TrafficSchedulerService {
         }
     }
 
-
-    @Scheduled(fixedRate = 600000)
-    public void archiveDailyTraffic() {
-        List<RealTimeTraffic> realTimeList = trafficRepository.findAll();
-        List<TrafficHistory> historyList = new ArrayList<>();
-
-        for (RealTimeTraffic realTime : realTimeList) {
-            TrafficHistory history = getTrafficHistory(realTime);
-
-            historyList.add(history);
-        }
-
-        historyRepository.saveAll(historyList);
-        System.out.println("Dump successfully complete at "+new Date()+" Archives size was : " + historyList.size());
-        trafficRepository.deleteAll();
-    }
 
     private static TrafficHistory getTrafficHistory(RealTimeTraffic realTime) {
         TrafficHistory history = new TrafficHistory();

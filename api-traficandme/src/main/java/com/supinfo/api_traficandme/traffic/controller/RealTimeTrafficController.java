@@ -25,16 +25,7 @@ public class RealTimeTrafficController {
     private final TrafficPredictionService service;
     private final RealTimeTrafficRepository repository;
 
-    @GetMapping("/predict")
-    public ResponseEntity<ApiResponse<List<TrafficResponse>>> predict() {
-        try {
-           List<TrafficResponse> response = service.predictTraffic();
 
-            return ResponseEntity.ok(new ApiResponse<>("TrafficData prediction fetched successfully", response));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(new ApiResponse<>(e.getMessage(), null));
-        }
-    }
 
     @GetMapping("/trafficData")
     public ResponseEntity<ApiResponse<List<TrafficData>>> getCurrentSpeed() {

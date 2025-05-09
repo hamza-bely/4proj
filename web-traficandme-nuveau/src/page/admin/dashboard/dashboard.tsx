@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import {
-    BarChart,
-    Bar,
     PieChart,
     Pie,
     Cell,
@@ -20,7 +18,8 @@ import Spinner from '../../../components/sniper/sniper';
 import {
     fetchApiStatisticsPerTime,
     fetchReportsByTypeStatistics,
-    fetchRoutesByModeStatistics, fetchSumOfMapStatistic
+    fetchRoutesByModeStatistics, fetchSumOfMapStatistic,
+    fetchTrafficDataFromTomTomApi
 } from "../../../services/service/admin-serivce.tsx";
 interface ApiUsageData {
     date: string;
@@ -35,33 +34,26 @@ interface ReportData {
     type: string;
     count: number;
 }
-interface ApiErrorData {
-    errorType: string;
-    count: number;
-}
+
+interface TrafficData {
+    address_start: string;
+    address_end: string;
+    averageSpeed: number;
+    congestionCount: number;
+    itineraryPointCount: number;
+  }
 const Dashboard: React.FC = () => {
     const { t } = useTranslation();
     const [reportData, setReportData] = useState<ReportData[]>([]);
     const [itineraryData, setItineraryData] = useState<RouteData[]>([]);
+    const [traffic, setTraffic] = useState<TrafficData[]>([]);
     const [usageData, setUsageData] = useState<ApiUsageData[]>([]);
-    const [errorData, setErrorData] = useState<ApiErrorData[]>([]);
     const [mapData, setMapData] = useState<AdminSumStats | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [timeRange, setTimeRange] = useState<string>('WEEK');
     const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
 
-    useEffect(() => {
-        setTimeout(() => {
-            setErrorData([
-                { errorType: 'Timeout', count: 45 },
-                { errorType: 'AddressNotFound', count: 78 },
-                { errorType: 'QuotaExceeded', count: 12 },
-                { errorType: 'InvalidParameters', count: 35 },
-                { errorType: 'Other', count: 20 }
-            ]);
-            setLoading(false);
-        }, 1000);
-    }, [timeRange]);
+    
 
     useEffect(() => {
         fetchSumOfMapStatistic()
@@ -80,7 +72,12 @@ const Dashboard: React.FC = () => {
             .then(res => setItineraryData(res.data))
             .catch(err => console.error('Erreur fetchRoutesByModeStatistics', err));
     }, []);
-
+    useEffect(() => {
+        fetchTrafficDataFromTomTomApi()
+            .then(res => setTraffic(res.data))
+            .catch(err => console.error('Erreur fetchTrafficDataFromTomTomApi', err));
+            console.log(traffic)
+    }, []);
     useEffect(() => {
         if (!timeRange) return;
         setLoading(true);
@@ -216,19 +213,46 @@ const Dashboard: React.FC = () => {
                     </ResponsiveContainer>
                 </div>
 
-                <div className="bg-white p-4 rounded-lg shadow">
-                    <h2 className="text-lg font-semibold mb-4">{t('dashboard.apiErrorTypes')}</h2>
-                    <ResponsiveContainer width="100%" height={300}>
-                        <BarChart data={errorData}>
-                            <CartesianGrid strokeDasharray="3 3" />
-                            <XAxis dataKey="errorType" />
-                            <YAxis />
-                            <Tooltip />
-                            <Legend />
-                            <Bar dataKey="count" fill="#FF8042" name={t('dashboard.errorCount')} />
-                        </BarChart>
-                    </ResponsiveContainer>
-                </div>
+                <div className="bg-white p-6 rounded-lg shadow-md">
+  <h2 className="text-lg font-semibold mb-4 text-gray-800">{t('dashboard.apiErrorTypes')}</h2>
+
+  {itineraryData.length > 0 ? (
+    <div className="overflow-x-auto">
+      <table className="min-w-full divide-y divide-gray-200">
+        <thead className="bg-gray-100">
+          <tr>
+            <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">Départ</th>
+            <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">Arrivée</th>
+            <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">Vitesse moyenne</th>
+            <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">Congestions</th>
+            <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">Points d'itinéraire</th>
+          </tr>
+        </thead>
+        <tbody className="bg-white divide-y divide-gray-200">
+          {traffic.map((item, index) => (
+            <tr key={index} className="hover:bg-gray-50 transition">
+              <td className="px-4 py-3 text-sm text-gray-800">{item.address_start}</td>
+              <td className="px-4 py-3 text-sm text-gray-800">{item.address_end}</td>
+              <td className="px-4 py-3 text-sm text-blue-600 font-medium">
+                {item.averageSpeed.toFixed(2)} km/h
+              </td>
+              <td className="px-4 py-3 text-sm text-red-600 font-medium">
+                {item.congestionCount}
+              </td>
+              <td className="px-4 py-3 text-sm text-green-600 font-medium">
+                {item.itineraryPointCount}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  ) : (
+    <p className="text-gray-500 text-sm mt-4">Aucun itinéraire disponible.</p>
+  )}
+</div>
+
+
             </div>
         </div>
     );

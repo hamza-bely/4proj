@@ -12,7 +12,6 @@ import java.util.Date;
 
 @Entity
 @Table(name = "itinerary")
-@Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -43,6 +42,9 @@ public class Itinerary {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private StatusTraffic status = StatusTraffic.ACTIVE;
+
+    @Transient
+    private String ItineraryStatus;
 
     public int getId() {
         return id;
@@ -146,5 +148,13 @@ public class Itinerary {
 
     public void setStatus(StatusTraffic status) {
         this.status = status;
+    }
+
+    public String getItineraryStatus() {
+        return ItineraryStatus;
+    }
+
+    public void setItineraryStatus(String itineraryStatus) {
+        ItineraryStatus = itineraryStatus;
     }
 }

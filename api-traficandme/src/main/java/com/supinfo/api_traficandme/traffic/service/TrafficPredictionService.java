@@ -9,6 +9,7 @@ import com.supinfo.api_traficandme.traffic.repository.RealTimeTrafficRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -21,7 +22,7 @@ import java.util.List;
 public class TrafficPredictionService {
     private final RealTimeTrafficRepository realTimeTrafficRepository;
     private final ItineraryRepository itineraryRepository;
-
+/*
     public List<TrafficResponse> predictTraffic() {
         LocalDateTime now = LocalDateTime.now();
         int hour = now.getHour();
@@ -41,17 +42,47 @@ public class TrafficPredictionService {
             response.setEndAddress(itinerary.getAddress_end());
 
             if (isRushHour && isWeekday && recentCongestions > 5) {
-                response.setStatus(TrafficPredictionStatus.TRAFFIC_LIKELY.name());
+                itinerary.setItineraryStatus(TrafficPredictionStatus.TRAFFIC_LIKELY.name());
+               // response.setStatus(TrafficPredictionStatus.TRAFFIC_LIKELY.name());
             } else if (isRushHour || recentCongestions > 2) {
-                response.setStatus(TrafficPredictionStatus.TRAFFIC_POSSIBLE.name());
+                itinerary.setItineraryStatus(TrafficPredictionStatus.TRAFFIC_POSSIBLE.name());
+               // response.setStatus(TrafficPredictionStatus.TRAFFIC_POSSIBLE.name());
             } else {
-                response.setStatus(TrafficPredictionStatus.TRAFFIC_NONE.name());
+                itinerary.setItineraryStatus(TrafficPredictionStatus.TRAFFIC_NONE.name());
+                //response.setStatus(TrafficPredictionStatus.TRAFFIC_NONE.name());
             }
 
             responses.add(response);
         }
         return responses;
     }
+
+    public TrafficPredictionStatus predictTraffic(double lat, double lon) {
+        LocalDateTime now = LocalDateTime.now();
+        int hour = now.getHour();
+        DayOfWeek day = now.getDayOfWeek();
+
+        boolean isRushHour = (hour >= 7 && hour <= 9) || (hour >= 17 && hour <= 19);
+        boolean isWeekday = day != DayOfWeek.SATURDAY && day != DayOfWeek.SUNDAY;
+
+        long recentCongestions = 0;
+        List<Itinerary> itineraries = itineraryRepository.findAll();
+
+        Date since = Date.from(now.minusHours(2).atZone(ZoneId.systemDefault()).toInstant());
+        List<TrafficResponse> responses = new ArrayList<>();
+
+        for (Itinerary itinerary : itineraries) {
+            recentCongestions = realTimeTrafficRepository.countRecentCongestions(itinerary.getId());
+        }
+
+        if (isRushHour && isWeekday && recentCongestions > 5) {
+            return TrafficPredictionStatus.TRAFFIC_LIKELY;
+        } else if (isRushHour || recentCongestions > 2) {
+            return TrafficPredictionStatus.TRAFFIC_POSSIBLE;
+        } else {
+            return TrafficPredictionStatus.TRAFFIC_NONE;
+        }
+    }*/
 
     public List<TrafficData> getItineraryCurrentSpeed() {
         List<Object[]> results = realTimeTrafficRepository.getAverageSpeedByItinerary();
@@ -71,10 +102,12 @@ public class TrafficPredictionService {
     private static TrafficData getTrafficResponse(Object[] result, String startAddress) {
         String endAddress = (String) result[1];
         Double averageSpeed = (Double) result[2];
-        Long congestedCount= (Long) result[3];
-        Long itineraryPoint = (Long) result[4];
+        Long itineraryPoint = (Long) result[3];
+        Long congestedCount= (Long) result[4];
+        Integer itineraryID = (Integer) result[5];
 
         TrafficData response = new TrafficData();
+        response.setId(itineraryID);
         response.setAddress_start(startAddress);
         response.setAddress_end(endAddress);
         response.setAverageSpeed(averageSpeed);
@@ -82,4 +115,26 @@ public class TrafficPredictionService {
         response.setItineraryPointCount(itineraryPoint);
         return response;
     }
+
+    public void enrichItinerariesWithTrafficStatus(List<Itinerary> itineraries) {
+        LocalDateTime now1 = LocalDateTime.now();
+        int hour = now1.getHour();
+        DayOfWeek day = now1.getDayOfWeek();
+        boolean isRushHour = (hour >= 7 && hour <= 9) || (hour >= 17 && hour <= 19);
+        boolean isWeekday = day != DayOfWeek.SATURDAY && day != DayOfWeek.SUNDAY;
+
+        for (Itinerary itinerary : itineraries) {
+            long recentCongestions = realTimeTrafficRepository.countRecentCongestions(
+                    itinerary.getId());
+
+            if (isRushHour && isWeekday && recentCongestions > 5) {
+                itinerary.setItineraryStatus(TrafficPredictionStatus.TRAFFIC_LIKELY.name());
+            } else if (isRushHour || recentCongestions > 2) {
+                itinerary.setItineraryStatus(TrafficPredictionStatus.TRAFFIC_POSSIBLE.name());
+            } else {
+                itinerary.setItineraryStatus(TrafficPredictionStatus.TRAFFIC_NONE.name());
+            }
+        }
+    }
+
 }
