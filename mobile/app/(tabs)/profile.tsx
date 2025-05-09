@@ -64,7 +64,7 @@ export default function ProfileScreen() {
         firstName,
         lastName,
         email,
-        role: user.role,
+        role: "",
       });
 
       setShowEditModal(false);
@@ -77,7 +77,6 @@ export default function ProfileScreen() {
       setIsLoading(false);
     }
   };
-
   const handleSignOut = () => {
     Alert.alert(
       'Déconnexion',
@@ -107,7 +106,6 @@ export default function ProfileScreen() {
       Alert.alert('Erreur', 'Impossible de supprimer l\'itinéraire');
     }
   };
-
   const handleSelectRoute = (id: number) => {
     Alert.alert('Information', 'Fonctionnalité de visualisation de l\'itinéraire en développement');
   };

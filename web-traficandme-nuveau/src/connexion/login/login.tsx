@@ -1,8 +1,6 @@
 import { useState } from "react";
 import {useTranslation} from "react-i18next";
 import {UserLoginRequest} from "../../services/model/user.tsx";
-import { FcGoogle } from "react-icons/fc";
-import { FaFacebookSquare } from "react-icons/fa";
 import {login} from "../../services/service/user-service.tsx";
 import Cookies from "js-cookie";
 
