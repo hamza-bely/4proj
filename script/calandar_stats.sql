@@ -1,3 +1,21 @@
+CREATE TABLE IF NOT EXISTS calendar_stats (
+    id SERIAL PRIMARY KEY, -- Si tu veux garder une colonne 'id' en plus de 'calendar_date'
+    calendar_date DATE NOT NULL UNIQUE, -- Assurer l'unicité de 'calendar_date'
+    day_number INT NOT NULL,
+    day_name VARCHAR(20), -- Réduire la taille à 20 pour les noms de jours
+    month_number INT NOT NULL,
+    month_name VARCHAR(20), -- Réduire la taille à 20 pour les noms de mois
+    week_number INT NOT NULL,
+    week_name VARCHAR(20), -- Réduire la taille à 20 pour les noms de semaines
+    week_start_date DATE NOT NULL,
+    week_end_date DATE NOT NULL,
+    month_start_date DATE NOT NULL,
+    month_end_date DATE NOT NULL,
+    quarter_number INT NOT NULL,
+    quarter_name VARCHAR(20), -- Réduire la taille à 20 pour les noms de trimestres
+    quarter_start_date DATE NOT NULL,
+    quarter_end_date DATE NOT NULL
+);
 
 INSERT INTO calendar_stats (
     calendar_date,
