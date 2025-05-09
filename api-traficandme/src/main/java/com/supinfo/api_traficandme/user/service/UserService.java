@@ -112,7 +112,6 @@ public class UserService {
         if (isNullOrEmpty(request.firstName())) throw new IllegalArgumentException("First name is required.");
         if (isNullOrEmpty(request.lastName())) throw new IllegalArgumentException("Last name is required.");
         if (isNullOrEmpty(request.email())) throw new IllegalArgumentException("Email is required.");
-        if (isNullOrEmpty(request.role())) throw new IllegalArgumentException("Role is required.");
 
         if (!user.getEmail().equals(request.email()) && userRepository.existsByEmail(request.email())) {
             throw new IllegalArgumentException("Email is already in use.");
@@ -136,7 +135,7 @@ public class UserService {
         user.setLastName(request.lastName());
         user.setEmail(request.email());
         user.setPassword(updatedPassword);
-        user.setRoles(Role.valueOf(request.role().toUpperCase()));
+        user.setRoles(user.getRoles());
 
         if (request.status() != null) {
             user.setStatus(StatusUser.valueOf(request.status().toUpperCase()));

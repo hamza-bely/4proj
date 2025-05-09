@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   Modal,
   Alert,
+  Vibration,
   TextInput,
   Platform,
   StyleSheet,
@@ -26,11 +27,9 @@ import {
   X,
   ThumbsUp,
   ThumbsDown,
-  ChevronDown,
   ChevronUp,
   RefreshCw,
   Trash2,
-  Pencil
 } from 'lucide-react-native';
 import RouteModal from '@/components/RouteModal';
 import * as Location from 'expo-location';
@@ -44,18 +43,13 @@ export default function MapScreen() {
   const [isLoading, setIsLoading] = useState(false);
   const [reports, setReports] = useState([]);
   const [selectedReport, setSelectedReport] = useState(null);
-
   const [showReportModal, setShowReportModal] = useState(false);
   const [reportType, setReportType] = useState('ACCIDENTS');
   const [reportLocation, setReportLocation] = useState(null);
   const [reportAddress, setReportAddress] = useState('');
-
   const [showRouteModal, setShowRouteModal] = useState(false);
   const [startLocation, setStartLocation] = useState(null);
-  const [startAddress, setStartAddress] = useState('');
-  const [destination, setDestination] = useState(null);
   const [destinationAddress, setDestinationAddress] = useState('');
-
   const [routeCoordinates, setRouteCoordinates] = useState([]);
   const [routeInstructions, setRouteInstructions] = useState([]);
   const [routeSummary, setRouteSummary] = useState(null);
@@ -63,6 +57,87 @@ export default function MapScreen() {
   const [geoEnabled, setGeoEnabled] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const params = useLocalSearchParams();
+
+  const [alertedReports, setAlertedReports] = useState(new Set());
+  const [proximityRadius, setProximityRadius] = useState(200);
+
+  const calculateDistance = (lat1, lon1, lat2, lon2) => {
+    const R = 6371e3;
+    const φ1 = (lat1 * Math.PI) / 180;
+    const φ2 = (lat2 * Math.PI) / 180;
+    const Δφ = ((lat2 - lat1) * Math.PI) / 180;
+    const Δλ = ((lon2 - lon1) * Math.PI) / 180;
+
+    const a =
+      Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+      Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    const distance = R * c;
+
+    return distance;
+  };
+
+  const checkProximityToReports = (currentPosition) => {
+    if (!currentPosition || !reports.length) return;
+
+    reports.forEach(report => {
+      const distance = calculateDistance(
+        currentPosition.latitude,
+        currentPosition.longitude,
+        report.latitude,
+        report.longitude
+      );
+
+      if (distance <= proximityRadius && !alertedReports.has(report.id)) {
+        let reportType = '';
+        switch (report.type) {
+          case 'ACCIDENTS': reportType = 'Accident'; break;
+          case 'TRAFFIC': reportType = 'Trafic dense'; break;
+          case 'ROADS_CLOSED': reportType = 'Route fermée'; break;
+          case 'POLICE_CHECKS': reportType = 'Contrôle de police'; break;
+          case 'OBSTACLES': reportType = 'Obstacle'; break;
+          default: reportType = 'Incident'; break;
+        }
+
+        Vibration.vibrate(500);
+
+        Alert.alert(
+          `${reportType} à proximité`,
+          `Vous êtes à ${Math.round(distance)} mètres d'un signalement: ${report.address}`,
+          [{ text: 'OK', onPress: () => console.log('Alerte confirmée') }]
+        );
+
+        setAlertedReports(prev => new Set([...prev, report.id]));
+      }
+    });
+  };
+
+  useEffect(() => {
+    const startWatching = async () => {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') return;
+
+      const watcher = await Location.watchPositionAsync(
+        {
+          accuracy: Location.Accuracy.High,
+          timeInterval: 5000,
+          distanceInterval: 10,
+        },
+        (loc) => {
+          const currentPosition = {
+            latitude: loc.coords.latitude,
+            longitude: loc.coords.longitude,
+          };
+          setStartLocation(currentPosition);
+          checkProximityToReports(currentPosition);
+        }
+      );
+
+      return () => watcher.remove();
+    };
+
+    startWatching();
+  }, [reports, proximityRadius]);
 
   const zoomToStart = (startPoint) => {
     if (mapRef?.current && startPoint) {
@@ -91,7 +166,6 @@ export default function MapScreen() {
       });
     }
   }, [startLat, startLng, endLat, endLng]);
-
 
   const fetchAndDisplayRoute = async (start, end) => {
     try {
@@ -142,11 +216,9 @@ export default function MapScreen() {
         }, 1000);
 
         zoomToStart(coordinates[0]);
-
       }
       }catch(error){
       }
-
   };
 
   useEffect(() => {
@@ -244,14 +316,6 @@ export default function MapScreen() {
           latitude: location.coords.latitude,
           longitude: location.coords.longitude,
         });
-        try {
-          const result = await reverseGeocode(location.coords.latitude, location.coords.longitude);
-          if (result.addresses && result.addresses.length > 0) {
-            setStartAddress(result.addresses[0].address.freeformAddress);
-          }
-        } catch (error) {
-          console.error('Error reverse geocoding:', error);
-        }
       }
     } catch (error) {
       console.error('Error initializing location:', error);
@@ -385,7 +449,6 @@ export default function MapScreen() {
     setRouteSummary(summary);
     setShowInstructions(true);
     if (dest) {
-      setDestination(dest.location);
       setDestinationAddress(dest.address);
     }
 
@@ -461,7 +524,6 @@ export default function MapScreen() {
     setRouteInstructions([]);
     setRouteSummary(null);
     setShowInstructions(false);
-    setDestination(null);
     setDestinationAddress('');
 
     router.replace('/(tabs)');
@@ -556,7 +618,7 @@ export default function MapScreen() {
                   borderWidth: 1,
                 }}
               >
-                <Text style={{ color: '#3498db', fontWeight: 'bold' }}>Je suis là</Text>
+                <Text style={{ color: '#3498db', fontWeight: 'bold' }}>MOI</Text>
               </View>
             </Callout>
           </Marker>
@@ -717,9 +779,6 @@ export default function MapScreen() {
                 locationState.location.coords.latitude,
                 locationState.location.coords.longitude
               ).then(result => {
-                if (result.addresses && result.addresses.length > 0) {
-                  setStartAddress(result.addresses[0].address.freeformAddress);
-                }
               }).catch(err => console.error('Error geocoding for route start:', err));
             }
             setShowRouteModal(true);
