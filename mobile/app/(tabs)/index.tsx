@@ -6,7 +6,6 @@ import {
   Modal,
   Alert,
   Vibration,
-  TextInput,
   Platform,
   StyleSheet,
   KeyboardAvoidingView,
@@ -387,7 +386,7 @@ export default function MapScreen() {
         type: reportType,
         latitude: location.latitude,
         longitude: location.longitude,
-        status: 'AVAILABLE',
+        status: 'PENDING',
         address: reportAddress || 'Adresse inconnue',
       };
 
