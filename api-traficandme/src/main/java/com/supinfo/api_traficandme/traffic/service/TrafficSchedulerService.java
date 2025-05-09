@@ -32,7 +32,12 @@ public class TrafficSchedulerService {
         this.historyRepository = historyRepository;
         this.itineraryRepository = itineraryRepository;
     }
-    //@Scheduled(fixedRate = 590000)
+
+    /**
+     * Archives the daily traffic data by saving it to the TrafficHistory repository and deleting it from the RealTimeTraffic repository.
+     *
+     * @param oldTrafficData The list of RealTimeTraffic data to be archived.
+     */
     public void archiveDailyTraffic(List<RealTimeTraffic> oldTrafficData) {
         //List<RealTimeTraffic> realTimeList = trafficRepository.findAll();
         List<TrafficHistory> historyList = new ArrayList<>();
@@ -49,7 +54,11 @@ public class TrafficSchedulerService {
     }
 
 
-    @Scheduled(fixedRate = 300000)
+    /**
+     * Fetches traffic data for all itineraries and stores it in the RealTimeTraffic repository.
+     * This method is scheduled to run every 10 minutes.
+     */
+    @Scheduled(fixedRate = 600000)
     public void fetchTrafficDataFixedRate() {
         List<Itinerary> itineraries = itineraryRepository.findAll();
         List<RealTimeTraffic> oldTrafficData = trafficRepository.findAll();
@@ -65,6 +74,12 @@ public class TrafficSchedulerService {
             fetchAndStoreTrafficForItinerary(itinerary);
         }
     }
+
+    /**
+     * Fetches traffic data for a specific itinerary and stores it in the RealTimeTraffic repository.
+     *
+     * @param itinerary The itinerary for which to fetch traffic data.
+     */
     private void fetchAndStoreTrafficForItinerary(Itinerary itinerary) {
         String startLat = itinerary.getStartLatitude();
         String startLon = itinerary.getStartLongitude();
@@ -126,6 +141,7 @@ public class TrafficSchedulerService {
                     System.out.println("Error fetching traffic for point " + lat + "," + lon + " : " + e.getMessage());
                 }
             }
+            System.out.println("Fetching data from TOMTOM TrafficApi successfully complete at "+new Date()+" Archives size was : " + trafficRepository.findAll().size());
 
         } catch (Exception e) {
             System.out.println("Error fetching itinerary route: " + e.getMessage());

@@ -26,4 +26,6 @@ public interface RealTimeTrafficRepository extends JpaRepository<RealTimeTraffic
             GROUP BY it.id, it.address_start, it.address_end""")
     List<Object[]> getAverageSpeedByItinerary();
 
+    @Query("SELECT t FROM RealTimeTraffic t WHERE t.congested = true AND t.itinerary.id = :itineraryId")
+    List<RealTimeTraffic> findCongestedTraffic(@Param("itineraryId") int itineraryId);
     }

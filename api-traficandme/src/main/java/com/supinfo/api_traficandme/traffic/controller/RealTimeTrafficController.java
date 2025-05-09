@@ -25,7 +25,16 @@ public class RealTimeTrafficController {
     private final TrafficPredictionService service;
     private final RealTimeTrafficRepository repository;
 
+    @GetMapping("/congested-points")
+    public ResponseEntity<ApiResponse<List<TrafficResponse>>> predict() {
+        try {
+           List<TrafficResponse> response = service.getTrafficCongestedPoints();
 
+            return ResponseEntity.ok(new ApiResponse<>("TrafficData congested points fetched successfully", response));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(new ApiResponse<>(e.getMessage(), null));
+        }
+    }
 
     @GetMapping("/trafficData")
     public ResponseEntity<ApiResponse<List<TrafficData>>> getCurrentSpeed() {

@@ -6,7 +6,7 @@ import java.util.Date;
 
 @Data
 public class TrafficResponse {
-    private int id;
+    private long id;
     private Double currentSpeed;
     private String latitude;
     private String longitude;

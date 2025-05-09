@@ -4,6 +4,7 @@ import com.supinfo.api_traficandme.common.TrafficPredictionStatus;
 import com.supinfo.api_traficandme.statistiques.dto.TrafficData;
 import com.supinfo.api_traficandme.traffic.dto.TrafficResponse;
 import com.supinfo.api_traficandme.traffic.entity.Itinerary;
+import com.supinfo.api_traficandme.traffic.entity.RealTimeTraffic;
 import com.supinfo.api_traficandme.traffic.repository.ItineraryRepository;
 import com.supinfo.api_traficandme.traffic.repository.RealTimeTrafficRepository;
 import lombok.RequiredArgsConstructor;
@@ -137,4 +138,22 @@ public class TrafficPredictionService {
         }
     }
 
+    public List<TrafficResponse> getTrafficCongestedPoints() {
+        List<Itinerary> itineraries = itineraryRepository.findAll();
+        List<TrafficResponse> trafficResponses = new ArrayList<>();
+
+        for (Itinerary itinerary: itineraries) {
+            List<RealTimeTraffic> congestedPoints = realTimeTrafficRepository.findCongestedTraffic(itinerary.getId());
+
+            for (RealTimeTraffic traffic : congestedPoints ) {
+                TrafficResponse response = new TrafficResponse();
+                response.setId(traffic.getId());
+                response.setLatitude(String.valueOf(traffic.getLatitude()));
+                response.setLongitude(String.valueOf(traffic.getLongitude()));
+                response.setCurrentSpeed(traffic.getCurrentSpeed());
+                trafficResponses.add(response);
+            }
+        }
+        return trafficResponses;
+    }
 }
