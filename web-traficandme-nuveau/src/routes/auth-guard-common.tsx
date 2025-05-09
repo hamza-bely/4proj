@@ -11,7 +11,6 @@ const isAuthenticated = (token: string | undefined) => {
     try {
         if (token) {
             const role =getUserRole();
-            console.log(role);
             if(role === "ROLE_MODERATOR" || role === "ROLE_ADMIN"){
                 return true;
             }

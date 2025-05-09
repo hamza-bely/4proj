@@ -22,7 +22,6 @@ export default function ProfileUser() {
     const [isOpen, setIsOpen] = useState(false);
     const [editMode, setEditMode] = useState(false);
     const [currentNavigation, setCurrentNavigation] = useState("General");
-    console.log(user)
     const [formData, setFormData] = useState({
         firstName: user?.firstName || "",
         lastName: user?.lastName || "",
@@ -62,7 +61,6 @@ export default function ProfileUser() {
             console.error("Erreur lors de la mise à jour de l'utilisateur:", error);
         }
     };
-    console.log(user)
 
     return (
         <div className="mx-auto max-w-7xl pt-16 lg:flex lg:gap-x-16 lg:px-8">
