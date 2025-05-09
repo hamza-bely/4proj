@@ -133,11 +133,10 @@ Lorsque vous travaillez avec une API locale (ex. via Docker), n'utilisez pas loc
 
  À faire :
 Dans le fichier .env, utilisez l'adresse IP locale de votre ordinateur (visible via ipconfig sous Windows ou ifconfig/ip a sous Linux/Mac). Par exemple :
-
-ini
-Copier
-Modifier
+```bash
 EXPO_PUBLIC_API_URL=http://192.168.1.65:8080/
+```
+
 Cela permet à l'application mobile sur le téléphone (ou l’émulateur) d'accéder à l'API qui tourne sur votre machine.
 
 
