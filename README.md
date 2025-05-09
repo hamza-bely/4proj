@@ -181,10 +181,10 @@ Le tableau ci-dessous présente l'état d'avancement des fonctionnalités par pl
 
 | Catégorie                          | Sous-catégorie                                | Points | Web  | Mobile | API |
 |-----------------------------------|------------------------------------------------|--------|------|--------|-----|
-| **Documentation** (50 pts)        | Documentation technique                        | 30     | ✅   | ⚠️     | ✅  |
-|                                   | Manuel utilisateur                             | 20     | ⚠️   | ⚠️     | ❌  |
-| **Déploiement** (50 pts)          | Architecture                                   | 30     | ✅   | ❌     | ⚠️  |
-|                                   | Containérisation                               | 20     | ✅   | ❌     | ⚠️  |
+| **Documentation** (50 pts)        | Documentation technique                        | 30     | ✅   | ✅    | ✅  |
+|                                   | Manuel utilisateur                             | 20     | ✅   | ✅    |     |
+| **Déploiement** (50 pts)          | Architecture                                   | 30     | ✅   | ❌    | ⚠️  |
+|                                   | Containérisation                               | 20     | ✅   | ❌    | ⚠️  |
 | **Fonctionnalités** (150 pts)     |                                                |        |      |        |     |
 | Authentification utilisateur      | OAuth                                          | 5      | ❌   | ❌    | ⚠️  |
 |                                   | Connexion standard                             | 5      | ✅   | ✅    | ✅  |
