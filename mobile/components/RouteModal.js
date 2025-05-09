@@ -12,7 +12,8 @@ import {
 import { X, MapPin, Search, Car, Bus } from 'lucide-react-native';
 import Button from '@/components/Button';
 import RouteOptionsModal from '@/components/RouteOptionsModal';
-import { KeyboardAvoidingView, Platform } from 'react-native';
+import { KeyboardAvoidingView } from 'react-native';
+import * as Location from 'expo-location';
 
 const styles = {
   modalContent: { padding: 16, backgroundColor: '#fff', borderRadius: 8 },
@@ -69,91 +70,6 @@ const RouteModal = ({
   const [routeOptions, setRouteOptions] = useState([]);
   const [showRouteOptionsModal, setShowRouteOptionsModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
-
-  const handleStartLocationSelect = async () => {
-    try {
-      setIsLoading(true);
-      setErrorMessage('');
-      if (navigator.geolocation && Platform.OS === 'web') {
-        navigator.geolocation.getCurrentPosition(
-          async (position) => {
-            const currentPosition = {
-              latitude: position.coords.latitude,
-              longitude: position.coords.longitude
-            };
-
-            setStartLocation(currentPosition);
-
-            try {
-              const response = await tomtomApi.get(`/search/2/reverseGeocode/${currentPosition.latitude},${currentPosition.longitude}.json`);
-              if (response.data && response.data.addresses && response.data.addresses.length > 0) {
-                const address = response.data.addresses[0].address;
-                const formattedAddress = [
-                  address.streetNumber || '',
-                  address.street || '',
-                  address.streetName || '',
-                  address.municipalitySubdivision || '',
-                  address.municipality || '',
-                  address.postalCode || '',
-                  address.countrySubdivision || '',
-                  address.country || ''
-                ].filter(Boolean).join(', ');
-
-                setStartAddress(formattedAddress);
-              }
-              setIsLoading(false);
-            } catch (error) {
-              console.error('Error getting address from coordinates:', error);
-              setStartAddress(`Position actuelle (${currentPosition.latitude.toFixed(5)}, ${currentPosition.longitude.toFixed(5)})`);
-              setIsLoading(false);
-            }
-          },
-          (error) => {
-            console.error('Error getting position:', error);
-            const parisPosition = {
-              latitude: 48.8566,
-              longitude: 2.3522
-            };
-            setStartLocation(parisPosition);
-            setStartAddress('Paris, France');
-            setIsLoading(false);
-          },
-          { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
-        );
-      } else {
-        const defaultPosition = {
-          latitude: 48.8566,
-          longitude: 2.3522
-        };
-
-        setStartLocation(defaultPosition);
-
-        try {
-          const response = await tomtomApi.get(`/search/2/reverseGeocode/${defaultPosition.latitude},${defaultPosition.longitude}.json`);
-          if (response.data && response.data.addresses && response.data.addresses.length > 0) {
-            const address = response.data.addresses[0].address;
-            const formattedAddress = [
-              address.streetNumber || '',
-              address.street || '',
-              address.municipality || '',
-              address.postalCode || '',
-              address.country || ''
-            ].filter(Boolean).join(', ');
-
-            setStartAddress(formattedAddress);
-          }
-        } catch (error) {
-          console.error('Error getting address from coordinates:', error);
-          setStartAddress(`Position actuelle (${defaultPosition.latitude.toFixed(5)}, ${defaultPosition.longitude.toFixed(5)})`);
-        }
-        setIsLoading(false);
-      }
-    } catch (error) {
-      console.error('Error getting current location:', error);
-      Alert.alert('Erreur', 'Impossible d\'obtenir votre position actuelle');
-      setIsLoading(false);
-    }
-  };
 
   const searchAddresses = async (text, isStart) => {
     if (!text || text.length < 2) {
@@ -406,6 +322,62 @@ const RouteModal = ({
     }
   };
 
+  const zoomToCurrentLocation = async () => {
+    try {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('Erreur', 'Permission de localisation refusée');
+        return;
+      }
+
+      const location = await Location.getCurrentPositionAsync({});
+      const { latitude, longitude } = location.coords;
+
+      // Zoom sur la position
+      mapRef.current?.animateCamera(
+        {
+          center: { latitude, longitude },
+          pitch: 0,
+          zoom: 17,
+        },
+        { duration: 1000 }
+      );
+
+      // Mettre à jour l’état de la position
+      setStartLocation({ latitude, longitude });
+
+      // Faire du reverse geocoding avec TomTom
+      try {
+        const response = await tomtomApi.get(`/search/2/reverseGeocode/${latitude},${longitude}.json`);
+        if (response.data?.addresses?.length > 0) {
+          const address = response.data.addresses[0].address;
+          const formattedAddress = [
+            address.streetNumber || '',
+            address.street || '',
+            address.streetName || '',
+            address.municipalitySubdivision || '',
+            address.municipality || '',
+            address.postalCode || '',
+            address.countrySubdivision || '',
+            address.country || ''
+          ]
+            .filter(Boolean)
+            .join(', ');
+          setStartAddress(formattedAddress);
+        } else {
+          setStartAddress(`Position actuelle (${latitude.toFixed(5)}, ${longitude.toFixed(5)})`);
+        }
+      } catch (error) {
+        console.error('Erreur reverse geocoding :', error);
+        setStartAddress(`Position actuelle (${latitude.toFixed(5)}, ${longitude.toFixed(5)})`);
+      }
+
+    } catch (error) {
+      console.error('Erreur de localisation :', error);
+      Alert.alert('Erreur', 'Impossible de récupérer la position actuelle');
+    }
+  };
+
   return (
     <KeyboardAvoidingView>
       <View style={styles.modalContent}>
@@ -428,7 +400,7 @@ const RouteModal = ({
           />
           <TouchableOpacity
             style={styles.locationButton}
-            onPress={handleStartLocationSelect}
+            onPress={zoomToCurrentLocation}
           >
             <MapPin size={20} color="#3498db" />
           </TouchableOpacity>

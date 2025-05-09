@@ -10,6 +10,7 @@ interface User {
   lastName?: string;
   username?: string;
   role?: string;
+  password :string;
 }
 
 interface AuthState {

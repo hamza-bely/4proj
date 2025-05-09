@@ -101,11 +101,13 @@ export default function MapScreen() {
 
         Vibration.vibrate(500);
 
-        Alert.alert(
-          `${reportType} à proximité`,
-          `Vous êtes à ${Math.round(distance)} mètres d'un signalement: ${report.address}`,
-          [{ text: 'OK', onPress: () => console.log('Alerte confirmée') }]
-        );
+        if (routeCoordinates) {
+          Alert.alert(
+            `${reportType} à proximité`,
+            `Vous êtes à ${Math.round(distance)} mètres d'un signalement: ${report.address}`,
+            [{ text: 'OK', onPress: () => console.log('Alerte confirmée') }]
+          );
+        }
 
         setAlertedReports(prev => new Set([...prev, report.id]));
       }

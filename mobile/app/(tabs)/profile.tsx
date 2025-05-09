@@ -18,6 +18,8 @@ export default function ProfileScreen() {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
   const [activeTab, setActiveTab] = useState('reports');
 
   useEffect(() => {
@@ -64,15 +66,15 @@ export default function ProfileScreen() {
         firstName,
         lastName,
         email,
+        password,
         role: "",
       });
 
       setShowEditModal(false);
       Alert.alert('Succès', 'Profil mis à jour avec succès');
     } catch (error) {
-      console.log(error.response)
       console.error('Error updating profile:', error);
-      Alert.alert('Erreur', 'Impossible de mettre à jour votre profil');
+      Alert.alert('Erreur', "Le mot de passe doit contenir au moins 8 caractères, un chiffre et un caractère spécial.");
     } finally {
       setIsLoading(false);
     }
@@ -118,9 +120,6 @@ export default function ProfileScreen() {
             <User size={32} color="#fff" />
           </View>
           <View style={styles.userDetails}>
-            <Text style={styles.userName}>
-              {authState.user?.firstName} {authState.user?.lastName}
-            </Text>
             <Text style={styles.userEmail}>{authState.user?.email}</Text>
           </View>
         </View>
@@ -284,6 +283,13 @@ export default function ProfileScreen() {
               onChangeText={setEmail}
               placeholder="Votre email"
               keyboardType="email-address"
+              autoCapitalize="none"
+            />
+            <Input
+              label="password"
+              value={password}
+              onChangeText={setPassword}
+              placeholder="Nuveau password"
               autoCapitalize="none"
             />
 
