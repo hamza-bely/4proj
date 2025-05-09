@@ -129,6 +129,19 @@ Créez un appareil virtuel (émulateur) via le AVD Manager
 
 Lancez npx expo start, puis appuyez sur la touche "a" dans le terminal pour ouvrir l’application sur l’émulateur Android
 
+Lorsque vous travaillez avec une API locale (ex. via Docker), n'utilisez pas localhost ou 127.0.0.1 dans votre application mobile.
+
+ À faire :
+Dans le fichier .env, utilisez l'adresse IP locale de votre ordinateur (visible via ipconfig sous Windows ou ifconfig/ip a sous Linux/Mac). Par exemple :
+
+ini
+Copier
+Modifier
+EXPO_PUBLIC_API_URL=http://192.168.1.65:8080/
+Cela permet à l'application mobile sur le téléphone (ou l’émulateur) d'accéder à l'API qui tourne sur votre machine.
+
+
+
 ## Lancement des tests
 **Pour lancer les tests back-end:**
 ```bash
