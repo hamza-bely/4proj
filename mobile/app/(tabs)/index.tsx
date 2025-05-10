@@ -11,7 +11,7 @@ import {
   KeyboardAvoidingView,
   ScrollView,
 } from 'react-native';
-import MapView, { Callout, Marker, Polyline } from 'react-native-maps';
+import MapView, { Callout, Marker, Polyline,PROVIDER_GOOGLE } from 'react-native-maps';
 import { useLocation } from '@/contexts/LocationContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { api, tomtomApi, reverseGeocode } from '@/services/api';
@@ -34,6 +34,7 @@ import RouteModal from '@/components/RouteModal';
 import * as Location from 'expo-location';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useLocalSearchParams } from 'expo-router';
+import TrafficIndicator from '@/components/TrafficIndicator';
 
 export default function MapScreen() {
   const { state: locationState, getCurrentLocation } = useLocation();
@@ -566,8 +567,9 @@ export default function MapScreen() {
   return (
     <View style={styles.container}>
       <MapView
-        ref={mapRef}
+        provider={PROVIDER_GOOGLE}
         style={styles.map}
+        showsTraffic={true} // Active la couche de trafic Google
         initialRegion={{
           latitude: locationState.location?.coords.latitude || 48.8566,
           longitude: locationState.location?.coords.longitude || 2.3522,
@@ -694,33 +696,32 @@ export default function MapScreen() {
           </ScrollView>
 
           <View style={styles.routeActionButtons}>
+            <TrafficIndicator />
+
             <TouchableOpacity
               style={[styles.routeActionButton, styles.refreshButton]}
               onPress={refreshRoute}
               disabled={refreshing}
             >
-              <RefreshCw size={20} color="#fff" />
-              <Text style={styles.routeActionButtonText}>
-                {refreshing ? 'Mise à jour...' : 'Rafraîchir'}
-              </Text>
+              <RefreshCw size={15} color="#fff" />
             </TouchableOpacity>
 
             <TouchableOpacity
               style={[styles.routeActionButton, styles.clearButton]}
               onPress={clearRoute}
             >
-              <Trash2 size={20} color="#fff" />
-              <Text style={styles.routeActionButtonText}>Supprimer</Text>
+              <Trash2 size={15} color="#fff" />
+            </TouchableOpacity>
+
+
+            <TouchableOpacity
+              style={styles.collapseButton}
+              onPress={() => setShowInstructions(false)}
+            >
+              <ChevronUp size={15} color="#fff" />
             </TouchableOpacity>
           </View>
 
-          <TouchableOpacity
-            style={styles.collapseButton}
-            onPress={() => setShowInstructions(false)}
-          >
-            <ChevronUp size={20} color="#fff" />
-            <Text style={styles.collapseButtonText}>Fermer</Text>
-          </TouchableOpacity>
         </View>
       )}
 
@@ -1181,10 +1182,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#3498db',
-    padding: 8,
-    borderRadius: 20,
+    padding: 10,
+    borderRadius: 10,
     alignSelf: 'center',
-    marginTop: 10,
+    marginLeft : 5
+
   },
   collapseButtonText: {
     color: 'white',
@@ -1197,9 +1199,10 @@ const styles = StyleSheet.create({
   },
   routeActionButtons: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
     alignItems: 'center',
-    marginTop: 10,
+    marginRight: 5,
+    marginLeft: 5,
+    marginTop: 5,
     paddingHorizontal: 16,
   },
 
@@ -1207,19 +1210,19 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: 10,
-    paddingHorizontal: 14,
+    paddingHorizontal: 10,
     borderRadius: 10,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 3,
-    elevation: 3,
   },
   refreshButton: {
     backgroundColor: '#4A90E2',
   },
   clearButton: {
     backgroundColor: '#D0021B',
+    marginLeft:5
   },
   routeActionButtonText: {
     color: '#fff',
