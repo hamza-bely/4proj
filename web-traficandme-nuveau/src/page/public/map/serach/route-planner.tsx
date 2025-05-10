@@ -232,11 +232,9 @@ const RoutePlanner: React.FC<RoutePlannerProps> = ({ onRouteCalculated, startAdd
             };
             console.log(routeData)
 
-            await createRoute(routeData);
-            toast.success(t("map.route-saved"));
+            await  createRoute(routeData);
         } catch (error) {
             console.error(t("error.save-route"), error);
-            toast.error(t("error.save-route"));
         } finally {
             setIsSaving(false);
         }
