@@ -171,7 +171,7 @@ Le système est fourni avec des utilisateurs pré-configurés :
 - Rôle : USER
 
 ### Modérateur
-- Email : moderator@traficandme.com
+- Email : moderator.@traficandme.com
 - Mot de passe : ModeratorPass123!
 - Rôle : MODERATOR
 
