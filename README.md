@@ -71,7 +71,7 @@ cd traficandme
 
 2. Créer un fichier `.env` à la racine du projet (contactez l'équipe pour obtenir les variables d'environnement nécessaires)
 
-3. Lancer les conteneurs avec le script de démarrage :
+3. Lancer les conteneurs avec le script de démarrage(dans du bash(EX: git bash ou le terminal de vs code)  :
 ```bash
 ./run.sh
 ```
