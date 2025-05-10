@@ -11,7 +11,7 @@
     "delete-definitive": "Supprimer definitivement",
     "email" : "Email",
     "actions": "Actions",
-    "confirm": "Confirm",
+    "confirm": "Confirmer",
     "message-confirm-delete" : "Êtes-vous sûr de vouloir supprimer ?",
     "status" : "Statut",
     "role" : "Rôle",
@@ -94,7 +94,7 @@
     },
     "incentive3": {
       "title": "Économie de temps et de carburant",
-      "description": "En proposant les trajets les plus courts et les plus rapides, ces applications réduisent votre consommation de carburant et votre empreinte écologique. Moins de temps sur la route signifie aussi plus de confort et moins de stress."
+      "description": "En proposant les trajets les plus courts et les plus rapides, cette application réduit votre consommation de carburant et votre empreinte écologique. Moins de temps sur la route signifie aussi plus de confort et moins de stress."
     }
   },
   "contact": {
@@ -225,7 +225,7 @@
     "title": "Gestion des utilisateurs",
     "add-user": "Ajouter un utilisateur",
     "role": "Role",
-    "username": "Username",
+    "username": "Nom d'utilisateur",
     "no_users": "Aucun utilisateur"
   },
   "profile": {
