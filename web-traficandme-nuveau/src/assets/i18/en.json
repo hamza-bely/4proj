@@ -359,7 +359,15 @@
     "today": "Today",
     "week": "Week",
     "month": "Month",
-    "quarter": "Quarter"
+    "quarter": "Quarter",
+    "TrafficSumary":"Real Time Traffic Summary",
+    "start": "Start Address",
+    "end":"End Address",
+    "currentSpped": "Average speed",
+    "congestion": "congestions",
+    "itineraryPoint": "Itinerary Point",
+    "unavailable":"No itinerary available."
+
   },
   "createUser": {
     "title": "Add a user",

@@ -351,7 +351,14 @@
     "today": "Aujourd'hui",
     "week": "Semaine",
     "month": "Mois",
-    "quarter": "Trimestre"
+    "quarter": "Trimestre",
+    "TrafficSumary": "Resumé du traffic en temps réel",
+    "start": "Départ",
+    "end":"Arrivée",
+    "currentSpped": "Vitesse Moyenne",
+    "congestion": "congestions",
+    "itineraryPoint": "Point d'itineraires",
+    "unavailable":"Aucun itinéraire disponible."
   },
   "createUser": {
     "title": "Ajouter un utilisateur",

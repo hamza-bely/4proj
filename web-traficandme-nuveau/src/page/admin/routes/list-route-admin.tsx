@@ -137,7 +137,7 @@ export default function ListRouteAdmin() {
                                 {t("route-admin.address_end", "Arrivée")}
                             </th>
                             <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                                Etat
+                                {t("route-admin.itineraryStatus", "Etat")}
                             </th>
                             <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
                                 {t("route-admin.createDate", "Date de création")}
