@@ -249,7 +249,7 @@
     }
   },
   "traffic": {
-    "title": "Real-time traffic",
+    "title": "Trafic en temps réel",
     "fast": "Fast",
     "slow": "Slow"
   },

@@ -257,7 +257,7 @@
   },
 
   "traffic": {
-    "title": "Trafic en temps réel",
+    "title": "Real-time traffic",
     "fast": "Rapide",
     "slow": "Lent"
   },
