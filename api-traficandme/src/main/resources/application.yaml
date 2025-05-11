@@ -14,8 +14,8 @@ spring:
         format_sql: true
   datasource:
     url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/postgres}
-    username: ${SPRING_DATASOURCE_USERNAME:postgres}
-    password: ${SPRING_DATASOURCE_PASSWORD:postgres}
+    username: ${SPRING_DATASOURCE_USERNAME:username}
+    password: ${SPRING_DATASOURCE_PASSWORD:password}
     driver-class-name: org.postgresql.Driver
   h2:
     console:
@@ -33,11 +33,11 @@ spring:
 logging.level.org.springframework.security: TRACE
 
 jwt:
-  secret: ${JWT_SECRET:4b0e1a3f53a7e8b7eac8c5a2a0cde3e0b2f1d8a5e6c5a7b2f1e8b1c2d3f4e5a6}
+  secret: ${JWT_SECRET:secret}
 
 cors:
   allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:8081,http://158.180.239.85:5181}
   
 tomtom:
-    api: ${TOMTOM_API_KEY:QBsKzG3zoRyZeec28eUDje0U8DeNoRSO}
+    api: ${TOMTOM_API_KEY:tomtom_api_key}
 
