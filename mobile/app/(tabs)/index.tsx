@@ -567,9 +567,10 @@ export default function MapScreen() {
   return (
     <View style={styles.container}>
       <MapView
+        ref={mapRef}
         provider={PROVIDER_GOOGLE}
         style={styles.map}
-        showsTraffic={true} // Active la couche de trafic Google
+        showsTraffic={true}
         initialRegion={{
           latitude: locationState.location?.coords.latitude || 48.8566,
           longitude: locationState.location?.coords.longitude || 2.3522,
@@ -725,6 +726,7 @@ export default function MapScreen() {
         </View>
       )}
 
+      {/*Geolocalitation */}
       <TouchableOpacity
         onPress={zoomToCurrentLocation}
         style={styles.locationButton}
