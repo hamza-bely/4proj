@@ -510,6 +510,7 @@ export default function MapScreen() {
           setRouteCoordinates(coordinates);
           setRouteInstructions(instructions);
           setRouteSummary(route.summary);
+          zoomToStart(coordinates[0])
           Alert.alert('Succès', 'Trajet mis à jour avec succès');
         }
       }
@@ -644,7 +645,7 @@ export default function MapScreen() {
                     width: 25,
                     height: 25,
                     borderRadius: 25,
-                    backgroundColor: '#3498db',
+                    backgroundColor: '#50e714',
                   }}
                 />
               </View>
