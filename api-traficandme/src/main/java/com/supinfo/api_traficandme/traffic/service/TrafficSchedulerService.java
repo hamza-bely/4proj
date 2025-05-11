@@ -6,6 +6,7 @@ import com.supinfo.api_traficandme.traffic.entity.TrafficHistory;
 import com.supinfo.api_traficandme.traffic.repository.ItineraryRepository;
 import com.supinfo.api_traficandme.traffic.repository.RealTimeTrafficRepository;
 import com.supinfo.api_traficandme.traffic.repository.TrafficHistoryRepository;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -24,8 +25,13 @@ public class TrafficSchedulerService {
     private final TrafficHistoryRepository historyRepository;
     private final ItineraryRepository itineraryRepository;
 
-    @Value("${tomtom.api.key}")
+    @Value("${tomtom.api}")
     private String tomtomApiKey;
+
+    @PostConstruct
+    public void checkApiKey() {
+        System.out.println("TomTom API Key: " + tomtomApiKey);  // Log de la clé pour debug
+    }
 
     public TrafficSchedulerService(RealTimeTrafficRepository trafficRepository, TrafficHistoryRepository historyRepository, ItineraryRepository itineraryRepository) {
         this.trafficRepository = trafficRepository;
@@ -58,7 +64,7 @@ public class TrafficSchedulerService {
      * Fetches traffic data for all itineraries and stores it in the RealTimeTraffic repository.
      * This method is scheduled to run every 10 minutes.
      */
-    @Scheduled(fixedRate = 600000)
+    @Scheduled(fixedRate = 21600000)
     public void fetchTrafficDataFixedRate() {
         List<Itinerary> itineraries = itineraryRepository.findAll();
         List<RealTimeTraffic> oldTrafficData = trafficRepository.findAll();
