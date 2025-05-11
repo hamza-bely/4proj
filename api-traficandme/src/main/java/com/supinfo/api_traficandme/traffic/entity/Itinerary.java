@@ -9,6 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "itinerary")
@@ -45,6 +46,10 @@ public class Itinerary {
 
     @Transient
     private String ItineraryStatus;
+
+    @OneToMany(mappedBy = "itinerary", cascade = CascadeType.REMOVE)
+    private List<RealTimeTraffic> realTimeTrafficList;
+
 
     public int getId() {
         return id;

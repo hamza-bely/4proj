@@ -24,8 +24,6 @@ public class TrafficHistory {
     private double freeFlowSpeed;
     private boolean congested;
     private String source;
-    @ManyToOne
-    @JoinColumn(name = "itinerary_id")
-    private Itinerary itinerary;
+    private int itinerary_id;
     private Date timestamp;
 }

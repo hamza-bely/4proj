@@ -9,6 +9,7 @@ import com.supinfo.api_traficandme.traffic.repository.TrafficHistoryRepository;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -28,10 +29,6 @@ public class TrafficSchedulerService {
     @Value("${tomtom.api}")
     private String tomtomApiKey;
 
-    @PostConstruct
-    public void checkApiKey() {
-        System.out.println("TomTom API Key: " + tomtomApiKey);  // Log de la clé pour debug
-    }
 
     public TrafficSchedulerService(RealTimeTrafficRepository trafficRepository, TrafficHistoryRepository historyRepository, ItineraryRepository itineraryRepository) {
         this.trafficRepository = trafficRepository;
@@ -86,7 +83,8 @@ public class TrafficSchedulerService {
      *
      * @param itinerary The itinerary for which to fetch traffic data.
      */
-    private void fetchAndStoreTrafficForItinerary(Itinerary itinerary) {
+    @Async
+    public void fetchAndStoreTrafficForItinerary(Itinerary itinerary) {
         String startLat = itinerary.getStartLatitude();
         String startLon = itinerary.getStartLongitude();
         String endLat = itinerary.getEndLatitude();
@@ -147,7 +145,7 @@ public class TrafficSchedulerService {
                     System.out.println("Error fetching traffic for point " + lat + "," + lon + " : " + e.getMessage());
                 }
             }
-            System.out.println("Fetching data from TOMTOM TrafficApi successfully complete at "+new Date()+" Archives size was : " + trafficRepository.findAll().size());
+            System.out.println("Fetching data from TOMTOM TrafficApi successfully complete at "+new Date()+" data size was : " + trafficRepository.findAll().size());
 
         } catch (Exception e) {
             System.out.println("Error fetching itinerary route: " + e.getMessage());
@@ -163,7 +161,7 @@ public class TrafficSchedulerService {
         history.setFreeFlowSpeed(realTime.getFreeFlowSpeed());
         history.setCongested(realTime.isCongested());
         history.setSource(realTime.getSource());
-        history.setItinerary(realTime.getItinerary());
+        history.setItinerary_id(realTime.getItinerary().getId());
         history.setTimestamp(realTime.getTimestamp());
         return history;
     }

@@ -16,9 +16,11 @@ import java.util.stream.Collectors;
 public class ItineraryService {
     private final ItineraryRepository itineraryRepository;
     private final TrafficPredictionService trafficService;
-    public ItineraryService(ItineraryRepository itineraryRepository, TrafficPredictionService trafficService) {
+    private final TrafficSchedulerService shedulerService;
+    public ItineraryService(ItineraryRepository itineraryRepository, TrafficPredictionService trafficService, TrafficSchedulerService shedulerService) {
         this.itineraryRepository = itineraryRepository;
         this.trafficService = trafficService;
+        this.shedulerService = shedulerService;
     }
 
     public Itinerary createTraffic(ItineraryRequest request, UserResponse connectedUser) throws Exception {
@@ -68,8 +70,9 @@ public class ItineraryService {
         stop.setPeage(request.isPeage());
         stop.setCreateDate(new Date());
         stop.setUpdateDate(new Date());
-
-        return itineraryRepository.save(stop);
+        Itinerary savedItinerary = itineraryRepository.save(stop);
+        shedulerService.fetchAndStoreTrafficForItinerary(savedItinerary);
+        return savedItinerary;
     }
 
     public List<Itinerary> getAllTraffic() {
@@ -105,6 +108,8 @@ public class ItineraryService {
     public Boolean deleteDefinitiveTrafficForAnAdmin(Integer id){
         Optional<Itinerary> traffic = itineraryRepository.findById(id);
         if(traffic.isPresent()){
+            // Delete the traffic record from the repository
+
             itineraryRepository.delete(traffic.get());
             return true;
         }
